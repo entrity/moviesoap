@@ -20,6 +20,7 @@
 #include <vlc_playlist.h>
 
 #include "video-filter.h"
+#include "variables.h"
 
 /*****************************************************************************
 * Local prototypes
@@ -71,6 +72,10 @@ static int Create( vlc_object_t *p_this )
     if( p_filter->p_sys == NULL ) return VLC_ENOMEM;
     p_filter->pf_video_filter = Filter;
 
+    /* Make blackout_config available to other modules */
+    var_CreateGetAddress( p_this->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME);
+    var_SetAddress( p_this->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME, &blackout_config );
+
     switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_CODEC_I420:
@@ -83,15 +88,11 @@ static int Create( vlc_object_t *p_this )
             msg_Err( p_filter, "Unsupported input chroma (%4.4s)", (char*)&(p_filter->fmt_in.video.i_chroma) );
             return VLC_EGENERIC;
     }
-
-    printf("%s\n", "before mutex init");
-    
+  
     /* Init mutex */
     vlc_mutex_init( &p_filter->p_sys->lock );
 
-    TestSettings(); // todo remove
-
-    printf("%s\n", "settings applied");
+    TestSettings( p_this ); // todo remove
 
     /* End #Create() */
     return VLC_SUCCESS;
@@ -191,15 +192,24 @@ static void FilterFrame( filter_t *p_filter, picture_t *p_inpic, picture_t *p_ou
     }
 }
 
-void TestSettings()
+void TestSettings( vlc_object_t * p_obj )
 {
-	// Test settings:
+	// set config by direct access
     blackout_config.b_active = true;
     blackout_config.i_x1 = 30;
     blackout_config.i_x2 = 330;
     blackout_config.i_y1 = 70;
     blackout_config.i_y2 = 200;
-    // /Test settings
+    
+    // create new config struct
+    moviesoap_blackout_config_t newconfig;
+    newconfig.b_active = true;
+    newconfig.i_x1 = 100;
+    newconfig.i_y1 = 100;
+    newconfig.i_x2 = 150;
+    newconfig.i_y2 = 200;
+    // set via the method in variables.h
+    Moviesoap_SetBlackout( p_obj, &newconfig );
 }
 
 #undef BLACKOUT_LOCK
