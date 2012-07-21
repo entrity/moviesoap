@@ -3,3 +3,4 @@ Makefile*
 .libs
 *.la
 *.lo
+extra
