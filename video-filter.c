@@ -75,6 +75,8 @@ static int Create( vlc_object_t *p_this )
     /* Make blackout_config available to other modules */
     var_CreateGetAddress( p_this->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME);
     var_SetAddress( p_this->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME, &blackout_config );
+    /* Apply test settings for blackout config */ 
+    TestSettings( p_this ); // todo remove
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
@@ -91,8 +93,6 @@ static int Create( vlc_object_t *p_this )
   
     /* Init mutex */
     vlc_mutex_init( &p_filter->p_sys->lock );
-
-    TestSettings( p_this ); // todo remove
 
     /* End #Create() */
     return VLC_SUCCESS;

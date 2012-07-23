@@ -1,0 +1,24 @@
+# Add the following line to the BOTTOM of modules/gui/qt4/Modules.am:
+# include $(srcdir)/../../moviesoap/qt4/Modules-patch.am
+
+# Moviesoap file lists
+
+MOVIESOAP_GUI_MOCS = \
+	../../moviesoap/qt4/main.moc.cpp
+
+MOVIESOAP_GUI_CPPS = \
+	../../moviesoap/qt4/main.cpp
+
+MOVIESOAP_GUI_HPPS = \
+	../../moviesoap/qt4/main.hpp
+
+
+# Add Moviesoap files to Modules.am vars
+
+nodist_SOURCES_qt4 += 	$(MOVIESOAP_GUI_MOCS)
+
+BUILT_SOURCES += 		$(MOVIESOAP_GUI_MOCS)
+
+SOURCES_qt4 += 			$(MOVIESOAP_GUI_CPPS)
+	
+noinst_HEADERS += 		$(MOVIESOAP_GUI_HPPS)

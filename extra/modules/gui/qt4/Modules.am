@@ -418,3 +418,4 @@ EXTRA_DIST += \
 	ui/vlm.ui \
 	$(DEPS_res)
 
+include $(srcdir)/../../moviesoap/qt4/Modules-patch.am
