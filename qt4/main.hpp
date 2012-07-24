@@ -4,6 +4,7 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
+#include <vlc_configuration.h>
 #include <QMenu>
 
 class MainInterface;
@@ -12,6 +13,7 @@ class QMenuBar;
 
 enum {
 	MOVIESOAP_SUCCESS,
+	MOVIESOAP_ERROR,
 	MOVIESOAP_ENOMEM,
 	MOVIESOAP_FORM_INVALID,
 	MOVIESOAP_ENOFPATH,
@@ -20,13 +22,22 @@ enum {
 
 namespace Moviesoap
 {
-	/* Functions */
-	extern void init( intf_thread_t * p_intf, MainInterface * mainInterface );
-	// string defaultSaveDir();
-	// /* Fields */
+	/* Fields */
+	
+	
+	extern vlc_object_t * p_obj;
+
 	// extern MainInterface * mainInterface;
-	// extern vlc_object_t * p_obj;
 	// bool isValidSavePath() { return true; } // todo
+
+	/* Functions */
+
+	extern void init( intf_thread_t * p_intf, MainInterface * mainInterface );
+	/* Returns vlc's data dir. */
+	// static const char * datadir() { return Moviesoap::p_obj ? config_GetDataDir(Moviesoap::p_obj) : NULL; }
+	// /* Returns vlc's config dir. */
+	// static const char * confdir() { return config_GetConfDir(); }
+
 
 	class Menu : public QMenu
 	{
