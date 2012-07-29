@@ -1,15 +1,6 @@
 # Add the following line to the BOTTOM of modules/gui/qt4/Modules.am:
 # include $(srcdir)/../../moviesoap/qt4/Modules-patch.am
 
-### Include minizip & zlib ###
-
-SUBDIRS = ../../moviesoap/minizip
-
-LDADD = \
-	../../moviesoap/minizip/zip.o \
-	../../moviesoap/minizip/unzip.o \
-	../../moviesoap/minizip/ioapi.o
-
 ### Moviesoap file lists ###
 
 MOVIESOAP_GUI_MOCS = \
@@ -18,11 +9,21 @@ MOVIESOAP_GUI_MOCS = \
 MOVIESOAP_GUI_CPPS = \
 	../../moviesoap/qt4/main.cpp \
 	../../moviesoap/filter.cpp
+	
 
 MOVIESOAP_GUI_HPPS = \
 	../../moviesoap/qt4/main.hpp \
 	../../moviesoap/variables.h \
 	../../moviesoap/filter.hpp
+
+### Include my tar stuff ###
+
+MOVIESOAP_GUI_HPPS += \
+	../../moviesoap/tar/packed.h \
+	../../moviesoap/tar/ustar.h
+
+MOVIESOAP_GUI_CPPS += \
+	../../moviesoap/tar/ustar.cpp
 
 ### Add Moviesoap files to Modules.am vars ###
 
