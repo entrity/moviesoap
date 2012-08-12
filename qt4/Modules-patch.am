@@ -19,6 +19,10 @@ MOVIESOAP_GUI_HPPS = \
 ### Include my tar stuff ###
 
 MOVIESOAP_GUI_HPPS += \
+<<<<<<< HEAD
+=======
+	../../moviesoap/tar/packed.h \
+>>>>>>> 89a430f389d595358d1859b4f1dd357820c7c998
 	../../moviesoap/tar/ustar.h
 
 MOVIESOAP_GUI_CPPS += \
