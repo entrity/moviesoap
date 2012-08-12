@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #ifndef ENTRITY_USTAR_H
 #define ENTRITY_USTAR_H
 
@@ -13,20 +12,23 @@ using namespace std;
 
 namespace Entrity
 {
-	namespace Ustar {
+	namespace Ustar
+	{
 		class File;
 		class Header;
 
 		enum {
-			USTAR_REGULAR,
-			USTAR_LINK,
-			USTAR_SYMLINK,
-			USTAR_CHAR_SPECIAL,
-			USTAR_BLOCK_SPECIAL,
-			USTAR_DIRECTORY,
-			USTAR_FIFO_SPECIAL
+		USTAR_REGULAR,
+		USTAR_LINK,
+		USTAR_SYMLINK,
+		USTAR_CHAR_SPECIAL,
+		USTAR_BLOCK_SPECIAL,
+		USTAR_DIRECTORY,
+		USTAR_FIFO_SPECIAL
 		};
-		class File {
+
+		class File
+		{
 		public:
 			/* fields */
 			unsigned long offset; // end of last header read
@@ -51,27 +53,27 @@ namespace Entrity
 		class Header
 		{	
 		public:	
-			char _name[100];             /* File name.  Null-terminated if room. */
-			char _mode[8];               /* Permissions as octal string. */
-			char _uid[8];                /* User ID as octal string. */
-			char _gid[8];                /* Group ID as octal string. */
+			char _name[100]; /* File name. Null-terminated if room. */
+			char _mode[8]; /* Permissions as octal string. */
+			char _uid[8]; /* User ID as octal string. */
+			char _gid[8]; /* Group ID as octal string. */
 
-			char _size[12];              /* File size in bytes as octal string. */
-			char _mtime[12];             /* Modification time in seconds from Jan 1, 1970, as octal string. */
-			char _chksum[8];             /* Sum of octets in header as octal string. */
-			
-			char _typeflag;              /* An enum ustar_type value. */
-			char _linkname[100];         /* Name of link target. Null-terminated if room. */
-			
-			char _magic[6];              /* "ustar\0" */
-			char _version[2];            /* "00" */
-			char _uname[32];             /* User name, always null-terminated. */
-			char _gname[32];             /* Group name, always null-terminated. */
-			char _devmajor[8];           /* Device major number as octal string. */
-			char _devminor[8];           /* Device minor number as octal string. */
-			char _prefix[155];           /* Prefix to file name. Null-terminated if room. */
-			char _padding[12];           /* Pad to 512 bytes. */
-		
+			char _size[12]; /* File size in bytes as octal string. */
+			char _mtime[12]; /* Modification time in seconds from Jan 1, 1970, as octal string. */
+			char _chksum[8]; /* Sum of octets in header as octal string. */
+
+			char _typeflag; /* An enum ustar_type value. */
+			char _linkname[100]; /* Name of link target. Null-terminated if room. */
+
+			char _magic[6]; /* "ustar\0" */
+			char _version[2]; /* "00" */
+			char _uname[32]; /* User name, always null-terminated. */
+			char _gname[32]; /* Group name, always null-terminated. */
+			char _devmajor[8]; /* Device major number as octal string. */
+			char _devminor[8]; /* Device minor number as octal string. */
+			char _prefix[155]; /* Prefix to file name. Null-terminated if room. */
+			char _padding[12]; /* Pad to 512 bytes. */
+
 			/* Constructor. Zeroes out all fields. */
 			Header();
 			/* Constructor. Initializes all fields, incl checksum */
@@ -83,8 +85,8 @@ namespace Entrity
 			void name(string);
 			void mode(unsigned int);
 			void uid(unsigned int);
-			void gid(unsigned int);		
-			void size(unsigned int);  // Set length of file contents. Returns amount of padding you should include at end of content, before next header. */
+			void gid(unsigned int);	
+			void size(unsigned int); // Set length of file contents. Returns amount of padding you should include at end of content, before next header. */
 			void mtime(unsigned int);
 			void typeflag(char);
 			void linkname(string);
@@ -121,35 +123,3 @@ namespace Entrity
 }
 
 #endif
-=======
-#ifndef __LIB_USTAR_H
-//107240412289
-#define __LIB_USTAR_H
-
-/* Support for the standard Posix "ustar" format.  See the
-   documentation of the "pax" utility in [SUSv3] for the the
-   "ustar" format specification. */
-
-#include <stdbool.h>
-
-/* Type of a file entry in an archive.
-   The values here are the bytes that appear in the file format.
-   Only types of interest to Pintos are listed here. */
-enum ustar_type
-  {
-    USTAR_REGULAR = '0',        /* Ordinary file. */
-    USTAR_DIRECTORY = '5',      /* Directory. */
-    USTAR_EOF = -1              /* End of archive (not an official value). */
-  };
-
-/* Size of a ustar archive header, in bytes. */
-#define USTAR_HEADER_SIZE 512
-
-bool ustar_make_header (const char *file_name, enum ustar_type,
-                        int size, char header[USTAR_HEADER_SIZE]);
-const char *ustar_parse_header (const char header[USTAR_HEADER_SIZE],
-                                const char **file_name,
-                                enum ustar_type *, int *size);
-
-#endif /* lib/ustar.h */
->>>>>>> 89a430f389d595358d1859b4f1dd357820c7c998

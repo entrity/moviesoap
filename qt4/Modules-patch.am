@@ -9,7 +9,6 @@ MOVIESOAP_GUI_MOCS = \
 MOVIESOAP_GUI_CPPS = \
 	../../moviesoap/qt4/main.cpp \
 	../../moviesoap/filter.cpp
-	
 
 MOVIESOAP_GUI_HPPS = \
 	../../moviesoap/qt4/main.hpp \
@@ -19,10 +18,6 @@ MOVIESOAP_GUI_HPPS = \
 ### Include my tar stuff ###
 
 MOVIESOAP_GUI_HPPS += \
-<<<<<<< HEAD
-=======
-	../../moviesoap/tar/packed.h \
->>>>>>> 89a430f389d595358d1859b4f1dd357820c7c998
 	../../moviesoap/tar/ustar.h
 
 MOVIESOAP_GUI_CPPS += \
@@ -30,10 +25,10 @@ MOVIESOAP_GUI_CPPS += \
 
 ### Add Moviesoap files to Modules.am vars ###
 
-nodist_SOURCES_qt4 += 	$(MOVIESOAP_GUI_MOCS)
+nodist_SOURCES_qt4 += $(MOVIESOAP_GUI_MOCS)
 
-BUILT_SOURCES += 		$(MOVIESOAP_GUI_MOCS)
+BUILT_SOURCES += $(MOVIESOAP_GUI_MOCS)
 
-SOURCES_qt4 += 			$(MOVIESOAP_GUI_CPPS)
-	
-noinst_HEADERS += 		$(MOVIESOAP_GUI_HPPS)
+SOURCES_qt4 += $(MOVIESOAP_GUI_CPPS)
+
+noinst_HEADERS += $(MOVIESOAP_GUI_HPPS)
