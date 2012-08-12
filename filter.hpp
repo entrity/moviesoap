@@ -17,11 +17,12 @@ namespace Moviesoap {
 	class Filter
 	{
 		public:
-		string filepath,
-		creator,
-		title,
-		isbn,
-		year;
+		string
+			filepath,
+			creator,
+			title,
+			isbn,
+			year;
 		list<Mod> modList;
 		/* Writes filter to file */
 		int save();

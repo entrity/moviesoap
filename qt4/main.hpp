@@ -29,7 +29,7 @@ namespace Moviesoap
 	/* Fields */
 
 	extern vlc_object_t * p_obj;
-	extern Filter * loadedFilter;
+	// extern Filter * loadedFilter;
 	// extern MainInterface * mainInterface;
 	// bool isValidSavePath() { return true; } // todo
 
@@ -37,9 +37,9 @@ namespace Moviesoap
 
 	extern void init( intf_thread_t * p_intf, MainInterface * mainInterface );
 	/* Returns vlc's data dir. */
-	static const char * datadir() { return Moviesoap::p_obj ? config_GetDataDir(Moviesoap::p_obj) : NULL; }
+	// static const char * datadir() { return Moviesoap::p_obj ? config_GetDataDir(Moviesoap::p_obj) : NULL; }
 	/* Returns vlc's config dir. */
-	static const char * confdir() { return config_GetConfDir(); }
+	// static const char * confdir() { return config_GetConfDir(); }
 
 
 	class Menu : public QMenu

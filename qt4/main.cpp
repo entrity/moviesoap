@@ -4,6 +4,7 @@
 #include <vlc_interface.h>
 #include <QMenu>
 #include <QMenuBar>
+// #include <QFileDialog>
 
 #include <cstdio>
 
@@ -25,24 +26,45 @@ namespace Moviesoap
 	}
 }
 
-
 namespace Moviesoap
 {
+	/* Constructor */
 	Menu::Menu( QWidget * parent ) : QMenu(parent)
 	{
+		// create actions
 		QAction * actionLoad = new QAction("&Load filter...", this);
-		addAction(actionLoad);
 		QAction * actionNew = new QAction("&New filter...", this);
-		addAction(actionNew);
 		QAction * actionEdit = new QAction("&Edit filter...", this);
-		addAction(actionEdit);
-		// connect(actionEdit, edit(), );
+		// add actions
+		// addAction(actionLoad);
+		// addSeparator();
+		// addAction(actionNew);
+		// addAction(actionEdit);
+		// connect actions
+		// connect( actionEdit, SIGNAL(triggered()), this, SLOT(editFilter()) );
 	}
 
-	Menu * Menu::create( QMenuBar * bar )
-	{
-		Menu * menu = new Menu(bar);
-		return menu;
-	}
+	/* Method called in gui/qt4/menus.cpp */
+	Menu * Menu::create( QMenuBar * bar ) { return new Menu(bar); }
+
+	/* Public slot fired by menubar action. Opens file dialogue. */
+	// void Menu::loadFilter()
+	// {
+	// 	const char * fstring;
+	// 	QString filename = QFileDialog::getOpenFileName(
+	// 		window(),
+	// 		tr("Choose a filter file"),
+	// 		datadir(),
+	// 		tr("Mediasoap filters (*.msf)")
+	// 	);
+	// 	fstring = filename.toStdString().c_str();
+	// 	printf( "fname as c: %s\n", fstring );
+	// 	// todo
+	// }
+
+	// void Menu::editFilter()
+	// {
+
+	// }
 
 }
