@@ -6,3 +6,4 @@ Makefile*
 extra
 *.o
 .dirstamp
+qt4/*.moc.cpp

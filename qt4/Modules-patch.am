@@ -4,14 +4,16 @@
 ### Moviesoap file lists ###
 
 MOVIESOAP_GUI_MOCS = \
-	../../moviesoap/qt4/main.moc.cpp
+	../../moviesoap/qt4/menu.moc.cpp
 
 MOVIESOAP_GUI_CPPS = \
 	../../moviesoap/qt4/main.cpp \
+	../../moviesoap/qt4/menu.cpp \
 	../../moviesoap/filter.cpp
 
 MOVIESOAP_GUI_HPPS = \
 	../../moviesoap/qt4/main.hpp \
+	../../moviesoap/qt4/menu.hpp \
 	../../moviesoap/variables.h \
 	../../moviesoap/filter.hpp
 

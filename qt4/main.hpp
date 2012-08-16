@@ -8,6 +8,7 @@
 #include <QMenu>
 
 #include "../filter.hpp"
+#include "../variables.h"
 
 class MainInterface;
 class QWidget;
@@ -22,9 +23,7 @@ enum {
 	MOVIESOAP_CANCEL
 };
 
-namespace Moviesoap
-{
-	class Filter;
+namespace Moviesoap {
 
 	/* Fields */
 
@@ -41,18 +40,14 @@ namespace Moviesoap
 	/* Returns vlc's config dir. */
 	// static const char * confdir() { return config_GetConfDir(); }
 
-
-	class Menu : public QMenu
-	{
-		Q_OBJECT
-	public:
-		Menu( QWidget * parent );
-		static Menu * create(QMenuBar * bar);
-	// public slots:
-	// 	void loadFilter();
-	// 	void editFilter();
-	// 	void newFilter();
-	};
+	extern struct config_t {
+		/* fields */
+		bool active;
+		uint8_t tolerances[MOVIESOAP_CAT_COUNT];
+		/* functions */
+		bool ignoreMod(Mod & mod); // Returns whether given Mod should not be activated
+	} config;
 }
+
 
 #endif

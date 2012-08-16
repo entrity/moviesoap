@@ -4,6 +4,10 @@
 
 #include "tar/ustar.h"
 
+#include <vlc_common.h>
+#include <vlc_threads.h>
+#include <vlc_variables.h>
+
 #include <string>
 #include <cstdio>
 #include <fstream>
@@ -12,9 +16,33 @@
 #include <list>
 using namespace std;
 
+#ifndef INT64_C
+# define INT64_C(c)  c ## LL
+#endif
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+/*
+ * mtime_t args should be in us (microseconds)
+ */
+static void scheduleTimer(vlc_timer_t timer, mtime_t now, mtime_t triggerTime)
+{
+	// calc delay
+	mtime_t delay = triggerTime;
+	delay -= now;
+	delay *= CLOCK_FREQ / 1000000; // multiply microseconds by clock cycles per microsecond to get delay in terms of clock cycles
+	// schedule timer
+	printf("delay %d\n", delay);
+	vlc_timer_schedule( timer, false, delay, 0 );
+}
+
 
 namespace Moviesoap
 {
+
+	// FILE IO
 
 	int Filter::metaOut(ofstream & outs)
 	{
@@ -66,6 +94,64 @@ namespace Moviesoap
 		outs.close();
 		return MOVIESOAP_SUCCESS;
 	}
+
+	// ACTIVATING AND DEACTIVATING MODS
+
+	/* Set p_queuedMod to first mod, load same. */		
+	void Filter::Restart()
+	{
+
+	}
+
+	/* Destroy timers. Undo any active effects (mute & blackout) */
+	void Filter::Stop()
+	{
+
+	}
+
+	/* Load queuedMod */
+	void Filter::loadNextMod()
+	{
+
+	}
+
+	/* Schedule start of mod or activate mod */
+	void Filter::loadMod(Mod & mod)
+	{
+		// get current time
+		mtime_t now = var_GetTime( Moviesoap::p_obj, "time" ); // 'now' in microseconds (us)
+		// add to scheduledMods
+		scheduledMods.push_back(mod);
+		// schedule start (if start not passed)
+		mtime_t start_us = mod.mod.start * 1000;
+		if (now > start_us) {
+			vlc_timer_create( &mod.timer, Filter::activateMod, &mod );
+			scheduleTimer( mod.timer, now, start_us );
+		}
+		// activate (if start passed)
+		else
+			Filter::activateMod( &mod );
+		
+		printf("mod scheduled\n");
+	}
+
+	/* Implement mod effect, schedule stop, destroy start timer */
+	void Filter::activateMod(void * p_data)
+	{
+		Mod * p_mod = (Mod *) p_data;
+		printf("activate mod +++\n");
+		// schedule stop
+		if (p_mod->mod.mode == MOVIESOAP_SKIP) return;
+		vlc_timer_create( &p_mod->timer, deactivateMod, p_mod );
+	}
+
+	/* Destroy stop timer. End effect. */
+	void Filter::deactivateMod(void * p_data)
+	{
+		Mod * p_mod = (Mod *) p_data;
+		// destroy timer
+		vlc_timer_destroy( p_mod->timer );
+	}
 	
 	/* Create a filter with a few test mods for testing */
 	Filter * Filter::dummy()
@@ -104,5 +190,20 @@ namespace Moviesoap {
 		mod.x2 = x2;
 		mod.y1 = y1;
 		mod.y2 = y2;
+	}
+
+	bool Mod::compare(Mod & otherMod)
+	{
+		return mod.start < otherMod.mod.start;
+	}
+
+	void Mod::activate()
+	{
+		printf("ACTIVATE MOD\n");
+	}
+	
+	void Mod::deactivate()
+	{
+		printf("DEACTIVATE MOD\n");
 	}
 }

@@ -2,9 +2,6 @@
 #include "../filter.hpp"
 #include <vlc_common.h>
 #include <vlc_interface.h>
-#include <QMenu>
-#include <QMenuBar>
-// #include <QFileDialog>
 
 #include <cstdio>
 
@@ -12,59 +9,42 @@ namespace Moviesoap
 {
 	vlc_object_t * p_obj = NULL;
 	Filter * loadedFilter = NULL;
+	struct config_t config;
 
-	void init( intf_thread_t * p_intf, MainInterface * mainInterface )
+	void test()
 	{
 		// save vlc object
-		p_obj = VLC_OBJECT(p_intf);
 		printf("---- ---- IN MOVIEOSAP INIT\n");
 		printf("---- %x\n", (unsigned int) p_obj);
 
 		// test dummy filter
 		Filter * p_filter = Moviesoap::Filter::dummy();
-		p_filter->save();
-	}
-}
+		// p_filter->save();
 
-namespace Moviesoap
-{
-	/* Constructor */
-	Menu::Menu( QWidget * parent ) : QMenu(parent)
+		// test config struct
+		config.active = true;
+		config.tolerances[0] = 168;
+		printf("---- config.tolerances[0]: %d\n", config.tolerances[0]);
+		// printf("foo & bar: %d %d\n", config.foo(), config.bar());
+
+		// Mod * p_mod = &p_filter->modList.front();
+		// p_filter->loadMod(*p_mod);
+	}
+
+	// int config_t::bar() {  return 678; }
+
+	void init( intf_thread_t * p_intf, MainInterface * mainInterface )
 	{
-		// create actions
-		QAction * actionLoad = new QAction("&Load filter...", this);
-		QAction * actionNew = new QAction("&New filter...", this);
-		QAction * actionEdit = new QAction("&Edit filter...", this);
-		// add actions
-		// addAction(actionLoad);
-		// addSeparator();
-		// addAction(actionNew);
-		// addAction(actionEdit);
-		// connect actions
-		// connect( actionEdit, SIGNAL(triggered()), this, SLOT(editFilter()) );
+		// set vars
+		p_obj = VLC_OBJECT(p_intf);
+		// test
+		test();
+		// build config
 	}
 
-	/* Method called in gui/qt4/menus.cpp */
-	Menu * Menu::create( QMenuBar * bar ) { return new Menu(bar); }
-
-	/* Public slot fired by menubar action. Opens file dialogue. */
-	// void Menu::loadFilter()
-	// {
-	// 	const char * fstring;
-	// 	QString filename = QFileDialog::getOpenFileName(
-	// 		window(),
-	// 		tr("Choose a filter file"),
-	// 		datadir(),
-	// 		tr("Mediasoap filters (*.msf)")
-	// 	);
-	// 	fstring = filename.toStdString().c_str();
-	// 	printf( "fname as c: %s\n", fstring );
-	// 	// todo
-	// }
-
-	// void Menu::editFilter()
-	// {
-
-	// }
-
+	bool config_t::ignoreMod(Mod & mod) {
+		uint8_t tolerance = tolerances[mod.mod.category];
+		return tolerance > mod.mod.severity;
+	}
 }
+
