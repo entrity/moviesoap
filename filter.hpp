@@ -1,5 +1,6 @@
 #ifndef MOVIESOAP_FILTER_HPP
 #define MOVIESOAP_FILTER_HPP
+#define MOVIESOAP_MOD_TIME_FACTOR 10000
 
 #include <QWidget>
 
@@ -15,6 +16,11 @@ namespace Moviesoap {
 	class Filter;
 	class Mod;
 
+	/* Implement mod effect, schedule stop, destroy start timer */
+	void activateMod(void * p_data);
+	/* Destroy stop timer. End effect. */
+	void deactivateMod(void * p_data);
+
 	class Filter
 	{
 		public:
@@ -25,12 +31,16 @@ namespace Moviesoap {
 			title,
 			isbn,
 			year;
-		list<Mod> modList;
-		list<Mod> scheduledMods;
-		Mod * p_queuedMod;
+		list<Mod> modList; // all mods for this filter
+		list<Mod*> scheduledMods; // this list lets programme know which timers to destroy when filter is stopped
+		list<Mod>::iterator queuedMod; // iterator on modList
+
+		// TESTING, DIAGNOSTIC
 
 		/* Returns a dummy Filter for testing. */
 		static Filter * dummy();
+		/* Output filter data to stdout */
+		void toStdout();
 
 		/* Sets this filter as active filter for player */
 		void set();
@@ -59,20 +69,17 @@ namespace Moviesoap {
 		/* Load queuedMod */
 		void loadNextMod();
 		/* Schedule start of mod or activate mod */
-		void loadMod(Mod &);
-		/* Implement mod effect, schedule stop, destroy start timer */
-		static void activateMod(void * p_data);
-		/* Destroy stop timer. End effect. */
-		static void deactivateMod(void * p_data);
+		void loadMod(Mod *, mtime_t);
 	};
 
 	class Mod
 	{
 	public:
 		// FIELDS
-		moviesoap_mod_t mod;
+		moviesoap_mod_t mod; // struct holding data for implementation of mod
 		string description; // used for meta file
-		vlc_timer_t timer;
+		vlc_timer_t timer; // holds data for activation or deactivation of mod
+		Filter * p_filter; // holds list of Mods with active timers (may include this Mod); used for Moviesoap::deactivateMod
 		
 		/* Constructor */
 		Mod(uint8_t mode,
@@ -82,9 +89,12 @@ namespace Moviesoap {
 		
 		/* Used for sorting. */
 		bool compare(Mod& otherMod);
+		/* Used for removing a Mod from a list. Returns true if their address' are the same (i.e. they are actually the same object) */
+		bool operator==(const Mod & other) const;
 
 		void activate();
 		void deactivate();
+		void out(ostream & stream);
 	};
 }
 
