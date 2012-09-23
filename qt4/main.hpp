@@ -28,7 +28,15 @@ namespace Moviesoap {
 	/* Fields */
 
 	extern vlc_object_t * p_obj;
-	// extern Filter * loadedFilter;
+	extern input_thread_t * p_input;
+	extern Filter * loadedFilter;
+	extern struct config_t {
+		/* fields */
+		bool active;
+		uint8_t tolerances[MOVIESOAP_CAT_COUNT];
+		/* functions */
+		bool ignoreMod(Mod & mod); // Returns whether given Mod should not be activated
+	} config;
 	// extern MainInterface * mainInterface;
 	// bool isValidSavePath() { return true; } // todo
 
@@ -39,14 +47,6 @@ namespace Moviesoap {
 	// static const char * datadir() { return Moviesoap::p_obj ? config_GetDataDir(Moviesoap::p_obj) : NULL; }
 	/* Returns vlc's config dir. */
 	// static const char * confdir() { return config_GetConfDir(); }
-
-	extern struct config_t {
-		/* fields */
-		bool active;
-		uint8_t tolerances[MOVIESOAP_CAT_COUNT];
-		/* functions */
-		bool ignoreMod(Mod & mod); // Returns whether given Mod should not be activated
-	} config;
 }
 
 
