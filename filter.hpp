@@ -62,12 +62,16 @@ namespace Moviesoap {
 		
 		// PLAYING FUNCTIONS
 	
-		/* Set p_queuedMod to first mod, load same. */		
+		/* Set p_queuedMod to first mod, load same. */
 		void Restart();
+		/* Set p_queuedMod to first mod, load same. */
+		void Restart(mtime_t);
 		/* Destroy timers. Undo any active effects (mute & blackout) */
 		void Stop();
-		/* Load queuedMod */
+		/* Load queuedMod. */
 		void loadNextMod();
+		/* Load queuedMod. */
+		void loadNextMod(mtime_t);
 		/* Schedule start of mod or activate mod */
 		void loadMod(Mod *, mtime_t);
 	};

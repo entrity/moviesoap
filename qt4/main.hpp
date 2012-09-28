@@ -5,6 +5,8 @@
 #include <vlc_common.h>
 #include <vlc_interface.h>
 #include <vlc_configuration.h>
+#include <vlc_aout.h>			// audio_volume_t
+#include <vlc_playlist.h>		// playlist_t
 #include <QMenu>
 
 #include "../filter.hpp"
@@ -28,8 +30,10 @@ namespace Moviesoap {
 	/* Fields */
 
 	extern vlc_object_t * p_obj;
+	extern playlist_t * p_playlist;
 	extern input_thread_t * p_input;
 	extern Filter * loadedFilter;
+	extern audio_volume_t volume;
 	extern struct config_t {
 		/* fields */
 		bool active;

@@ -1,14 +1,18 @@
-- user tolerances
-- new/edit filter
-- load filter (from file)
+EFFECTS
 - skip
 - mute
 - blackout
+
+UI &c
+- user tolerances
+- new/edit filter
+- load filter (from file)
 - filter save choose filename
 - attach listeners to forward/backward actions 
 - do I need to remove callbacks in main.cpp? (after playlist, input changes)?
 - activate mod only if severity exceeds tolerance
 - add 'stop' to qt4 interface close
+- destroy timers on 'stop'
 
 DONE
 - test create and destroy timers

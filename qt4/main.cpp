@@ -2,7 +2,6 @@
 #include "../filter.hpp"
 #include <vlc_common.h>
 #include <vlc_interface.h>
-#include <vlc_playlist.h>
 
 #include <cstdio>
 
@@ -15,25 +14,14 @@
 namespace Moviesoap
 {
 	vlc_object_t * p_obj;
+	playlist_t * p_playlist;
 	input_thread_t * p_input;
 	Filter * p_loadedFilter;
+	audio_volume_t volume;
 	struct config_t config;
 	static int PlaylistChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
 	static int InputChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
-
-// static void tempCallback(void * p_data) {}
-
-// static void scheduleTimer(vlc_timer_t timer, mtime_t now, mtime_t triggerTime)
-// {
-// 	// calc delay
-// 	mtime_t delay = triggerTime;
-// 	delay -= now;
-// 	delay *= CLOCK_FREQ / 1000000; // multiply microseconds by clock cycles per microsecond to get delay in terms of clock cycles
-// 	// schedule timer
-// 	printf("delay %d\n", delay);
-// 	vlc_timer_schedule( timer, false, delay, 0 );
-// }
-
+	static int PositionChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
 	void test()
 	{
@@ -85,7 +73,7 @@ namespace Moviesoap
 	static int PlaylistChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data )
 	{
 		intf_thread_t * p_intf = ( intf_thread_t *) p_data;
-		playlist_t * p_playlist = pl_Get( p_intf );
+		p_playlist = pl_Get( p_intf );
 		if (p_playlist)
 		{
 			p_input = playlist_CurrentInput( p_playlist );
@@ -93,7 +81,7 @@ namespace Moviesoap
 				// add callbacks for input change (see vlc_input.h "Input events and variables")
 				var_AddCallback( p_input, "state", InputChangeCallback, p_data );
 				var_AddCallback( p_input, "navigation", InputChangeCallback, p_data );
-				var_AddCallback( p_input, "position", InputChangeCallback, p_data );
+				var_AddCallback( p_input, "position", PositionChangeCallback, p_data );
 				// start filter object if one exists
 				if (p_loadedFilter) p_loadedFilter->Restart();
 			} else
@@ -109,6 +97,14 @@ namespace Moviesoap
 		msg_Info( p_this, "!!! input change !!! : %s", psz_var );
 		// restart filter object if extant
 		if (p_loadedFilter) p_loadedFilter->Restart();
+		return 0;
+	}
+
+	static int PositionChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data )
+	{
+		msg_Info( p_this, "!!! input change !!! : %s", psz_var );
+		mtime_t new_time = newval.f_float * var_GetTime( p_input, "length" );
+		if (p_loadedFilter) p_loadedFilter->Restart( new_time );
 		return 0;
 	}
 
