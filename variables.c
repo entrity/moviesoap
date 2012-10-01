@@ -36,7 +36,9 @@ void Moviesoap_FreeFilter( vlc_object_t * p_obj )
  */
 void Moviesoap_SetBlackout( vlc_object_t * p_obj, moviesoap_blackout_config_t * p_new_blackout_config )
 {
-	moviesoap_blackout_config_t * p_actual_config =
-		(moviesoap_blackout_config_t *) var_GetAddress(p_obj->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME);
-	*p_actual_config = *p_new_blackout_config;
+	moviesoap_blackout_config_t * p_actual_config;
+	// Get pointer to blackout config on moviesoap/video-filter module
+	p_actual_config = (moviesoap_blackout_config_t *) var_GetAddress(p_obj->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME);
+	// copy fields from new config to actual config
+	if (p_actual_config) *p_actual_config = *p_new_blackout_config;
 }

@@ -1,6 +1,5 @@
 #include "qt4/main.hpp"
 #include "variables.h"
-#include "filter.hpp"
 
 #include "tar/ustar.h"
 
@@ -35,7 +34,7 @@ using namespace std;
 /* Non-member functions */
 namespace Moviesoap
 {
-	/* Get current time in play */
+	/* Get current time in play (in us) */
 	static inline mtime_t getNow() { return var_GetTime( p_input, "time" ); }
 
 	/* mtime_t args should be in us (microseconds) */
@@ -56,7 +55,7 @@ namespace Moviesoap
 	/* 	Callback. Implement mod effect.
 		Schedule mod deactivation or unscheduleMod. 
 		Load next Mod. */
-	inline void activateMod(void * p_data)
+	void activateMod(void * p_data)
 	{
 		Mod * p_mod = (Mod *) p_data;
 		// Begin effect
@@ -72,7 +71,7 @@ namespace Moviesoap
 	}
 
 	/* Callback. Remove from list scheduledMods. End effect. */
-	inline void deactivateMod(void * p_data)
+	void deactivateMod(void * p_data)
 	{
 		Mod * p_mod = (Mod *) p_data;
 		// Remove from scheduledMods list
@@ -88,7 +87,12 @@ namespace Moviesoap
 			scheduleMod( p_mod, now, stop, deactivateMod ); }
 	}
 
-	inline void setMute( bool on_off ) { aout_SetMute( VLC_OBJECT(p_playlist), &volume, on_off ); }
+	inline void setMute( bool on_off ) { // todo: needs intf lock; otherwise, danger of race condition (which, unfortunately, leads to interface freeze)
+		cout << "is muted? " << aout_IsMuted(VLC_OBJECT(pl_Get(p_obj))) << endl;
+		// if ( aout_IsMuted( VLC_OBJECT(pl_Get(p_obj)) ) != on_off )
+			{ aout_SetMute( VLC_OBJECT(pl_Get(p_obj)), &volume, on_off ); }
+		cout << "is muted? " << aout_IsMuted(VLC_OBJECT(pl_Get(p_obj))) << endl;
+	}
 }
 
 /* Filter functions */
@@ -156,16 +160,19 @@ namespace Moviesoap
 
 	/* Set queuedMod to first mod. Call loadNextMod */
 	void Filter::Restart(mtime_t now) {
-		Stop();
 		queuedMod = modList.begin();
-		cout << "FILTER RESTART " << (*queuedMod).description << endl;
+		#ifdef MSDEBUG2
+			cout << "FILTER RESTART (first mod: " << (*queuedMod).description << ")" << endl;
+		#endif
 		loadNextMod( now );
 	}
 
 	/* Destroy active timers. Undo any active effects (mute & blackout). Empty scheduledMods list. */
 	void Filter::Stop()
 	{
-		cout << "FILTER STOP. " << scheduledMods.size() << " mods active." << endl;
+		#ifdef MSDEBUG2
+			cout << "FILTER STOP. " << scheduledMods.size() << " mods active." << endl;
+		#endif
 		list<Mod*>::iterator iter;
 		for ( iter = scheduledMods.begin(); iter != scheduledMods.end(); iter++ ) {
 			Mod * p_mod = *iter;
@@ -174,10 +181,18 @@ namespace Moviesoap
 			cout << "-- stop mod: " << p_mod->description << endl;
 			// End effect
 			p_mod->deactivate();
+			cout << "-- stop mod: deactivated" << endl;
 			// Destroy active timer
 			vlc_timer_destroy( p_mod->timer );
+			cout << "-- stop mod: timer destroyed" << endl;
 		}
+		#ifdef MSDEBUG2
+			cout << "FILTER STOP: timers destroyed. " << endl;
+		#endif
 		scheduledMods.clear();
+		#ifdef MSDEBUG2
+			cout << "FILTER STOP COMPLETE. " << endl;
+		#endif
 	}
 
 	/* Load queuedMod. Stop Filter if end reached. */
@@ -190,9 +205,13 @@ namespace Moviesoap
 		// cout << "loadNextMod called. queuedMod: " << queuedMod->description << endl;
 		// Find next mod whose stop time is not passed
 		for ( ; queuedMod != modList.end(); queuedMod++ ) {
-			cout << "MOD SEEK -- now: " << now / MOVIESOAP_MOD_TIME_FACTOR << " start: " << queuedMod->mod.start << " stop: " << queuedMod->mod.stop << " " << (*queuedMod).description << endl;
+			#ifdef MSDEBUG2
+				cout << "MOD SEEK -- now: " << now / MOVIESOAP_MOD_TIME_FACTOR << " start: " << queuedMod->mod.start << " stop: " << queuedMod->mod.stop << " " << (*queuedMod).description << endl;
+			#endif
 			if ( (queuedMod->mod.stop * MOVIESOAP_MOD_TIME_FACTOR) > now ) {
-				cout << setw(18) << "QUEUE MOD: " << "now(" << now / MOVIESOAP_MOD_TIME_FACTOR << ") ";
+				#ifdef MSDEBUG2
+					cout << setw(18) << "QUEUE MOD: " << "now(" << now / MOVIESOAP_MOD_TIME_FACTOR << ") ";
+				#endif
 				queuedMod->out(cout);
 				Mod * p_mod = &*queuedMod++;
 				loadMod( p_mod, now ); // Load mod if stop time is not passed
@@ -228,11 +247,11 @@ namespace Moviesoap
 		p_filter->isbn = "1234567890";
 		p_filter->year = "1987";
 		// add mod
-		p_mod = new Mod( MOVIESOAP_SKIP, 100, 800, 0, 0 );
+		p_mod = new Mod( MOVIESOAP_SKIP, 200, 800, 0, 0 );
 		p_mod->description = "skip talking";
 		p_filter->modList.push_back( *p_mod );
 		// add mod
-		p_mod = new Mod( MOVIESOAP_BLACKOUT, 300, 1000, 5, 6, 7, 8, 9, 2 );
+		p_mod = new Mod( MOVIESOAP_BLACKOUT, 300, 1300, 5, 6, 5, 30, 400, 60 );
 		p_mod->description = "blackout (cover) something";
 		p_filter->modList.push_back( *p_mod );
 		// add mod
@@ -269,6 +288,10 @@ namespace Moviesoap {
 		mod.y1 = y1;
 		mod.y2 = y2;
 	}
+	Mod::~Mod()
+	{
+		vlc_timer_destroy( timer );
+	}
 
 	bool Mod::compare(Mod & otherMod)
 	{
@@ -277,8 +300,9 @@ namespace Moviesoap {
 
 	void Mod::activate()
 	{
-		cout << setw(18) << "ACTIVATE MOD: " << "now(" << getNow() / MOVIESOAP_MOD_TIME_FACTOR << ") ";
-		out(cout);
+		#ifdef MSDEBUG2
+			cout << setw(18) << "ACTIVATE MOD: " << "now(" << getNow() / MOVIESOAP_MOD_TIME_FACTOR << ") " << description << endl;
+		#endif
 		switch(mod.mode) {
 			case MOVIESOAP_SKIP:
 				var_SetTime( Moviesoap::p_input, "time", MOVIESOAP_MOD_TIME_TO_US( mod.stop ) );
@@ -287,21 +311,28 @@ namespace Moviesoap {
 				setMute( true );
 				break;
 			case MOVIESOAP_BLACKOUT:
+				blackout_config.b_active = true;
+				blackout_config.i_x1 = mod.x1;
+				blackout_config.i_y1 = mod.y1;
+				blackout_config.i_x2 = mod.x2;
+				blackout_config.i_y2 = mod.y2;
 				break;
 		}
 	}
 	
 	void Mod::deactivate()
 	{
-		cout << setw(18) << "DEACTIVATE MOD: " << "now(" << getNow() / MOVIESOAP_MOD_TIME_FACTOR << ") ";
-		out(cout);
 		switch(mod.mode) {
 			case MOVIESOAP_MUTE:
 				setMute( false );
 				break;
 			case MOVIESOAP_BLACKOUT:
+				blackout_config.b_active = false;
 				break;
 		}
+		#ifdef MSDEBUG2
+			cout << setw(18) << "DEACTIVATE MOD: " << "now(" << getNow() / MOVIESOAP_MOD_TIME_FACTOR << ") " << description << endl;
+		#endif
 	}
 
 	void Mod::out(ostream & stream) { stream << "Mod: " << description << " (" << mod.start << "-" << mod.stop << ")" << endl; }

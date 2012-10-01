@@ -90,6 +90,8 @@ namespace Moviesoap {
 		uint32_t start, uint32_t stop,
 		uint8_t category=0, uint8_t severity=0,
 		uint16_t x1=0, uint16_t y1=0, uint16_t x2=100, uint16_t y2=100);
+		/* Destructor */
+		~Mod();
 		
 		/* Used for sorting. */
 		bool compare(Mod& otherMod);

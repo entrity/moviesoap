@@ -3,7 +3,18 @@
 #define MOVIESOAP_FILTER_VARNAME "moviesoap-filter"
 #define MOVIESOAP_BLACKOUT_VARNAME "moviesoap-blackout-config"
 
-#include "video-filter.h"
+#define MSDEBUG1
+#define MSDEBUG2
+#define MSDEBUG3
+
+/************************************************
+* blackout config
+************************************************/
+
+typedef struct {
+	bool b_active;
+	uint16_t i_x1, i_y1, i_x2, i_y2;
+} moviesoap_blackout_config_t;
 
 /************************************************
 * moviesoap_mod_t
@@ -31,16 +42,16 @@ typedef struct {
 * Function prototypes
 ************************************************/
 
-/* Return pointer to currently loaded Moviesoap filter. */
+/* (Unused) Return pointer to currently loaded Moviesoap filter. */
 moviesoap_filter_t * MoviesoapGetFilter( vlc_object_t * p_obj );
 
-/* Set address for current Moviesoap filter. (You should usually free the existing filter before doing this by calling Moviesoap_FreeFilter.) */
+/* (Unused) Set address for current Moviesoap filter. (You should usually free the existing filter before doing this by calling Moviesoap_FreeFilter.) */
 void Moviesoap_SetFilter( vlc_object_t * p_obj, moviesoap_filter_t * p_filter );
 
-/* Deallocate memory for currently loaded filter and its array of mods. */
+/* (Unused) Deallocate memory for currently loaded filter and its array of mods. */
 void Moviesoap_FreeFilter( vlc_object_t * p_obj );
 
-/* Set fields for blackout box (they'll be copied over from the supplied arg to the actual struct). */
+/* Set fields for blackout box (they'll be copied over from the supplied arg to the actual struct). This function requires that the module in moviesoap/video-filter.c have been loaded (it sets the its config address as a public variable, attached to p_libvlc). */
 void Moviesoap_SetBlackout( vlc_object_t * p_obj, moviesoap_blackout_config_t * p_new_blackout_config );
 
 /************************************************

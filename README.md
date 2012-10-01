@@ -8,4 +8,4 @@ Several files outside this dir must also be modified:
  - <root>/modules/gui/qt4/Modules.am
  - <root>/modules/gui/qt4/menus.cpp
  
-Look in the dir `extra` (in this bundle) to see modified versions of these files. It will probably work to just copy the modified versions to aforementioned locations.
+Look in the dir `extra` (in this bundle) to see modified versions of these files. Look for lines with comments including the name "Markham" or "moviesoap." Modify your files accordingly. (It will probably work to just copy the modified versions to aforementioned locations.)

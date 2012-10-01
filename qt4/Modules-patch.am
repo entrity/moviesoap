@@ -15,7 +15,8 @@ MOVIESOAP_GUI_HPPS = \
 	../../moviesoap/qt4/main.hpp \
 	../../moviesoap/qt4/menu.hpp \
 	../../moviesoap/variables.h \
-	../../moviesoap/filter.hpp
+	../../moviesoap/filter.hpp \
+	../../moviesoap/filter-chain.h
 
 ### Include my tar stuff ###
 

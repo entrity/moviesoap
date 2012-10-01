@@ -33,7 +33,9 @@ namespace Moviesoap {
 	extern playlist_t * p_playlist;
 	extern input_thread_t * p_input;
 	extern Filter * loadedFilter;
-	extern audio_volume_t volume;
+	extern audio_volume_t volume; // holds value to make mute possible
+	extern vlc_mutex_t lock;
+	extern moviesoap_blackout_config_t blackout_config;
 	extern struct config_t {
 		/* fields */
 		bool active;

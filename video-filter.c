@@ -1,8 +1,20 @@
 /*
- * Much of this file was lifted from the erase.c module
+ * HOW TO:
+ *
+ * The config (blackout_config a.k.a. MOVIESOAP_BLACKOUT_VARNAME) is attached to 
+ * p_libvlc by this module. The moviesoap interface (actually, the qt4 interface 
+ * with some additions of mine) must use
+ *      var_GetAddress( [p_vlc_obj]->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME )
+ * to get the address of the config, then change the config fields (which are 
+ * defined in moviesoap/video-filter.h) to alter the activity and bounds of the
+ * blackout box produced by this filter module. *
+ *
+ * The filter is active when blackout_config.b_active is true.
+ * The dimensions of the blackout box are set by the remaining fields of 
+ * moviesoap_blackout_config_t.
+ * 
+ * Much of this file was extracted from the erase.c module
  */
-
-#define BLACKOUT_LOCK blackout_config.p_lock;
 
 /*****************************************************************************
 * includes
@@ -19,7 +31,6 @@
 #include <vlc_picture.h>
 #include <vlc_playlist.h>
 
-#include "video-filter.h"
 #include "variables.h"
 
 /*****************************************************************************
@@ -40,6 +51,7 @@ struct filter_sys_t {
 *****************************************************************************/
 
 static moviesoap_blackout_config_t blackout_config;
+static moviesoap_blackout_config_t * p_blackout_config;
 
 /*****************************************************************************
 * Module descriptor
@@ -47,6 +59,14 @@ static moviesoap_blackout_config_t blackout_config;
 
 #define MOVIESOAP_HELP N_("Make custom filters to remove violence, sexuality, and profanity from your movie.")
 #define CFG_PREFIX "moviesoap-"
+#define POSX1_TEXT N_("left")
+#define POSY1_TEXT N_("top")
+#define POSX2_TEXT N_("right")
+#define POSY2_TEXT N_("bottom")
+#define POSX1_LONGTEXT N_("left coord of blackout box")
+#define POSY1_LONGTEXT N_("top coord of blackout box")
+#define POSX2_LONGTEXT N_("right coord of blackout box")
+#define POSY2_LONGTEXT N_("bottom coord of blackout box")
 
 vlc_module_begin ()
     set_description( N_("MovieSoap video filter for making blackout") )
@@ -56,6 +76,8 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_callbacks( Create, Destroy )
+    // add_bool( CFG_PREFIX "active", 0, N_("active"), N_("whether the blackout is in effect"), false )
+    // add_address( CFG_PREFIX "x1", 0, POSX1_TEXT, POSX1_LONGTEXT, false )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -65,18 +87,18 @@ vlc_module_end ()
 static int Create( vlc_object_t *p_this )
 {
     filter_t * p_filter = (filter_t *) p_this;
-    printf("%s\n", "----- CREATE MOVIESOAP VIDEO FILTER");
+    #ifdef MSDEBUG1
+        msg_Info(p_this, "----- CREATE MOVIESOAP VIDEO FILTER");
+    #endif
     
-    /* Init filter */
+    /* Init filter (this) */
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_filter->p_sys == NULL ) return VLC_ENOMEM;
     p_filter->pf_video_filter = Filter;
 
-    /* Make blackout_config available to other modules */
-    var_CreateGetAddress( p_this->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME);
-    var_SetAddress( p_this->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME, &blackout_config );
-    /* Apply test settings for blackout config */ 
-    TestSettings( p_this ); // todo remove
+    /* Set local pointer to blackout config */
+    p_blackout_config = var_GetAddress(p_this->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME);
+    msg_Info( p_this, "blackout config address (2): %x", p_blackout_config );
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
@@ -93,6 +115,10 @@ static int Create( vlc_object_t *p_this )
   
     /* Init mutex */
     vlc_mutex_init( &p_filter->p_sys->lock );
+
+    #ifdef MSDEBUG2
+        msg_Info( p_this, "video filter module creation complete");
+    #endif
 
     /* End #Create() */
     return VLC_SUCCESS;
@@ -126,7 +152,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
 
     /* If the filter is inactive: just copy the image, else make blackout rectangle */
     vlc_mutex_lock( &p_filter->p_sys->lock );
-    if ( blackout_config.b_active )
+    if ( p_blackout_config->b_active )
         FilterFrame( p_filter, p_inpic, p_outpic );
     else
         picture_CopyPixels( p_outpic, p_inpic );
@@ -150,10 +176,10 @@ static void FilterFrame( filter_t *p_filter, picture_t *p_inpic, picture_t *p_ou
         /* Copy original pixel buffer */
         plane_CopyPixels( &p_outpic->p[i_plane], &p_inpic->p[i_plane] );
     
-        uint16_t i_x1 = blackout_config.i_x1;
-        uint16_t i_y1 = blackout_config.i_y1;
-        uint16_t i_x2 = blackout_config.i_x2;
-        uint16_t i_y2 = blackout_config.i_y2;
+        uint16_t i_x1 = p_blackout_config->i_x1;
+        uint16_t i_y1 = p_blackout_config->i_y1;
+        uint16_t i_x2 = p_blackout_config->i_x2;
+        uint16_t i_y2 = p_blackout_config->i_y2;
 
         const int i_visible_pitch = p_inpic->p[i_plane].i_visible_pitch;
         const int i_visible_lines = p_inpic->p[i_plane].i_visible_lines;            
@@ -192,14 +218,15 @@ static void FilterFrame( filter_t *p_filter, picture_t *p_inpic, picture_t *p_ou
     }
 }
 
+/* Supplies values for the blackout config. Used for testing. */
 void TestSettings( vlc_object_t * p_obj )
 {
 	// set config by direct access
-    blackout_config.b_active = true;
-    blackout_config.i_x1 = 30;
-    blackout_config.i_x2 = 330;
-    blackout_config.i_y1 = 70;
-    blackout_config.i_y2 = 200;
+    p_blackout_config->b_active = true;
+    p_blackout_config->i_x1 = 30;
+    p_blackout_config->i_x2 = 330;
+    p_blackout_config->i_y1 = 70;
+    p_blackout_config->i_y2 = 200;
     
     // create new config struct
     moviesoap_blackout_config_t newconfig;
@@ -208,8 +235,7 @@ void TestSettings( vlc_object_t * p_obj )
     newconfig.i_y1 = 100;
     newconfig.i_x2 = 150;
     newconfig.i_y2 = 200;
+
     // set via the method in variables.h
     Moviesoap_SetBlackout( p_obj, &newconfig );
 }
-
-#undef BLACKOUT_LOCK
