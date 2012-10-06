@@ -1,24 +1,30 @@
-#include "main.hpp"
-#include "../filter.hpp"
-#include "../variables.h"
+#include <cstdio>
+#include <cassert>
+
 #include <vlc_common.h>
 #include <vlc_interface.h>
 #include <vlc_modules.h>
 #include <vlc_aout_intf.h>	// aout_ToggleMute
 
-#include <cstdio>
-#include <cassert>
+#include "main.hpp"
+#include "config.hpp"
+#include "../filter.hpp"
+#include "../variables.h"
+#include "../filter-chain.h"
 
-#include <vlc_input.h> // temp used for input_GetState()
-#include <vlc_threads.h> // temp used for vlc_timer...
 #ifndef INT64_C	// ibid.
 # define INT64_C(c)  c ## LL
 #endif
 
-#include "../filter-chain.h"
+// test
+#include <vlc_input.h> // temp used for input_GetState()
+#include <vlc_threads.h> // temp used for vlc_timer...
+#include <iostream>
+using namespace std;
 
 namespace Moviesoap
 {
+	/* Initialize static fields */
 	vlc_object_t * p_obj;
 	playlist_t * p_playlist;
 	input_thread_t * p_input;
@@ -27,7 +33,8 @@ namespace Moviesoap
 	audio_volume_t volume;
 	vlc_mutex_t lock;
 	moviesoap_blackout_config_t blackout_config;
-	struct config_t config;
+
+	/* Local prototypes */
 	static int PlaylistChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
 	static int ItemChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
 	static int StateChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
@@ -36,17 +43,11 @@ namespace Moviesoap
 	static int TimeChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
 	static inline void StopAndStartFilter(mtime_t new_time);
 	
-	// static inline void InitBlackoutConfig();
+	/* Temp protoypes and vars */
 	vlc_timer_t test_timer;
 	char * test_str = "foo bar baz qux";
 	static void tempCallback( void * p_data );
 	static int TempCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
-
-	/* Returns true if given content for given mod is tolerable to user's config. */
-	bool config_t::ignoreMod(Mod & mod) {
-		uint8_t tolerance = tolerances[mod.mod.category];
-		return tolerance > mod.mod.severity;
-	}
 
 	void test()
 	{
@@ -66,7 +67,6 @@ namespace Moviesoap
 		// vlc_timer_create( &test_timer, tempCallback, test_str );
 		// mtime_t delay = 1000000L;
 		// vlc_timer_schedule( test_timer, false, 1, delay );
-
 
 		// supply dummy values for blackout config
 		blackout_config.b_active = false;
@@ -104,7 +104,7 @@ namespace Moviesoap
 		// test (dummy filter)
 		test();
 		// build config (tolerances)
-		// todo
+		config.load();
 		// Get playlist pointer
 		playlist_t * p_playlist = pl_Get( p_intf );
 		// Unmute because aout_IsMuted will incorrectly return true until this is done

@@ -29,11 +29,11 @@ namespace Moviesoap
 		actionActive->setCheckable(true);
 		actionActive->setChecked(true);
 		// connect actions
+		connect( actionPreferences, SIGNAL(triggered()), this, SLOT(editPreferences()) );
 		// connect( actionEdit, SIGNAL(triggered()), this, SLOT(editFilter()) );
 	}
 
-
-	//static Menu * create(QMenuBar * bar);
+	/* Called by menu creation in modules/gui/qt4/... */
 	Menu * Menu::create(QMenuBar * bar) { return new Menu(bar); }
 
 	/* Public slot fired by menubar action. Opens file dialogue. */

@@ -36,13 +36,6 @@ namespace Moviesoap {
 	extern audio_volume_t volume; // holds value to make mute possible
 	extern vlc_mutex_t lock;
 	extern moviesoap_blackout_config_t blackout_config;
-	extern struct config_t {
-		/* fields */
-		bool active;
-		uint8_t tolerances[MOVIESOAP_CAT_COUNT];
-		/* functions */
-		bool ignoreMod(Mod & mod); // Returns whether given Mod should not be activated
-	} config;
 	// extern MainInterface * mainInterface;
 	// bool isValidSavePath() { return true; } // todo
 

@@ -1,4 +1,8 @@
 - ! pausing makes program freeze now.
+- label radios in prefs
+- preferences file io
+- include default save path in moviesoap.conf
+
 
 EFFECTS
 - blackout
@@ -12,6 +16,7 @@ UI &c
 - do I need to remove callbacks in main.cpp? (after playlist, input changes)?
 - activate mod only if severity exceeds tolerance
 - add 'stop' to qt4 interface close
+- write activate & deactivate functions on config
 
 DONE
 - test create and destroy timers

@@ -1,24 +1,43 @@
 # Add the following line to the BOTTOM of modules/gui/qt4/Modules.am:
 # include $(srcdir)/../../moviesoap/qt4/Modules-patch.am
 
+# When adding a new gui file, add to all three MOCS, CPPS, HPPS
+
+################################################
 ### Moviesoap file lists ###
+################################################
 
 MOVIESOAP_GUI_MOCS = \
-	../../moviesoap/qt4/menu.moc.cpp
+	../../moviesoap/qt4/menu.moc.cpp \
+	../../moviesoap/qt4/preferences.moc.cpp
 
 MOVIESOAP_GUI_CPPS = \
 	../../moviesoap/qt4/main.cpp \
 	../../moviesoap/qt4/menu.cpp \
-	../../moviesoap/filter.cpp
+	../../moviesoap/qt4/preferences.cpp
 
 MOVIESOAP_GUI_HPPS = \
 	../../moviesoap/qt4/main.hpp \
 	../../moviesoap/qt4/menu.hpp \
+	../../moviesoap/qt4/preferences.hpp
+
+################################################
+### Include non-gui models ###
+################################################
+
+MOVIESOAP_GUI_HPPS += \
 	../../moviesoap/variables.h \
 	../../moviesoap/filter.hpp \
-	../../moviesoap/filter-chain.h
+	../../moviesoap/filter-chain.h \
+	../../moviesoap/qt4/config.hpp
 
+MOVIESOAP_GUI_CPPS += \
+	../../moviesoap/filter.cpp \
+	../../moviesoap/qt4/config.cpp
+
+################################################
 ### Include my tar stuff ###
+################################################
 
 MOVIESOAP_GUI_HPPS += \
 	../../moviesoap/tar/ustar.h
@@ -26,7 +45,9 @@ MOVIESOAP_GUI_HPPS += \
 MOVIESOAP_GUI_CPPS += \
 	../../moviesoap/tar/ustar.cpp
 
+################################################
 ### Add Moviesoap files to Modules.am vars ###
+################################################
 
 nodist_SOURCES_qt4 += $(MOVIESOAP_GUI_MOCS)
 

@@ -2,6 +2,7 @@
 #define MOVIESOAP_VARIABLES_H
 #define MOVIESOAP_FILTER_VARNAME "moviesoap-filter"
 #define MOVIESOAP_BLACKOUT_VARNAME "moviesoap-blackout-config"
+#define MOVIESOAP_TOLERANCE_COUNT 6
 
 #define MSDEBUG1
 #define MSDEBUG2
