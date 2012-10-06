@@ -41,11 +41,9 @@ namespace Moviesoap {
 		static Filter * dummy();
 		/* Output filter data to stdout */
 		void toStdout();
-
-		/* Sets this filter as active filter for player */
-		void set();
+		
 		/* Sorts mods in order of ascending start time */
-		void sortMods();
+		void sort();
 		/* Returns directory for saving Moviesoap filters. If this filter has valid filepath, returns its dir, else static saveDir, else application's datadir. */
 		string& saveDir();
 				
@@ -94,7 +92,7 @@ namespace Moviesoap {
 		~Mod();
 		
 		/* Used for sorting. */
-		bool compare(Mod& otherMod);
+		bool operator<(const Mod& otherMod) const;
 		/* Used for removing a Mod from a list. Returns true if their address' are the same (i.e. they are actually the same object) */
 		bool operator==(const Mod & other) const;
 

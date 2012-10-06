@@ -51,23 +51,6 @@ namespace Moviesoap
 
 	void test()
 	{
-		/* timer test */
-		// vlc_timer_t timer;
-		// vlc_timer_create( &timer, tempCallback, NULL );
-		// // msg_Info(p_obj, "timer created: q %s", timer->quit);
-		// vlc_timer_destroy(timer);
-		// // msg_Info(p_obj, "timer destroyed without being scheduled: q %s", timer.quit);
-		// vlc_timer_create( &timer, tempCallback, NULL );
-		// mtime_t delay = 999999999UL;
-		// scheduleTimer( timer, 0, delay );
-		// // msg_Info(p_obj, "timer scheduled: q %s", timer.quit);
-		// vlc_timer_destroy(timer);
-		// msg_Info(p_obj, "timer destroyed: q %s", timer.quit);
-		/* timer that prints a message */
-		// vlc_timer_create( &test_timer, tempCallback, test_str );
-		// mtime_t delay = 1000000L;
-		// vlc_timer_schedule( test_timer, false, 1, delay );
-
 		// supply dummy values for blackout config
 		blackout_config.b_active = false;
 		blackout_config.i_x1 = 30;
@@ -80,16 +63,6 @@ namespace Moviesoap
 		#ifdef MSDEBUG3
 			p_loadedFilter->toStdout();
 		#endif
-		// p_loadedFilter->save();
-
-		/* test config struct */
-		// config.active = true;
-		// config.tolerances[0] = 168;
-		// printf("---- config.tolerances[0]: %d\n", config.tolerances[0]);
-		// printf("foo & bar: %d %d\n", config.foo(), config.bar());
-
-		// Mod * p_mod = &p_loadedFilter->modList.front();
-		// p_loadedFilter->loadMod(*p_mod);
 	}
 
 	/* Set vars, config. (Called by VLCMenuBar::createMenuBar in menus.cpp) */
@@ -107,10 +80,6 @@ namespace Moviesoap
 		config.load();
 		// Get playlist pointer
 		playlist_t * p_playlist = pl_Get( p_intf );
-		// Unmute because aout_IsMuted will incorrectly return true until this is done
-		// cout << "is muted? " << aout_IsMuted(VLC_OBJECT(p_playlist)) << endl;
-		// if ( aout_IsMuted(VLC_OBJECT(p_playlist)) )
-		// 	{ aout_SetMute( VLC_OBJECT(p_playlist), &volume, false ); }
 		// Create variable pointer to blackout config
 		#define MOVIESOAP_BLACKOUT_CONFIG_POINTER
 		var_CreateGetAddress( p_obj->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME);

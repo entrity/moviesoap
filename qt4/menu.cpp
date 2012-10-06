@@ -1,11 +1,12 @@
 #include "main.hpp"
 #include "menu.hpp"
+#include "config.hpp"
+#include "frames/preferences.hpp"
 
 #include <QMenu>
 #include <QMenuBar>
 #include <QAction>
 // #include <QFileDialog>
-
 
 namespace Moviesoap
 {
@@ -17,7 +18,7 @@ namespace Moviesoap
 		QAction * actionNew = new QAction("&New filter...", this);
 		QAction * actionEdit = new QAction("&Edit filter...", this);
 		QAction * actionPreferences = new QAction("&Set Tolerances...", this);
-		QAction * actionActive = new QAction("&Active...", this);
+		actionActive = new QAction("&Active...", this);
 		// add actions
 		addAction(actionLoad);
 		addSeparator();
@@ -30,30 +31,14 @@ namespace Moviesoap
 		actionActive->setChecked(true);
 		// connect actions
 		connect( actionPreferences, SIGNAL(triggered()), this, SLOT(editPreferences()) );
-		// connect( actionEdit, SIGNAL(triggered()), this, SLOT(editFilter()) );
+		connect( actionActive, SIGNAL(triggered()), this, SLOT(activeTriggered()) );
 	}
 
 	/* Called by menu creation in modules/gui/qt4/... */
 	Menu * Menu::create(QMenuBar * bar) { return new Menu(bar); }
 
-	/* Public slot fired by menubar action. Opens file dialogue. */
-	// void Menu::loadFilter()
-	// {
-	// 	const char * fstring;
-	// 	QString filename = QFileDialog::getOpenFileName(
-	// 		window(),
-	// 		tr("Choose a filter file"),
-	// 		datadir(),
-	// 		tr("Mediasoap filters (*.msf)")
-	// 	);
-	// 	fstring = filename.toStdString().c_str();
-	// 	printf( "fname as c: %s\n", fstring );
-	// 	// todo
-	// }
+	void Menu::activeTriggered() { config.active = actionActive->isChecked(); }
 
-	// void Menu::editFilter()
-	// {
-
-	// }
+	void Menu::editPreferences() { Moviesoap::PreferencesWin::openEditor(); }
 
 }

@@ -6,10 +6,9 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
-#include "main.hpp"
+#include "../main.hpp"
 #include "preferences.hpp"
-#include "config.hpp"
-#include "../variables.h"
+#include "../config.hpp"
 
 #define SOAP_BUILD_RADIO_BUTTON(layout, name, row, col) { \
 	radios[row][col] = new QRadioButton; \

@@ -98,6 +98,10 @@ namespace Moviesoap
 /* Filter functions */
 namespace Moviesoap
 {
+
+	/* Sort mods in modList by start time */
+	void Filter::sort() { modList.sort(); }
+
 	// FILE IO
 
 	/* Write filter's meta data (mod descriptions) to outstream */
@@ -288,15 +292,12 @@ namespace Moviesoap {
 		mod.y1 = y1;
 		mod.y2 = y2;
 	}
-	Mod::~Mod()
-	{
-		vlc_timer_destroy( timer );
-	}
 
-	bool Mod::compare(Mod & otherMod)
-	{
-		return mod.start < otherMod.mod.start;
-	}
+	Mod::~Mod() { vlc_timer_destroy( timer ); }
+
+	bool Mod::operator<(const Mod& otherMod) const { return mod.start < otherMod.mod.start; }
+
+	bool Mod::operator==(const Mod& otherMod) const { return this == &otherMod; }
 
 	void Mod::activate()
 	{

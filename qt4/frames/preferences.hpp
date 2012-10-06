@@ -4,7 +4,7 @@
 #include <QFrame>
 class QRadioButton;
 #include <vlc_common.h>
-#include "../variables.h"
+#include "../../variables.h"
 
 // test
 #include <cstdio>

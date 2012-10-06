@@ -1,22 +1,15 @@
 - ! pausing makes program freeze now.
-- label radios in prefs
-- preferences file io
-- include default save path in moviesoap.conf
 
-
-EFFECTS
-- blackout
-
-UI &c
-- user tolerances
 - new/edit filter
 - load filter (from file)
 - filter save choose filename
-- attach listeners to forward/backward actions (alt+Rarr, alt+Larr)
 - do I need to remove callbacks in main.cpp? (after playlist, input changes)?
 - activate mod only if severity exceeds tolerance
-- add 'stop' to qt4 interface close
-- write activate & deactivate functions on config
+- add 'stop' (cleanup) to qt4 interface close
+- activate & deactivate functions on config
+- label radios in prefs
+- include default save path in moviesoap.conf
+
 
 DONE
 - test create and destroy timers
@@ -25,4 +18,8 @@ DONE
 - implement timers for activate/deactivate mods
 - skip EFFECT
 - mute EFFECT
+- blackout EFFECT
 - destroy timers on 'stop'
+- attach listeners to forward/backward actions (alt+Rarr, alt+Larr)
+- user tolerances ui
+- preferences file io
