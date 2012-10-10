@@ -7,3 +7,4 @@ extra
 *.o
 .dirstamp
 qt4/*.moc.cpp
+qt4/frames/*.moc.cpp

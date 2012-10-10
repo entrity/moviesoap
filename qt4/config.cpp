@@ -36,11 +36,6 @@ namespace Moviesoap
 		in.read( (char *)&tolerances, MOVIESOAP_CAT_COUNT*sizeof(uint8_t) );
 		if (!in) { cerr << "Could not read from file in Moviesoap::config_t::load." << endl; exit(1); }
 		in.close();
-
-		cout << "read bytes: " << MOVIESOAP_CAT_COUNT*sizeof(uint8_t) << endl;
-		for (int i = 0; i < MOVIESOAP_CAT_COUNT; i++)
-			cout << " " << dec << (unsigned int) tolerances[i];
-		cout << endl;
 	}
 
 	/* Returns path of config dir. */

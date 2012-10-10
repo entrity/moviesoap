@@ -6,17 +6,25 @@ class QLineEdit;
 class QListWidget;
 
 namespace Moviesoap {
-	class FilterWin : public QFrame
+	class Filter;
+
+	class FilterFrame : public QFrame
 	{
 		Q_OBJECT
 	protected:
-		static FilterWin * p_window;
 		QLineEdit *titleText, *yearText, *isbnText, *creatorText;
-		QListWidget *modList;
+		QListWidget *modListWidget;
 	public:
-		FilterWin();
-		static void openEditor();
+		FilterFrame(QWidget * parent);
+		void load(Filter *);
+	// 	void dump(Filter *);
 	public slots:
+		// void saveClicked();
+		// void saveAsClicked();
+		// void okClicked() { parentWidget()->hide(); }
+		// void newModClicked();
+		// void editModClicked();
+		// void previewClicked();
 	};
 }
 

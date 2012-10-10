@@ -8,6 +8,8 @@ class QAction;
 
 namespace Moviesoap
 {
+	class Filter;
+
 	class Menu : public QMenu
 	{
 		Q_OBJECT
@@ -16,8 +18,10 @@ namespace Moviesoap
 		static Menu * create(QMenuBar * bar);
 		Menu( QWidget * parent );
 	public slots:
-		void editPreferences();
 		void activeTriggered();
+		void editPreferences();
+		void editFilter();
+		void newFilter();
 	};
 }
 

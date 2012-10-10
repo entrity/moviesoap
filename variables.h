@@ -4,6 +4,8 @@
 #define MOVIESOAP_BLACKOUT_VARNAME "moviesoap-blackout-config"
 #define MOVIESOAP_TOLERANCE_COUNT 6
 
+#include <vlc_common.h>
+
 #define MSDEBUG1
 #define MSDEBUG2
 #define MSDEBUG3

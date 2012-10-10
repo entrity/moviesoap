@@ -10,6 +10,10 @@
 #include "preferences.hpp"
 #include "../config.hpp"
 
+// tmep
+#include <iostream>
+using namespace std;
+
 #define SOAP_BUILD_RADIO_BUTTON(layout, name, row, col) { \
 	radios[row][col] = new QRadioButton; \
 	layout->addWidget(radios[row][col], row+1, col+1); \

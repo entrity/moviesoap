@@ -35,13 +35,19 @@ namespace Moviesoap {
 		list<Mod*> scheduledMods; // this list lets programme know which timers to destroy when filter is stopped
 		list<Mod>::iterator queuedMod; // iterator on modList
 
+		/* Constructors */
+		Filter() {}
+		Filter(Filter * other) { *this = *other; }
+		/* Destructor */
+		~Filter() { Stop(); }
+
 		// TESTING, DIAGNOSTIC
 
 		/* Returns a dummy Filter for testing. */
 		static Filter * dummy();
 		/* Output filter data to stdout */
 		void toStdout();
-		
+
 		/* Sorts mods in order of ascending start time */
 		void sort();
 		/* Returns directory for saving Moviesoap filters. If this filter has valid filepath, returns its dir, else static saveDir, else application's datadir. */
@@ -81,7 +87,7 @@ namespace Moviesoap {
 		moviesoap_mod_t mod; // struct holding data for implementation of mod
 		string description; // used for meta file
 		vlc_timer_t timer; // holds data for activation or deactivation of mod
-		Filter * p_filter; // holds list of Mods with active timers (may include this Mod); used for Moviesoap::deactivateMod
+		Filter * p_filter; // holds list of pointers to Mods with active timers (which may include this Mod); used for Moviesoap::deactivateMod
 		
 		/* Constructor */
 		Mod(uint8_t mode,

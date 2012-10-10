@@ -9,17 +9,23 @@
 
 MOVIESOAP_GUI_MOCS = \
 	../../moviesoap/qt4/menu.moc.cpp \
-	../../moviesoap/qt4/frames/preferences.moc.cpp
+	../../moviesoap/qt4/frames/preferences.moc.cpp \
+	../../moviesoap/qt4/frames/filter_win.moc.cpp \
+	../../moviesoap/qt4/frames/filter_frame.moc.cpp
 
 MOVIESOAP_GUI_CPPS = \
 	../../moviesoap/qt4/main.cpp \
 	../../moviesoap/qt4/menu.cpp \
-	../../moviesoap/qt4/frames/preferences.cpp
+	../../moviesoap/qt4/frames/preferences.cpp \
+	../../moviesoap/qt4/frames/filter_win.cpp \
+	../../moviesoap/qt4/frames/filter_frame.cpp
 
 MOVIESOAP_GUI_HPPS = \
 	../../moviesoap/qt4/main.hpp \
 	../../moviesoap/qt4/menu.hpp \
-	../../moviesoap/qt4/frames/preferences.hpp
+	../../moviesoap/qt4/frames/preferences.hpp \
+	../../moviesoap/qt4/frames/filter_win.hpp \
+	../../moviesoap/qt4/frames/filter_frame.hpp
 
 ################################################
 ### Include non-gui models ###
