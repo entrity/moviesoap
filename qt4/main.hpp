@@ -16,15 +16,6 @@ class MainInterface;
 class QWidget;
 class QMenuBar;
 
-enum {
-	MOVIESOAP_SUCCESS,
-	MOVIESOAP_ERROR,
-	MOVIESOAP_ENOMEM,
-	MOVIESOAP_FORM_INVALID,
-	MOVIESOAP_ENOFPATH,
-	MOVIESOAP_CANCEL
-};
-
 namespace Moviesoap {
 
 	/* Fields */

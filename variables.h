@@ -3,12 +3,24 @@
 #define MOVIESOAP_FILTER_VARNAME "moviesoap-filter"
 #define MOVIESOAP_BLACKOUT_VARNAME "moviesoap-blackout-config"
 #define MOVIESOAP_TOLERANCE_COUNT 6
+#define MOVIESOAP_FILE_EXT ".cln"
 
 #include <vlc_common.h>
 
 #define MSDEBUG1
 #define MSDEBUG2
 #define MSDEBUG3
+
+enum {
+	MOVIESOAP_SUCCESS,
+	MOVIESOAP_ERROR,
+	MOVIESOAP_ENOMEM,
+	MOVIESOAP_FORM_INVALID,
+	MOVIESOAP_ENOFPATH,
+	MOVIESOAP_CANCEL,
+	MOVIESOAP_ENOFILE,
+	MOVIESOAP_EFILEIO
+};
 
 /************************************************
 * blackout config

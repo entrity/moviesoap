@@ -143,16 +143,21 @@ namespace Moviesoap
 		return 0;
 	}
 
-	/* Write filter to tar file */
+	/* Write filter to tar file. Return 0 if success. */
 	int Filter::save()
 	{
-		string fpath = "output.tar"; // psz
-		// open file & write meta & write data
-		ofstream outs(fpath.c_str());
+		// open file
+		ofstream outs(filepath.c_str());
+		// return failure if couldn't write to file
+		if (!outs) return MOVIESOAP_ENOFILE;
+		// write meta & write data
 		metaOut(outs);
+		if (!outs) return MOVIESOAP_EFILEIO;
 		dataOut(outs);
+		if (!outs) return MOVIESOAP_EFILEIO;
 		// write two empty blocks & close stream & return
 		for (int i=0; i < 512*2; i++) { outs.put(0); }
+		if (!outs) return MOVIESOAP_EFILEIO;
 		outs.close();
 		return MOVIESOAP_SUCCESS;
 	}

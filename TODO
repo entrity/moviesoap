@@ -1,5 +1,6 @@
 - ! pausing makes program freeze now.
 
+- add http break moviesoap feature
 - new/edit filter
 - load filter (from file)
 - filter save choose filename
