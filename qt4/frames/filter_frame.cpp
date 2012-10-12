@@ -1,5 +1,6 @@
-#include "../main.hpp"
 #include "filter_frame.hpp"
+#include "filter_win.hpp"
+#include "../main.hpp"
 #include "../../filter.hpp"
 #include <vlc_configuration.h>
 #include <QFrame>
@@ -43,13 +44,7 @@ namespace Moviesoap
 	inline void setText(QLineEdit * input, const string &text) { input->setText(QString(text.c_str())); }
 
 	/* Update loadedFilter and hide filter editor window. */
-	void FilterFrame::close()
-	{
-		*p_loadedFilter = *p_editingFilter;
-		((QFrame *) parentWidget())->hide();
-		delete p_editingFilter;
-		p_editingFilter = NULL;
-	}
+	void FilterFrame::closeWin() { ( (QWidget *) parent() )->hide(); }
 
 	/* Fill GUI fields with Filter data */
 	void FilterFrame::load(Filter * filter)
@@ -67,7 +62,7 @@ namespace Moviesoap
 			new QListWidgetItem(QString(iter->description.c_str()), modListWidget);
 	}
 
-	/* Set filter string data to GUI field values */
+	/* Set filter string data to GUI field values. */
 	void FilterFrame::dump(Filter * filter)
 	{
 		// Get string values
@@ -87,10 +82,11 @@ namespace Moviesoap
 		// update editingFilter
 		dump(p_editingFilter);
 		// Attempt save; if fail, perform 'save as'
-		if (p_editingFilter->filepath.empty() || !p_editingFilter->save())
+		if ( p_editingFilter->filepath.empty() || p_editingFilter->save() )
 			saveAsClicked();
 		// close editor window
-		close();
+		*p_loadedFilter = *p_editingFilter;
+		closeWin();
 	}
 
 	/* Slot. Save filter as. */
@@ -98,8 +94,8 @@ namespace Moviesoap
 	{
 		// get filepath from user
 		char * userDir = config_GetUserDir( VLC_HOME_DIR );
-		QString fileName = QFileDialog::getSaveFileName(this, QString("Save filter file"), userDir, QString("Filter files (*.cln)"));
-		VLC_UNUSED(userDir);
+		QString fileName = QFileDialog::getSaveFileName(this, QString("Save filter file"), userDir, QString(MOVIESOAP_FILECHOOSER_FILTER));
+		free(userDir);
 		if (fileName.isNull())
 			return;
 		// set filepath on editingFilter
@@ -110,13 +106,17 @@ namespace Moviesoap
 		// save
 		p_editingFilter->save();
 		// close editor window
-		close();
+		*p_loadedFilter = *p_editingFilter;
+		closeWin();
 	}
 
 	/* Slot. Update loadedFilter and close filter editor window. */
 	void FilterFrame::okClicked() {
-		close(); 
+		*p_loadedFilter = *p_editingFilter;
+		closeWin();
 	}
+
+	void FilterFrame::cancelClicked() { closeWin(); }
 
 	/* Constructor */
 	FilterFrame::FilterFrame(QWidget *parent) : QFrame(parent), p_editingFilter(NULL)
@@ -159,15 +159,18 @@ namespace Moviesoap
 		hbox = newRow(frameVLayout);
 		addLabelAndLine(hbox, &creatorText, "Filter maker");
 		hbox = newRow(frameVLayout);
-		QPushButton * saveButton = new QPushButton(tr("Save"));
-		QPushButton * saveAsButton = new QPushButton(tr("Save as..."));
-		QPushButton * okButton = new QPushButton(tr("Update without saving"));
+		QPushButton * saveButton = new QPushButton(tr("&Save"));
+		QPushButton * saveAsButton = new QPushButton(tr("S&ave as..."));
+		QPushButton * okButton = new QPushButton(tr("&Update w/out save"));
+		QPushButton * cancelButton = new QPushButton(tr("&Cancel"));
 		connect(saveButton, SIGNAL(clicked()), this, SLOT(saveClicked()));
 		connect(saveAsButton, SIGNAL(clicked()), this, SLOT(saveAsClicked()));
 		connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
+		connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
 		hbox->addWidget(saveButton);
 		hbox->addWidget(saveAsButton);
 		hbox->addWidget(okButton);
+		hbox->addWidget(cancelButton);
 		layout->addWidget(frame);
 		// end
 		setLayout(layout);

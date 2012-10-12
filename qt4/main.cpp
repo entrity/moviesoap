@@ -19,13 +19,11 @@ namespace Moviesoap
 	string saveDir()
 	{
 		if (p_loadedFilter && !p_loadedFilter->filepath.empty()) {
-			cout << "using fileter filepath" << endl;
 			return extractDir(p_loadedFilter->filepath);
 		} else {
 			char * userDir = config_GetUserDir( VLC_HOME_DIR );
 			string dir(userDir);
 			free(userDir);
-			cout << "using config file path" << endl;
 			return dir;
 		}
 	}

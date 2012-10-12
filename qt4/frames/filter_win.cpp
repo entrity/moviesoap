@@ -28,6 +28,13 @@ namespace Moviesoap
 		p_window->show();
 	}
 
+	void FilterWin::hideEditor() { 
+		// cout << "p_window ? "
+			// << hex << p_window
+			// << endl;
+		if (p_window) p_window->close(); 
+	}
+
 	void FilterWin::load(Filter * filterToEdit)
 	{
 		// delete existing editingFilter

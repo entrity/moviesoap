@@ -37,7 +37,11 @@ namespace Moviesoap {
 
 		/* Constructors */
 		Filter() {}
-		Filter(Filter * other) { *this = *other; }
+		Filter(Filter * other) { 
+			cout << "FILTER COPY CONSTRUCTOR CALLED" << endl;
+			*this = *other; 
+			cout << &*this->modList.begin() << " - " << &*other->modList.begin() << endl;
+		}
 		/* Destructor */
 		~Filter() { Stop(); }
 
@@ -55,14 +59,17 @@ namespace Moviesoap {
 				
 		// FILE IO
 		
+		inline size_t metaSize();
 		/* Write tar header, data and padding to stream */
-		int metaOut(ofstream & out);
+		int metaOut(ofstream &);
+		int metaIn(istream &);
 		/* Write tar header, data and padding to stream */
-		int dataOut(ofstream & out);
+		int dataOut(ofstream &);
+		int dataIn(istream &);
 		/* Writes filter to file */
 		int save();
-		/* Reads filter from file */
-		static Filter load();
+		/* Reads filter from file. (Clears existing modList first) */
+		int load(const string &);
 		
 		// PLAYING FUNCTIONS
 	

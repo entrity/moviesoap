@@ -101,28 +101,47 @@ namespace Moviesoap
 	/* Sort mods in modList by start time */
 	void Filter::sort() { modList.sort(); }
 
+	/* Calculate size of meta file (meta + mod descriptions) */
+	size_t Filter::metaSize()
+	{
+		size_t size = 0;
+		// calc length of filter meta + "\n"
+		size += 1 + creator.length();
+		size += 1 + title.length();
+		size += 1 + isbn.length();
+		size += 1 + year.length();
+		// calc length of mod descriptions + "\n"
+		for (list<Mod>::iterator iter = modList.begin(); iter != modList.end(); iter++) {
+			size += 1 + iter->description.length(); // the +1 is for the endl char, which we'll write in the next loop
+		}
+		return size;
+	}
+
 	// FILE IO
 
-	/* Write filter's meta data (mod descriptions) to outstream */
+	/* Write filter's text data (meta & mod descriptions) to outstream */
 	int Filter::metaOut(ofstream & outs)
 	{
-		list<Mod>::iterator iter;
-		// calculate data size
-		unsigned int size = 0;
-		for (iter = modList.begin(); iter != modList.end(); iter++) {
-			size += iter->description.length();
-			size += 1; // the +1 is for the endl char, which we'll write in the next loop
-		}
 		// make header
-		Entrity::Ustar::Header header("meta.txt", size);
-		// write header
+		Entrity::Ustar::Header header("meta.txt", metaSize());
+		// write tar header
 		header.out(outs);
-		// write data		
-		for (iter = modList.begin(); iter != modList.end(); iter++)
+		// write file meta
+		outs << creator << endl;
+		outs << title << endl;
+		outs << isbn << endl;
+		outs << year << endl;
+		// write mod descriptions
+		for (list<Mod>::iterator iter = modList.begin(); iter != modList.end(); iter++)
 			outs << iter->description << endl;
 		// write padding
 		header.pad(outs);
 		return 0;
+	}
+
+	int Filter::metaIn(istream & ins)
+	{
+
 	}
 
 	/* Write filters mod data to outstream */
@@ -147,7 +166,7 @@ namespace Moviesoap
 	int Filter::save()
 	{
 		// open file
-		ofstream outs(filepath.c_str());
+		ofstream outs(filepath.c_str(), ios::binary );
 		// return failure if couldn't write to file
 		if (!outs) return MOVIESOAP_ENOFILE;
 		// write meta & write data
@@ -158,7 +177,21 @@ namespace Moviesoap
 		// write two empty blocks & close stream & return
 		for (int i=0; i < 512*2; i++) { outs.put(0); }
 		if (!outs) return MOVIESOAP_EFILEIO;
+		cout << "good up to point before close" << endl;
 		outs.close();
+		cout << "good after close" << endl;
+		return MOVIESOAP_SUCCESS;
+	}
+
+	int Filter::load(const string & newfpath)
+	{
+		ifstream ins(newfpath.c_str(), ios::binary );
+		if (!ins) return MOVIESOAP_ENOFILE;
+
+		// set filepath
+		filepath = newfpath;
+		// load mod data
+		modList.clear();
 		return MOVIESOAP_SUCCESS;
 	}
 
@@ -250,7 +283,7 @@ namespace Moviesoap
 	{
 		Mod * p_mod;
 		Filter * p_filter = new Filter();
-		p_filter->filepath = "/home/markhama/tmp/dummy-filter.cln";
+		p_filter->filepath = "/home/markham/tmp/dummy-filter.cln";
 		p_filter->creator = "MJ";
 		p_filter->title = "Labour of Love";
 		p_filter->isbn = "1234567890";

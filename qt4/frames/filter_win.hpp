@@ -10,12 +10,13 @@ namespace Moviesoap
 	{
 		Q_OBJECT
 	protected:
-		static FilterWin *p_window;
 		Filter * p_editingFilter;
 		FilterFrame *filterFrame;
 	public:
 		FilterWin();
+		static FilterWin *p_window;
 		static void openEditor(Filter *);
+		static void hideEditor();
 		void load(Filter *);
 	};
 }

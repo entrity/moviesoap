@@ -22,6 +22,7 @@ namespace Moviesoap
 		void editPreferences();
 		void editFilter();
 		void newFilter();
+		void loadFilter();
 	};
 }
 

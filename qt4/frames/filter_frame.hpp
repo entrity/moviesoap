@@ -21,11 +21,12 @@ namespace Moviesoap {
 		FilterFrame(QWidget * parent);
 		void load(Filter *);
 		void dump(Filter *);
-		inline void close();
+		void closeWin();
 	public slots:
 		void saveClicked();
 		void saveAsClicked();
 		void okClicked();
+		void cancelClicked();
 		// void newModClicked();
 		// void editModClicked();
 		// void delModClicked();

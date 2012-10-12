@@ -4,6 +4,7 @@
 #define MOVIESOAP_BLACKOUT_VARNAME "moviesoap-blackout-config"
 #define MOVIESOAP_TOLERANCE_COUNT 6
 #define MOVIESOAP_FILE_EXT ".cln"
+#define MOVIESOAP_FILECHOOSER_FILTER "Filter files (*.cln)"
 
 #include <vlc_common.h>
 

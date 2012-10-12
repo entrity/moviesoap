@@ -8,7 +8,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QAction>
-// #include <QFileDialog>
+#include <QFileDialog>
 
 // test
 #include <iostream>
@@ -36,6 +36,7 @@ namespace Moviesoap
 		actionActive->setCheckable(true);
 		actionActive->setChecked(true);
 		// connect actions
+		connect( actionLoad, SIGNAL(triggered()), this, SLOT(loadFilter()) );
 		connect( actionActive, SIGNAL(triggered()), this, SLOT(activeTriggered()) );
 		connect( actionPreferences, SIGNAL(triggered()), this, SLOT(editPreferences()) );
 		connect( actionEdit, SIGNAL(triggered()), this, SLOT(editFilter()) );
@@ -49,13 +50,20 @@ namespace Moviesoap
 
 	void Menu::editPreferences() { Moviesoap::PreferencesWin::openEditor(); }
 
-	void Menu::editFilter() {
-		cout << "loaded filter: " << hex << p_loadedFilter << endl;
-		Moviesoap::FilterWin::openEditor(Moviesoap::p_loadedFilter);
-	}
+	void Menu::editFilter() { Moviesoap::FilterWin::openEditor(Moviesoap::p_loadedFilter); }
 
-	void Menu::newFilter() {
-		Moviesoap::FilterWin::openEditor(NULL);
+	void Menu::newFilter() { Moviesoap::FilterWin::openEditor(NULL); }
+
+	void Menu::loadFilter() {
+		QString filepath = QFileDialog::getOpenFileName( this,
+			QString("Open Moviesoap filter file"),
+			QString(saveDir().c_str()),
+			QString(MOVIESOAP_FILECHOOSER_FILTER));
+		if ( !filepath.isEmpty() ) {
+			vlc_mutex_lock( &Moviesoap::lock );
+			p_loadedFilter->load( filepath.toStdString() );
+			vlc_mutex_unlock( &Moviesoap::lock );
+		}
 	}
 
 }
