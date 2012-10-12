@@ -9,9 +9,10 @@
 #include <QMenuBar>
 #include <QAction>
 #include <QFileDialog>
+#include <QMessageBox>
 
-// test
 #include <iostream>
+#include <sstream>
 using namespace std;
 
 namespace Moviesoap
@@ -61,8 +62,17 @@ namespace Moviesoap
 			QString(MOVIESOAP_FILECHOOSER_FILTER));
 		if ( !filepath.isEmpty() ) {
 			vlc_mutex_lock( &Moviesoap::lock );
-			p_loadedFilter->load( filepath.toStdString() );
+			int err = p_loadedFilter->load( filepath.toStdString() );
 			vlc_mutex_unlock( &Moviesoap::lock );
+			if (err) {
+				stringstream msgs;
+				msgs << "Failure to load filter from file.\nError code " << err;
+				QMessageBox::warning( this, 
+					tr("File IO failure"),
+					QString(msgs.str().c_str()),
+					QMessageBox::Ok);
+			}
+			cout << p_loadedFilter->title << endl;
 		}
 	}
 

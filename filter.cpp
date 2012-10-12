@@ -132,16 +132,38 @@ namespace Moviesoap
 		outs << isbn << endl;
 		outs << year << endl;
 		// write mod descriptions
-		for (list<Mod>::iterator iter = modList.begin(); iter != modList.end(); iter++)
+		for (list<Mod>::iterator iter = modList.begin(); iter != modList.end(); iter++) {
 			outs << iter->description << endl;
+			if (!outs) return MOVIESOAP_EFILEIO;
+		}
 		// write padding
 		header.pad(outs);
-		return 0;
+		return outs ? MOVIESOAP_EFILEIO : MOVIESOAP_SUCCESS;
 	}
 
 	int Filter::metaIn(istream & ins)
 	{
-
+		// read tar file header
+		Entrity::Ustar::Header header(ins);
+		cout << "header name: " << header.name() << endl << "expected meta.txt" << endl;
+		if (header.name().compare("meta.txt")) return MOVIESOAP_ENOFPATH; // if wrong archive file
+		// read file meta
+		getline(ins, creator);
+		getline(ins, title);
+		cout << "title got " << title << endl;
+		getline(ins, isbn);
+		getline(ins, year);
+		if (!ins) return MOVIESOAP_EFILEIO;
+		// read mod descriptions
+		for (list<Mod>::iterator iter = modList.begin(); iter != modList.end(); iter++) {
+			getline(ins, iter->description);
+			if (ins.eof()) break;
+			if (!ins) return MOVIESOAP_EFILEIO;
+		}
+		// seek past padding
+		ins.seekg(header.padding(), ios::cur);
+		// return
+		return MOVIESOAP_SUCCESS;
 	}
 
 	/* Write filters mod data to outstream */
@@ -155,11 +177,34 @@ namespace Moviesoap
 		// write header
 		header.out(outs);
 		// write data
-		for (iter = modList.begin(); iter != modList.end(); iter++)
+		for (iter = modList.begin(); iter != modList.end(); iter++) {
 			outs.write((char *) &iter->mod, sizeof(moviesoap_mod_t));
+			if (!outs) return MOVIESOAP_EFILEIO;
+		}
 		// write padding
 		header.pad(outs);
-		return 0;
+		// return
+		return outs ? MOVIESOAP_EFILEIO : MOVIESOAP_SUCCESS;
+	}
+
+	/* Read mods from tar file. Return err/success */
+	int Filter::dataIn(istream & ins)
+	{
+		// read tar file header
+		Entrity::Ustar::Header header(ins);
+		cout << "header name: " << header.name() << endl << "expected data" << endl;
+		if (header.name().compare("data")) return MOVIESOAP_ENOFPATH; // if wrong archive file
+		// calc number of mods
+		size_t mods_n = header.size() / sizeof(moviesoap_mod_t);
+		// push new mods onto list
+		for (size_t i = 0; i < mods_n; i++ ) {
+			if (!ins) return MOVIESOAP_EFILEIO;
+			modList.push_back( Mod(ins) );
+		}
+		// seek past padding
+		ins.seekg(header.padding(), ios::cur);
+		// return
+		return MOVIESOAP_SUCCESS;
 	}
 
 	/* Write filter to tar file. Return 0 if success. */
@@ -169,29 +214,35 @@ namespace Moviesoap
 		ofstream outs(filepath.c_str(), ios::binary );
 		// return failure if couldn't write to file
 		if (!outs) return MOVIESOAP_ENOFILE;
-		// write meta & write data
-		metaOut(outs);
-		if (!outs) return MOVIESOAP_EFILEIO;
+		// write mods
 		dataOut(outs);
+		if (!outs) return MOVIESOAP_EFILEIO;
+		// write meta
+		metaOut(outs);
 		if (!outs) return MOVIESOAP_EFILEIO;
 		// write two empty blocks & close stream & return
 		for (int i=0; i < 512*2; i++) { outs.put(0); }
 		if (!outs) return MOVIESOAP_EFILEIO;
-		cout << "good up to point before close" << endl;
 		outs.close();
-		cout << "good after close" << endl;
 		return MOVIESOAP_SUCCESS;
 	}
 
 	int Filter::load(const string & newfpath)
 	{
+		int status;
 		ifstream ins(newfpath.c_str(), ios::binary );
 		if (!ins) return MOVIESOAP_ENOFILE;
-
 		// set filepath
 		filepath = newfpath;
-		// load mod data
+		cout << "newfpath: " << filepath << endl;
+		// load mods
 		modList.clear();
+		status = dataIn(ins);
+		if (status) return status;
+		// load meta
+		status = metaIn(ins);
+		cout << "new meta title: " << title << endl;
+		if (status) return status;
 		return MOVIESOAP_SUCCESS;
 	}
 
@@ -318,6 +369,7 @@ namespace Moviesoap
 
 /* Mod functions */
 namespace Moviesoap {
+	/* Constructor */
 	Mod::Mod(uint8_t mode, uint32_t start, uint32_t stop, uint8_t category, uint8_t severity, uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
 	{
 		mod.mode = mode;
@@ -330,6 +382,9 @@ namespace Moviesoap {
 		mod.y1 = y1;
 		mod.y2 = y2;
 	}
+
+	/* Constructor. Reads moviesoap_mod_t data from stream. Creates mod with same. */
+	Mod::Mod(istream & ins) { ins.read( (char *) &mod, sizeof(moviesoap_mod_t) ); }
 
 	Mod::~Mod() { /*vlc_timer_destroy( timer );*/ }
 

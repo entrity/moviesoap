@@ -37,11 +37,7 @@ namespace Moviesoap {
 
 		/* Constructors */
 		Filter() {}
-		Filter(Filter * other) { 
-			cout << "FILTER COPY CONSTRUCTOR CALLED" << endl;
-			*this = *other; 
-			cout << &*this->modList.begin() << " - " << &*other->modList.begin() << endl;
-		}
+		Filter(Filter * other) { *this = *other; }
 		/* Destructor */
 		~Filter() { Stop(); }
 
@@ -96,11 +92,13 @@ namespace Moviesoap {
 		vlc_timer_t timer; // holds data for activation or deactivation of mod
 		Filter * p_filter; // holds list of pointers to Mods with active timers (which may include this Mod); used for Moviesoap::deactivateMod
 		
-		/* Constructor */
+		/* Constructor(s) */
 		Mod(uint8_t mode,
 		uint32_t start, uint32_t stop,
 		uint8_t category=0, uint8_t severity=0,
 		uint16_t x1=0, uint16_t y1=0, uint16_t x2=100, uint16_t y2=100);
+		/* Constructor. Reads moviesoap_mod_t data from stream. Creates mod with same. */
+		Mod(istream &);
 		/* Destructor */
 		~Mod();
 		

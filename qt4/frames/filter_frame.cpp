@@ -43,9 +43,6 @@ namespace Moviesoap
 {
 	inline void setText(QLineEdit * input, const string &text) { input->setText(QString(text.c_str())); }
 
-	/* Update loadedFilter and hide filter editor window. */
-	void FilterFrame::closeWin() { ( (QWidget *) parent() )->hide(); }
-
 	/* Fill GUI fields with Filter data */
 	void FilterFrame::load(Filter * filter)
 	{
@@ -86,7 +83,7 @@ namespace Moviesoap
 			saveAsClicked();
 		// close editor window
 		*p_loadedFilter = *p_editingFilter;
-		closeWin();
+		FilterWin::hideEditor();
 	}
 
 	/* Slot. Save filter as. */
@@ -107,16 +104,16 @@ namespace Moviesoap
 		p_editingFilter->save();
 		// close editor window
 		*p_loadedFilter = *p_editingFilter;
-		closeWin();
+		FilterWin::hideEditor();
 	}
 
 	/* Slot. Update loadedFilter and close filter editor window. */
 	void FilterFrame::okClicked() {
 		*p_loadedFilter = *p_editingFilter;
-		closeWin();
+		FilterWin::hideEditor();
 	}
 
-	void FilterFrame::cancelClicked() { closeWin(); }
+	void FilterFrame::cancelClicked() { FilterWin::hideEditor(); }
 
 	/* Constructor */
 	FilterFrame::FilterFrame(QWidget *parent) : QFrame(parent), p_editingFilter(NULL)
