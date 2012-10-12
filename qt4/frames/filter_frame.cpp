@@ -1,3 +1,4 @@
+#include "../main.hpp"
 #include "filter_frame.hpp"
 #include "../../filter.hpp"
 #include <vlc_configuration.h>

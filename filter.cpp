@@ -250,6 +250,7 @@ namespace Moviesoap
 	{
 		Mod * p_mod;
 		Filter * p_filter = new Filter();
+		p_filter->filepath = "/home/markhama/tmp/dummy-filter.cln";
 		p_filter->creator = "MJ";
 		p_filter->title = "Labour of Love";
 		p_filter->isbn = "1234567890";

@@ -2,6 +2,12 @@
 #define MOVIESOAP_MAIN_H
 #define MOVIESOAP_VERSION 0.3.0
 
+#include "../filter.hpp"
+#include "../variables.h"
+
+#include <string>
+using namespace std;
+
 #include <vlc_common.h>
 #include <vlc_interface.h>
 #include <vlc_configuration.h>
@@ -9,17 +15,21 @@
 #include <vlc_playlist.h>		// playlist_t
 #include <QMenu>
 
-#include "../filter.hpp"
-#include "../variables.h"
-
 class MainInterface;
 class QWidget;
 class QMenuBar;
 
-namespace Moviesoap {
+// MISC
+namespace Moviesoap 
+{
+	extern string saveDir();
+	extern string extractDir(const string& str);
+}
 
+// CALLBACKS
+namespace Moviesoap
+{
 	/* Fields */
-
 	extern vlc_object_t * p_obj;
 	extern playlist_t * p_playlist;
 	extern input_thread_t * p_input;
@@ -29,12 +39,32 @@ namespace Moviesoap {
 	extern moviesoap_blackout_config_t blackout_config;
 
 	/* Functions */
-
 	extern void init( intf_thread_t * p_intf, MainInterface * mainInterface );
-	/* Returns vlc's data dir. */
-	// static const char * datadir() { return Moviesoap::p_obj ? config_GetDataDir(Moviesoap::p_obj) : NULL; }
-	/* Returns vlc's config dir. */
-	// static const char * confdir() { return config_GetConfDir(); }
+}
+
+// CONFIG
+namespace Moviesoap
+{
+	extern struct config_t {
+		/* fields */
+		bool active;
+		uint8_t tolerances[MOVIESOAP_CAT_COUNT];
+
+		/* functions */	
+		/* Write user preferences (tolerances) to file */
+		void save();
+		/* Load user preferences (tolerances) from file */
+		void load();
+		/* Set necessary callbacks on playlist and input thread */
+		void activate();
+		/* Delete callbacks */
+		void deactivate();
+		/* Returns app data dir */
+		inline string fpath();
+		/* Returns whether given Mod should not be activated */
+		bool ignoreMod(Mod &);
+		
+	} config;
 }
 
 

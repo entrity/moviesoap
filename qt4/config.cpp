@@ -21,7 +21,7 @@ namespace Moviesoap
 	void config_t::save()
 	{
 		ofstream out;
-		out.open(ConfigFpath(), ios_base::out | ios_base::trunc | ios_base::binary);
+		out.open(fpath().c_str(), ios_base::out | ios_base::trunc | ios_base::binary);
 		if (!out) { cerr << "Could not open file in Moviesoap::config_t::save." << endl; exit(1); }
 		out.write( (char *)&tolerances, MOVIESOAP_CAT_COUNT*sizeof(uint8_t) );
 		if (!out) { cerr << "Could not write to file in Moviesoap::config_t::save." << endl; exit(1); }
@@ -31,7 +31,7 @@ namespace Moviesoap
 	void config_t::load()
 	{
 		ifstream in;
-		in.open(ConfigFpath(), ios::in | ios::binary);
+		in.open(fpath().c_str(), ios::in | ios::binary);
 		if (!in) { cout << "No in config file." << endl; return; };
 		in.read( (char *)&tolerances, MOVIESOAP_CAT_COUNT*sizeof(uint8_t) );
 		if (!in) { cerr << "Could not read from file in Moviesoap::config_t::load." << endl; exit(1); }
@@ -39,15 +39,13 @@ namespace Moviesoap
 	}
 
 	/* Returns path of config dir. */
-	char * config_t::ConfigFpath()
+	string config_t::fpath()
 	{
-		if (!confPath && Moviesoap::p_obj) {
-			char * dir = config_GetDataDir( Moviesoap::p_obj );
-			confPath = (char *) malloc(strlen(dir) + strlen(MOVIESOAP_CONF_FNAME) + 1);
-			strcpy(confPath, dir);
-			free(dir);
-			strcat(confPath, MOVIESOAP_CONF_FNAME);
-		}
+		char * dir = config_GetDataDir( Moviesoap::p_obj );
+		// string confPath = (char *) malloc(strlen(dir) + strlen(MOVIESOAP_CONF_FNAME) + 1);
+		string confPath(dir);
+		free(dir);
+		confPath += MOVIESOAP_CONF_FNAME;
 		return confPath;
 	}
 

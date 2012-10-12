@@ -15,7 +15,10 @@ MOVIESOAP_GUI_MOCS = \
 
 MOVIESOAP_GUI_CPPS = \
 	../../moviesoap/qt4/main.cpp \
+	../../moviesoap/qt4/callbacks.cpp \
 	../../moviesoap/qt4/menu.cpp \
+	../../moviesoap/filter.cpp \
+	../../moviesoap/qt4/config.cpp \
 	../../moviesoap/qt4/frames/preferences.cpp \
 	../../moviesoap/qt4/frames/filter_win.cpp \
 	../../moviesoap/qt4/frames/filter_frame.cpp
@@ -23,23 +26,12 @@ MOVIESOAP_GUI_CPPS = \
 MOVIESOAP_GUI_HPPS = \
 	../../moviesoap/qt4/main.hpp \
 	../../moviesoap/qt4/menu.hpp \
-	../../moviesoap/qt4/frames/preferences.hpp \
-	../../moviesoap/qt4/frames/filter_win.hpp \
-	../../moviesoap/qt4/frames/filter_frame.hpp
-
-################################################
-### Include non-gui models ###
-################################################
-
-MOVIESOAP_GUI_HPPS += \
 	../../moviesoap/variables.h \
 	../../moviesoap/filter.hpp \
 	../../moviesoap/filter-chain.h \
-	../../moviesoap/qt4/config.hpp
-
-MOVIESOAP_GUI_CPPS += \
-	../../moviesoap/filter.cpp \
-	../../moviesoap/qt4/config.cpp
+	../../moviesoap/qt4/frames/preferences.hpp \
+	../../moviesoap/qt4/frames/filter_win.hpp \
+	../../moviesoap/qt4/frames/filter_frame.hpp	
 
 ################################################
 ### Include my tar stuff ###
