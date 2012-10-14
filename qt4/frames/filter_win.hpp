@@ -3,20 +3,33 @@
 
 namespace Moviesoap
 {
-	class Filter;
-	class FilterFrame;
+	enum moviesoap_frame_t {
+		MOVIESOAP_FILTER_FRAME,
+		MOVIESOAP_MOD_FRAME,
+		MOVIESOAP_BLACKOUT_FRAME
+	};
 
-	class FilterWin : QStackedWidget
+	class Filter;
+	class Mod;
+	class FilterFrame;
+	class ModFrame;
+	class BlackoutFrame;
+
+	class FilterWin : public QStackedWidget
 	{
 		Q_OBJECT
 	protected:
 		Filter * p_editingFilter;
-		FilterFrame *filterFrame;
+		FilterFrame * filterFrame;
+		ModFrame * modFrame;
+		BlackoutFrame * blackoutFrame;
+		static FilterWin *p_window;
 	public:
 		FilterWin();
-		static FilterWin *p_window;
+		static FilterWin * window() { return p_window; }
 		static void openEditor(Filter *);
 		static void hideEditor();
-		void load(Filter *);
+		void editFilter(Filter *);
+		void editMod(Mod *);
 	};
 }

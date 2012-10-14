@@ -6,7 +6,8 @@
 class QLineEdit;
 class QListWidget;
 
-namespace Moviesoap {
+namespace Moviesoap
+{
 	class Filter;
 	class Mod;
 
@@ -14,7 +15,8 @@ namespace Moviesoap {
 	{
 		Q_OBJECT
 	protected:
-		QLineEdit *titleText, *yearText, *isbnText, *creatorText;
+		QLineEdit
+			*titleText, *yearText, *isbnText, *creatorText;
 		QListWidget *modListWidget;
 		Filter * p_editingFilter;
 	public:
@@ -27,8 +29,8 @@ namespace Moviesoap {
 		void saveAsClicked();
 		void okClicked();
 		void cancelClicked();
-		// void newModClicked();
-		// void editModClicked();
+		void newModClicked();
+		void editModClicked();
 		// void delModClicked();
 		// void modDblClicked();
 		// void previewClicked();

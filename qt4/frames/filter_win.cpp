@@ -1,5 +1,7 @@
 #include "filter_win.hpp"
 #include "filter_frame.hpp"
+#include "mod_frame.hpp"
+#include "blackout_frame.hpp"
 #include "../../filter.hpp"
 
 // test
@@ -16,6 +18,10 @@ namespace Moviesoap
 		setWindowTitle(QString("Moviesoap Filter Editor"));
 		filterFrame = new FilterFrame(this);
 		addWidget(filterFrame);
+		modFrame = new ModFrame(this);
+		addWidget(modFrame);
+		blackoutFrame = new BlackoutFrame(this);
+		addWidget(blackoutFrame);
 	}
 
 	void FilterWin::openEditor(Filter * filterToEdit)
@@ -23,9 +29,10 @@ namespace Moviesoap
 		// create filter if necessary
 		if (p_window == NULL)
 			p_window = new FilterWin;
-		p_window->load(filterToEdit);
+		p_window->editFilter(filterToEdit);
 		// show window
 		p_window->show();
+		p_window->raise();
 	}
 
 	/* Free editingFilter. Hide window */
@@ -39,7 +46,7 @@ namespace Moviesoap
 		}
 	}
 
-	void FilterWin::load(Filter * filterToEdit)
+	void FilterWin::editFilter(Filter * filterToEdit)
 	{
 		// delete existing editingFilter
 		if (p_editingFilter)
@@ -48,5 +55,16 @@ namespace Moviesoap
 		p_editingFilter = filterToEdit ? new Filter(filterToEdit) : new Filter;
 		// pass filter to pane(s)
 		filterFrame->load(p_editingFilter);
+		// set visible pane
+		setCurrentWidget(filterFrame);
 	}
+
+	void FilterWin::editMod(Mod * mod)
+	{
+		// pass mod to pane
+		modFrame->load(mod);
+		// set visible pane
+		setCurrentWidget(modFrame);
+	}
+
 }

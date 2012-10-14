@@ -24,6 +24,7 @@ namespace Moviesoap
 {
 	extern string saveDir();
 	extern string extractDir(const string& str);
+	extern const char * toleranceLabels[];	
 }
 
 // CALLBACKS

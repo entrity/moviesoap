@@ -4,6 +4,20 @@
 
 namespace Moviesoap
 {
+	const char * toleranceLabels[] = {
+		"(unspecified)",
+		"Bigotry",
+		"Blasphemy",
+		"Contention",
+		"Disrespect family",
+		"Other",
+		"Nudity",
+		"Profanity",
+		"Sexuality",
+		"Violence",
+		"Vulgarity"
+	};
+
 	/* Return file path without filename */
 	string extractDir (const string& str)
 	{

@@ -77,7 +77,8 @@ void Moviesoap_SetBlackout( vlc_object_t * p_obj, moviesoap_blackout_config_t * 
 enum {
 	MOVIESOAP_SKIP,
 	MOVIESOAP_MUTE,
-	MOVIESOAP_BLACKOUT
+	MOVIESOAP_BLACKOUT,
+	MOVIESOAP_MODE_COUNT
 };
 
 /************************************************

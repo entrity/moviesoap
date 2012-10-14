@@ -29,21 +29,6 @@ using namespace std;
 
 namespace Moviesoap
 {
-	/* Local fields */
-	static const char * toleranceLabels[] = {
-		"(unspecified)",
-		"Bigotry",
-		"Blasphemy",
-		"Contention",
-		"Disrespect family",
-		"Other",
-		"Nudity",
-		"Profanity",
-		"Sexuality",
-		"Violence",
-		"Vulgarity"
-	};
-
 	/* Local function prototypes */
 
 	/* Initialize static vars */
@@ -54,9 +39,12 @@ namespace Moviesoap
 	{
 		setWindowTitle(QString("Moviesoap Tolerance"));
 		QGridLayout * grid = new QGridLayout;
-		// labels 0-5
-		for (char i = 0; i < MOVIESOAP_TOLERANCE_COUNT; i++)
-			SOAP_BUILD_TOLERANCE_LABEL(i, "x")
+		// labels at top
+		grid->addWidget(
+			new QLabel(QString("tolerance (none <-> all)")),
+			0, 1, 1, MOVIESOAP_TOLERANCE_COUNT,
+			Qt::AlignCenter
+			);
 		// rows of radio buttons (w/ text labels)
 		QButtonGroup * btnGroup;
 		for (uint8_t i = 0; i < MOVIESOAP_CAT_COUNT; i++)
@@ -77,6 +65,7 @@ namespace Moviesoap
 		if (p_window == NULL)
 			p_window = new PreferencesWin;
 		p_window->show();
+		p_window->raise();
 	}
 
 	/* Set values on QRadioButtons */

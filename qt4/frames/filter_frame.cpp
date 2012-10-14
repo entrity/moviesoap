@@ -1,5 +1,6 @@
 #include "filter_frame.hpp"
 #include "filter_win.hpp"
+#include "mod_list_widget.hpp"
 #include "../main.hpp"
 #include "../../filter.hpp"
 #include <vlc_configuration.h>
@@ -15,6 +16,7 @@
 #include <QFileDialog>
 #include <cstdio> // unused
 
+/* Create padded, bordered QFrame, using given layout */
 static inline QFrame *newDiv(QLayout * layout)
 {
 	QFrame * frame = new QFrame;
@@ -108,12 +110,29 @@ namespace Moviesoap
 	}
 
 	/* Slot. Update loadedFilter and close filter editor window. */
-	void FilterFrame::okClicked() {
-		*p_loadedFilter = *p_editingFilter;
-		FilterWin::hideEditor();
+	void FilterFrame::okClicked() { *p_loadedFilter = *p_editingFilter; FilterWin::hideEditor(); }
+
+	/* Slot. Hide editor without update. */
+	void FilterFrame::cancelClicked() { FilterWin::hideEditor(); }
+
+	/* Slot. Add new mod to list */
+	void FilterFrame::newModClicked()
+	{
+		p_editingFilter->modList.push_back(*(new Mod));
+		FilterWin::window()->editMod( &p_editingFilter->modList.back() );
 	}
 
-	void FilterFrame::cancelClicked() { FilterWin::hideEditor(); }
+	/* Slot. Edit currently selected mod in list */
+	void FilterFrame::editModClicked()
+	{
+		int n = modListWidget->currentRow();
+		// ensure n corresponds to a mod in modList
+		if (n >= 0 && n < p_editingFilter->modList.size()) {
+			list<Mod>::iterator iter = p_editingFilter->modList.begin();
+			advance(iter, n);
+			FilterWin::window()->editMod(&*iter);
+		}
+	}
 
 	/* Constructor */
 	FilterFrame::FilterFrame(QWidget *parent) : QFrame(parent), p_editingFilter(NULL)
@@ -141,14 +160,20 @@ namespace Moviesoap
 		hbox->addLayout(frameVLayout);
 		// mods div (right)
 		frameVLayout = new QVBoxLayout;
-		QPushButton * newModButton = new QPushButton(tr("New edit")); 
-		QPushButton * editModButton = new QPushButton(tr("Edit edit"));
-		QPushButton * delModButton = new QPushButton(tr("Delete edit"));
-		QPushButton * previewButton = new QPushButton(tr("Preview"));
+		QPushButton * newModButton = new QPushButton(tr("&New edit")); 
+		QPushButton * editModButton = new QPushButton(tr("&Edit edit"));
+		QPushButton * delModButton = new QPushButton(tr("&Delete edit"));
+		connect(newModButton, SIGNAL(clicked()), this, SLOT(newModClicked()));
+		connect(editModButton, SIGNAL(clicked()), this, SLOT(editModClicked()));
 		frameVLayout->addWidget(newModButton);
 		frameVLayout->addWidget(editModButton);
-		frameVLayout->addWidget(previewButton);
 		hbox->addLayout(frameVLayout);
+		layout->addWidget(frame);
+		// preview div
+		hbox = new QHBoxLayout;
+		frame = newDiv(hbox);
+		QPushButton * previewButton = new QPushButton(tr("Preview"));
+		hbox->addWidget(previewButton);
 		layout->addWidget(frame);
 		// creation div
 		frameVLayout = new QVBoxLayout;
