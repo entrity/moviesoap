@@ -49,6 +49,31 @@ namespace Moviesoap
 		descText->setText(QString(mod->description.c_str()));
 	}
 
+	/* Return to filterFrame view. */
+	void ModFrame::cancelClicked()
+	{
+		filterWin()->setCurrentIndex(0);
+	}
+
+	/* Dump fields into mod in editingMod.modList. Return to filterFrame view. */
+	void ModFrame::okClicked()
+	{
+		// case: new mod, not edit
+		if (!p_editingMod) {
+			// make new mod
+			Filter * p_editingFilter = filterWin()->p_editingFilter;
+			Mod newMod;
+			p_editingFilter->modList.push_back(newMod);
+			// point to new mod
+			p_editingMod = &p_editingFilter->modList.back();
+		}
+		// dump data to editingMod
+		dump(p_editingMod);
+		// return to filterFrame view
+		filterWin()->refreshModListWidget();
+		filterWin()->setCurrentIndex(0);
+	}
+
 	/* Constructor */
 	ModFrame::ModFrame(QWidget *parent) : QFrame(parent)
 	{
@@ -65,10 +90,10 @@ namespace Moviesoap
 		frame->setLayout(vbox);
 		addLabelRow(vbox, "Mode:");
 		hbox = new QHBoxLayout;
-		modeRadios[MOVIESOAP_SKIP] = addRadio(hbox, "Skip");
-		modeRadios[MOVIESOAP_MUTE] = addRadio(hbox, "Mute");
-		modeRadios[MOVIESOAP_BLACKOUT] = addRadio(hbox, "Blackout");
-		QPushButton *blackoutButton = addButton(hbox, "Set blackout bounds");
+		modeRadios[MOVIESOAP_SKIP] = addRadio(hbox, "&Skip");
+		modeRadios[MOVIESOAP_MUTE] = addRadio(hbox, "&Mute");
+		modeRadios[MOVIESOAP_BLACKOUT] = addRadio(hbox, "&Blackout");
+		QPushButton *blackoutButton = addButton(hbox, "&Set blackout bounds");
 		vbox->addLayout(hbox);
 		layout->addWidget(frame);
 		// time div
@@ -106,8 +131,8 @@ namespace Moviesoap
 		layout->addLayout(hbox);
 		// Submit div
 		hbox = new QHBoxLayout;
-		QPushButton * okButton = addButton(hbox, "Ok");
-		QPushButton * cancelButton = addButton(hbox, "<< (cancel)");
+		QPushButton * okButton = addButton(hbox, "&Ok");
+		QPushButton * cancelButton = addButton(hbox, "<< (&cancel)");
 		layout->addLayout(hbox);
 		connect( okButton, SIGNAL(clicked()), this, SLOT(okClicked()) );
 		connect( cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()) );
@@ -116,29 +141,5 @@ namespace Moviesoap
 		layout->addLayout(hbox, 9);
 		setLayout(layout);
 	}
-
-	/* Return to filterFrame view. */
-	void ModFrame::cancelClicked()
-	{
-		filterWin()->setCurrentIndex(0);
-	}
-
-	/* Dump fields into mod in editingMod.modList. Return to filterFrame view. */
-	void ModFrame::okClicked()
-	{
-		// make new mod, point to it
-		if (!p_editingMod) {
-			Filter * p_editingFilter = filterWin()->p_editingFilter;
-			Mod newMod;
-			p_editingFilter->modList.push_back(newMod);
-			p_editingMod = &p_editingFilter->modList.back();
-		}
-		// dump data to editingMod
-		dump(p_editingMod);
-		// return to filterFrame view
-		filterWin()->refreshModListWidget();
-		filterWin()->setCurrentIndex(0);
-	}
-
 	
 }

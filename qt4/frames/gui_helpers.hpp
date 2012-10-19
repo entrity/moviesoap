@@ -56,7 +56,7 @@ namespace Moviesoap
 	}
 	/* Return a time in units us*MOVIESOAP_MOD_TIME_FACTOR (= centiseconds) from string formatted 00:00:00.00 */
 	inline time_t strptime(char * text) {
-		unsigned int n, // number of slots filled with sscanf
+		int n = 0, // number of slots filled with sscanf
 			i; // counter for iterator used later
 		int ints[3];
 		time_t centiseconds = 0;

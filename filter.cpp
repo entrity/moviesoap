@@ -191,7 +191,7 @@ namespace Moviesoap
 		p_filter->isbn = "1234567890";
 		p_filter->year = "1987";
 		// add mod
-		p_mod = new Mod( MOVIESOAP_SKIP, 200, 800, 0, 0 );
+		p_mod = new Mod( MOVIESOAP_SKIP, 500, 800, 0, 0 );
 		p_mod->description = "skip talking";
 		p_filter->modList.push_back( *p_mod );
 		// add mod
@@ -202,6 +202,8 @@ namespace Moviesoap
 		p_mod = new Mod( MOVIESOAP_MUTE, 1100, 2300, 0, 0 );
 		p_mod->description = "mute the word \"foo\"";
 		p_filter->modList.push_back( *p_mod );
+		// sort
+		p_filter->modList.sort();
 		return p_filter;
 	}
 

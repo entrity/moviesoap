@@ -15,9 +15,12 @@ namespace Moviesoap
 	{
 		Q_OBJECT
 	protected:
-		QLineEdit *startText, *stopText;
+		QLineEdit *x1Text, *x2Text, *y1Text, *y2Text;
+		Mod * p_editingMod;
 	public:
 		BlackoutFrame(QWidget *);
+		void load(Mod *);
+		void dump(Mod *);
 	};
 }
 
