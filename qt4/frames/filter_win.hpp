@@ -19,17 +19,24 @@ namespace Moviesoap
 	{
 		Q_OBJECT
 	protected:
-		Filter * p_editingFilter;
 		FilterFrame * filterFrame;
 		ModFrame * modFrame;
 		BlackoutFrame * blackoutFrame;
 		static FilterWin *p_window;
 	public:
+		Filter * p_editingFilter;
+		/* Constructor */
 		FilterWin();
 		static FilterWin * window() { return p_window; }
+		/* 'Open' this window */
 		static void openEditor(Filter *);
+		/* 'Close' this window */
 		static void hideEditor();
+		/* Load and open filter-editing pane */
 		void editFilter(Filter *);
+		/* Load and open mod-editing pane */
 		void editMod(Mod *);
+		/* Refreshes contents of list of mods */
+		void refreshModListWidget();
 	};
 }

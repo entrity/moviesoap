@@ -18,12 +18,14 @@ namespace Moviesoap
 		QLineEdit
 			*titleText, *yearText, *isbnText, *creatorText;
 		QListWidget *modListWidget;
-		Filter * p_editingFilter;
 	public:
 		FilterFrame(QWidget * parent);
 		void load(Filter *);
 		void dump(Filter *);
 		void closeWin();
+		Filter * p_editingFilter;
+		/* Refreshes contents of list of mods */
+		void refreshModListWidget();
 	public slots:
 		void saveClicked();
 		void saveAsClicked();

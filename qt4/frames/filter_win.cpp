@@ -46,6 +46,7 @@ namespace Moviesoap
 		}
 	}
 
+	/* Set p_editingFilter. Load filter in filter frame. */
 	void FilterWin::editFilter(Filter * filterToEdit)
 	{
 		// delete existing editingFilter
@@ -66,5 +67,7 @@ namespace Moviesoap
 		// set visible pane
 		setCurrentWidget(modFrame);
 	}
+
+	void FilterWin::refreshModListWidget() { filterFrame->refreshModListWidget(); }
 
 }

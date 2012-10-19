@@ -2,6 +2,7 @@
 #include "main.hpp"
 #include "../filter.hpp"
 #include <fstream>
+#include <iostream>
 using namespace std;
 
 #define MOVIESOAP_CONF_FNAME "/moviesoap.conf" // used for config file io

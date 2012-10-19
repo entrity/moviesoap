@@ -9,7 +9,6 @@
 #include <vlc_threads.h>
 #include <list>
 #include <string>
-#include <iostream>
 using namespace std;
 
 namespace Moviesoap {

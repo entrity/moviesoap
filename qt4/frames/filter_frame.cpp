@@ -14,7 +14,10 @@
 #include <QPushButton>
 #include <QTranslator>
 #include <QFileDialog>
+// temp
 #include <cstdio> // unused
+#include <iostream>
+
 
 /* Create padded, bordered QFrame, using given layout */
 static inline QFrame *newDiv(QLayout * layout)
@@ -55,10 +58,7 @@ namespace Moviesoap
 		setText(isbnText, filter->isbn);
 		setText(creatorText, filter->creator);
 		// list input
-		modListWidget->clear();
-		list<Mod>::iterator iter;
-		for (iter = filter->modList.begin(); iter != filter->modList.end(); iter++)
-			new QListWidgetItem(QString(iter->description.c_str()), modListWidget);
+		refreshModListWidget();
 	}
 
 	/* Set filter string data to GUI field values. */
@@ -132,6 +132,14 @@ namespace Moviesoap
 			advance(iter, n);
 			FilterWin::window()->editMod(&*iter);
 		}
+	}
+
+	void FilterFrame::refreshModListWidget()
+	{
+		modListWidget->clear();
+		list<Mod>::iterator iter;
+		for (iter = p_editingFilter->modList.begin(); iter != p_editingFilter->modList.end(); iter++)
+			new QListWidgetItem(QString(iter->description.c_str()), modListWidget);
 	}
 
 	/* Constructor */

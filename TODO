@@ -5,6 +5,7 @@ BUGS
 
 
 TODO
+- add qmessage warnings when changes made to filter/mod w/out update call
 - add http break moviesoap feature
 - do I need to remove callbacks in main.cpp? (after playlist, input changes)?
 - activate mod only if severity exceeds tolerance

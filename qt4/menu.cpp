@@ -72,7 +72,6 @@ namespace Moviesoap
 					QString(msgs.str().c_str()),
 					QMessageBox::Ok);
 			}
-			cout << p_loadedFilter->title << endl;
 		}
 	}
 
