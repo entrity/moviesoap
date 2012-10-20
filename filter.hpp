@@ -51,6 +51,8 @@ namespace Moviesoap {
 		void sort();
 		/* Returns directory for saving Moviesoap filters. If this filter has valid filepath, returns its dir, else static saveDir, else application's datadir. */
 		string& saveDir();
+		/* Nullifies strings & pointers, empties lists */
+		void nullify();
 				
 		// FILE IO
 		
@@ -89,13 +91,13 @@ namespace Moviesoap {
 		moviesoap_mod_t mod; // struct holding data for implementation of mod
 		string description; // used for meta file
 		vlc_timer_t timer; // holds data for activation or deactivation of mod
-		Filter * p_filter; // holds list of pointers to Mods with active timers (which may include this Mod); used for Moviesoap::deactivateMod
+		Filter * p_filter; // Largely safe to ignore. Set by Filter::loadMod(). Points to mod's owner so that mod can find Filter::scheduledMods, so that mod can remove itself from Filter::scheduledMods when Filter::deactivateMod() callback fires.
 		
 		/* Constructor(s) */
 		Mod(uint8_t mode=0,
 		uint32_t start=0, uint32_t stop=0,
 		uint8_t category=0, uint8_t severity=0,
-		uint16_t x1=0, uint16_t y1=0, uint16_t x2=100, uint16_t y2=100);
+		uint16_t x1=0, uint16_t y1=0, uint16_t x2=0, uint16_t y2=0);
 		/* Constructor. Reads moviesoap_mod_t data from stream. Creates mod with same. */
 		Mod(istream &);
 		/* Destructor */
@@ -109,6 +111,7 @@ namespace Moviesoap {
 		void activate();
 		void deactivate();
 		void out(ostream & stream);
+		void nullify();
 	};
 }
 

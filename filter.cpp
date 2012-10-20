@@ -97,6 +97,18 @@ namespace Moviesoap
 	/* Sort mods in modList by start time */
 	void Filter::sort() { modList.sort(); }
 
+	void Filter::nullify()
+	{
+		filepath.clear();
+		creator.clear();
+		title.clear();
+		isbn.clear();
+		year.clear();
+		modList.clear();
+		scheduledMods.clear();
+		queuedMod = modList.begin();
+	}
+
 	// ACTIVATING AND DEACTIVATING MODS
 
 	void Filter::Restart() { Restart(getNow()); }
@@ -283,6 +295,13 @@ namespace Moviesoap {
 	}
 
 	void Mod::out(ostream & stream) { stream << "Mod: " << description << " (" << mod.start << "-" << mod.stop << ")" << endl; }
+
+	void Mod::nullify()
+	{
+		memset(&mod, 0, sizeof(mod));
+		description.clear();
+		memset(&timer, 0, sizeof(timer));
+	}
 }
 
 #undef CALC_CLOCK_CYCLES

@@ -1,5 +1,6 @@
 #include "filter_frame.hpp"
 #include "filter_win.hpp"
+#include "gui_helpers.hpp"
 #include "../main.hpp"
 #include "../../filter.hpp"
 #include <vlc_configuration.h>
@@ -12,7 +13,6 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QTranslator>
-#include <QFileDialog>
 // temp
 #include <cstdio> // unused
 #include <iostream>
@@ -45,24 +45,25 @@ static inline void addLabelAndLine( QLayout *layout, QLineEdit **p_lineEdit, cha
 
 namespace Moviesoap
 {
-	inline void setText(QLineEdit * input, const string &text) { input->setText(QString(text.c_str())); }
-
 	/* Fill GUI fields with Filter data */
 	void FilterFrame::load(Filter * filter)
 	{
-		p_editingFilter = filter;
+		// default to use filterWin->p_editingFilter;
+		if (!filter) filter = &filterWin->filter;
 		// text inputs
 		setText(titleText, filter->title);
 		setText(yearText, filter->year);
 		setText(isbnText, filter->isbn);
 		setText(creatorText, filter->creator);
 		// list input
-		refreshModListWidget();
+		refreshModListWidget(filter);
 	}
 
 	/* Set filter string data to GUI field values. */
 	void FilterFrame::dump(Filter * filter)
 	{
+		// default to use filterWin->p_editingFilter;
+		if (!filter) filter = &filterWin->filter;
 		// Get string values
 		filter->title = titleText->text().toStdString();
 		filter->year = yearText->text().toStdString();
@@ -74,79 +75,56 @@ namespace Moviesoap
 	/* Slot. Save filter. */
 	void FilterFrame::saveClicked()
 	{
-		// Return if no filter exists
-		if (!p_editingFilter)
-			{ cout << "no filter" << endl; return;}
-		// update editingFilter
-		dump(p_editingFilter);
-		// Attempt save; if fail, perform 'save as'
-		if ( p_editingFilter->filepath.empty() || p_editingFilter->save() )
-			saveAsClicked();
-		// close editor window
-		*p_loadedFilter = *p_editingFilter;
-		FilterWin::hideEditor();
+		dump();
+		filterWin->save();
+		filterWin->updateLoadedFilter();
+		filterWin->hide();
 	}
 
 	/* Slot. Save filter as. */
 	void FilterFrame::saveAsClicked()
 	{
-		// get filepath from user
-		char * userDir = config_GetUserDir( VLC_HOME_DIR );
-		QString fileName = QFileDialog::getSaveFileName(this, QString("Save filter file"), userDir, QString(MOVIESOAP_FILECHOOSER_FILTER));
-		free(userDir);
-		if (fileName.isNull())
-			return;
-		// set filepath on editingFilter
-		p_editingFilter->filepath = fileName.toStdString();
-		// force .cln file extension
-		if ( !fileName.endsWith(QString(MOVIESOAP_FILE_EXT)) )
-			p_editingFilter->filepath += MOVIESOAP_FILE_EXT;
-		// save
-		p_editingFilter->save();
-		// close editor window
-		*p_loadedFilter = *p_editingFilter;
-		FilterWin::hideEditor();
+		dump();
+		filterWin->saveAs();
+		filterWin->updateLoadedFilter();
+		filterWin->hide();
 	}
 
 	/* Slot. Update loadedFilter and close filter editor window. */
-	void FilterFrame::okClicked() { *p_loadedFilter = *p_editingFilter; FilterWin::hideEditor(); }
+	void FilterFrame::okClicked()
+	{
+		dump();
+		filterWin->updateLoadedFilter();
+		filterWin->hide();
+	}
 
 	/* Slot. Hide editor without update. */
-	void FilterFrame::cancelClicked() { FilterWin::hideEditor(); }
+	void FilterFrame::cancelClicked() { filterWin->hide(); }
 
 	/* Slot. Add new mod to list */
-	void FilterFrame::newModClicked()
-	{
-		p_editingFilter->modList.push_back(*(new Mod));
-		FilterWin::window()->editMod( &p_editingFilter->modList.back() );
-	}
+	void FilterFrame::newModClicked() { filterWin->editMod(); }
 
 	/* Slot. Edit currently selected mod in list */
 	void FilterFrame::editModClicked()
 	{
-		int n = modListWidget->currentRow();
-		// ensure n corresponds to a mod in modList
-		if (n >= 0 && n < p_editingFilter->modList.size()) {
-			list<Mod>::iterator iter = p_editingFilter->modList.begin();
-			advance(iter, n);
-			FilterWin::window()->editMod(&*iter);
-		}
+		int i = modListWidget->currentRow();
+		filterWin->editMod(i);
 	}
 
-	void FilterFrame::refreshModListWidget()
+	void FilterFrame::refreshModListWidget(Filter * filter)
 	{
 		// sort
-		p_editingFilter->modList.sort();
+		filter->modList.sort();
 		// clear
 		modListWidget->clear();
 		// add mods
 		list<Mod>::iterator iter;
-		for (iter = p_editingFilter->modList.begin(); iter != p_editingFilter->modList.end(); iter++)
+		for (iter = filter->modList.begin(); iter != filter->modList.end(); iter++)
 			new QListWidgetItem(QString(iter->description.c_str()), modListWidget);
 	}
 
 	/* Constructor */
-	FilterFrame::FilterFrame(QWidget *parent) : QFrame(parent), p_editingFilter(NULL)
+	FilterFrame::FilterFrame(FilterWin *parent) : QFrame(parent), filterWin(parent)
 	{
 		QVBoxLayout *frameVLayout, *layout = new QVBoxLayout;
 		QHBoxLayout *hbox;

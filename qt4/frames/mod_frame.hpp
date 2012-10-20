@@ -25,15 +25,15 @@ namespace Moviesoap
 			*severityRadios[MOVIESOAP_TOLERANCE_COUNT],
 			*categoryRadios[MOVIESOAP_CAT_COUNT];
 		QComboBox * categoryBox;
-		Mod * p_editingMod; // will be NULL if this is for a new Mod, else points to something in editingFilter->modList
-		inline FilterWin *filterWin();
+		FilterWin *filterWin;
 	public:
-		ModFrame(QWidget *);
+		ModFrame(FilterWin *);
 		void load(Mod *);
 		void dump(Mod *);
 	public slots:
 		void cancelClicked();
 		void okClicked();
+		void blackoutClicked();
 	};
 }
 

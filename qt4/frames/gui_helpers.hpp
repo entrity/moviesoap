@@ -1,3 +1,6 @@
+#ifndef MOVIESOAP_GUI_HELPERS_H
+#define MOVIESOAP_GUI_HELPERS_H
+
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QRadioButton>
@@ -6,6 +9,8 @@
 #include <QComboBox>
 #include <QPushButton>
 
+#include <string>
+using namespace std;
 #include <cstdio>
 
 namespace Moviesoap
@@ -21,6 +26,12 @@ namespace Moviesoap
 		QLineEdit * text = new QLineEdit;
 		if (placeholder) text->setPlaceholderText(QString(placeholder));
 		layout->addWidget(text);
+		return text;
+	}
+	inline QLineEdit * addTextToGrid(QGridLayout * gridLayout, int row, int col, const char * placeholder=NULL) {
+		QLineEdit * text = new QLineEdit;
+		if (placeholder) text->setPlaceholderText(QString(placeholder));
+		gridLayout->addWidget(text, row, col);
 		return text;
 	}
 	/* Add a QWidget to given layout */
@@ -42,6 +53,8 @@ namespace Moviesoap
 		hbox->addWidget(lbl, 0);
 		layout->addLayout(hbox);
 	}
+	/* Set value of QLineEdit */
+	inline void setText(QLineEdit * input, const string &text) { input->setText(QObject::tr(text.c_str())); }
 	/* Return a string 00:00:00.00 for time_t in us*MOVIESOAP_MOD_TIME_FACTOR (= centiseconds) */
 	inline void strftime(time_t t, char dst[12]) {
 		uint8_t cs, sec, min, hr;
@@ -56,7 +69,7 @@ namespace Moviesoap
 	}
 	/* Return a time in units us*MOVIESOAP_MOD_TIME_FACTOR (= centiseconds) from string formatted 00:00:00.00 */
 	inline time_t strptime(char * text) {
-		int n = 0, // number of slots filled with sscanf
+		int n, // number of slots filled with sscanf
 			i; // counter for iterator used later
 		int ints[3];
 		time_t centiseconds = 0;
@@ -88,3 +101,5 @@ namespace Moviesoap
 		return -1;
 	}
 }
+
+#endif

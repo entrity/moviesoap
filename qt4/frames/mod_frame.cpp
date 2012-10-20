@@ -1,7 +1,8 @@
 #include "mod_frame.hpp"
-#include "../main.hpp"
 #include "gui_helpers.hpp"
 #include "filter_win.hpp"
+#include "../main.hpp"
+#include <cstring>
 
 // temp
 #include <iostream>
@@ -9,8 +10,6 @@ using namespace std;
 
 namespace Moviesoap
 {
-	FilterWin *ModFrame::filterWin() { return (FilterWin *) parent(); }
-
 	/* Read fields into Mod */
 	void ModFrame::dump(Mod * mod)
 	{
@@ -30,7 +29,6 @@ namespace Moviesoap
 	/* Set fields, p_editingMod */
 	void ModFrame::load(Mod * mod)
 	{
-		p_editingMod = mod;
 		// mode
 		modeRadios[mod->mod.mode]->setChecked(true);
 		// times
@@ -50,34 +48,24 @@ namespace Moviesoap
 	}
 
 	/* Return to filterFrame view. */
-	void ModFrame::cancelClicked()
-	{
-		filterWin()->setCurrentIndex(0);
-	}
+	void ModFrame::cancelClicked() { filterWin->toFilterFrame(); }
 
 	/* Dump fields into mod in editingMod.modList. Return to filterFrame view. */
 	void ModFrame::okClicked()
 	{
-		// case: new mod, not edit
-		if (!p_editingMod) {
-			// make new mod
-			Filter * p_editingFilter = filterWin()->p_editingFilter;
-			Mod newMod;
-			p_editingFilter->modList.push_back(newMod);
-			// point to new mod
-			p_editingMod = &p_editingFilter->modList.back();
-		}
-		// dump data to editingMod
-		dump(p_editingMod);
+		// dump data to editingMod (appending new one to modList if necessary)
+		dump( filterWin->p_mod );
+		// add new mod to filter.modList (if this is new)
+		filterWin->addModToModListIfNew();
 		// return to filterFrame view
-		filterWin()->refreshModListWidget();
-		filterWin()->setCurrentIndex(0);
+		filterWin->toFilterFrame();
 	}
 
+	void ModFrame::blackoutClicked() { filterWin->toBlackoutFrame(); }
+
 	/* Constructor */
-	ModFrame::ModFrame(QWidget *parent) : QFrame(parent)
+	ModFrame::ModFrame(FilterWin *parent) : QFrame(parent), filterWin(parent)
 	{
-		
 		// base layout
 		QVBoxLayout * layout = new QVBoxLayout;
 		QVBoxLayout * vbox;
@@ -93,7 +81,8 @@ namespace Moviesoap
 		modeRadios[MOVIESOAP_SKIP] = addRadio(hbox, "&Skip");
 		modeRadios[MOVIESOAP_MUTE] = addRadio(hbox, "&Mute");
 		modeRadios[MOVIESOAP_BLACKOUT] = addRadio(hbox, "&Blackout");
-		QPushButton *blackoutButton = addButton(hbox, "&Set blackout bounds");
+		QPushButton *blackoutButton = addButton(hbox, "S&et blackout bounds");
+		connect( blackoutButton, SIGNAL(clicked()), this, SLOT(blackoutClicked()) );
 		vbox->addLayout(hbox);
 		layout->addWidget(frame);
 		// time div

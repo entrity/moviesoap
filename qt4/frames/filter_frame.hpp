@@ -10,6 +10,7 @@ namespace Moviesoap
 {
 	class Filter;
 	class Mod;
+	class FilterWin;
 
 	class FilterFrame : public QFrame
 	{
@@ -18,14 +19,13 @@ namespace Moviesoap
 		QLineEdit
 			*titleText, *yearText, *isbnText, *creatorText;
 		QListWidget *modListWidget;
+		FilterWin * filterWin;
 	public:
-		FilterFrame(QWidget * parent);
-		void load(Filter *);
-		void dump(Filter *);
-		void closeWin();
-		Filter * p_editingFilter;
+		FilterFrame(FilterWin * parent);
+		void load(Filter * filter=NULL);
+		void dump(Filter * filter=NULL);
 		/* Refreshes contents of list of mods */
-		void refreshModListWidget();
+		void refreshModListWidget(Filter *);
 	public slots:
 		void saveClicked();
 		void saveAsClicked();
