@@ -49,7 +49,7 @@ namespace Moviesoap
 	static void tempCallback( void * p_data );
 	static int TempCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
-	void test()
+	static void test()
 	{
 		// supply dummy values for blackout config
 		blackout_config.b_active = false;
@@ -75,7 +75,7 @@ namespace Moviesoap
 		#endif
 		vlc_mutex_init( &lock );
 		// test (dummy filter)
-		test();
+		/*test();*/
 		// build config (tolerances)
 		config.load();
 		// Get playlist pointer

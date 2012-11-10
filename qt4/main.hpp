@@ -19,7 +19,7 @@ class MainInterface;
 class QWidget;
 class QMenuBar;
 
-// MISC
+// MISC (main.cpp)
 namespace Moviesoap 
 {
 	extern string saveDir();
@@ -27,7 +27,7 @@ namespace Moviesoap
 	extern const char * toleranceLabels[];	
 }
 
-// CALLBACKS
+// CALLBACKS (callbacks.cpp)
 namespace Moviesoap
 {
 	/* Fields */
@@ -43,7 +43,7 @@ namespace Moviesoap
 	extern void init( intf_thread_t * p_intf, MainInterface * mainInterface );
 }
 
-// CONFIG
+// CONFIG (config.cpp)
 namespace Moviesoap
 {
 	extern struct config_t {
