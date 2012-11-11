@@ -61,7 +61,10 @@ namespace Moviesoap
 			QString(saveDir().c_str()),
 			QString(MOVIESOAP_FILECHOOSER_FILTER));
 		if ( !filepath.isEmpty() ) {
+			cout << "filepath: " << filepath.toStdString() << endl; // todo del
 			vlc_mutex_lock( &Moviesoap::lock );
+			if (p_loadedFilter == NULL)
+				p_loadedFilter = new Filter;
 			int err = p_loadedFilter->load( filepath.toStdString() );
 			vlc_mutex_unlock( &Moviesoap::lock );
 			if (err) {

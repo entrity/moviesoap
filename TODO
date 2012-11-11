@@ -10,9 +10,8 @@ TODO
 - do I need to remove callbacks in main.cpp? (after playlist, input changes)?
 - activate mod only if severity exceeds tolerance
 - activate & deactivate functions on config
-- new/edit mod
 - preview mod function
-- make blackout: drag over screenshot
+- + delete mod ability
 
 DONE
 - test create and destroy timers
@@ -29,6 +28,9 @@ DONE
 - load filter (from file)
 - filter save choose filename
 - new/edit filter
--------------
 - in menu's open frame actions: move opened window to front
 - label radios in prefs
+- make blackout: drag over screenshot
+- new/edit mod
+-------------
+- bugfix: segfault when opening filter file. Why? It worked before!
