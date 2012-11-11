@@ -23,6 +23,8 @@
 #include <iostream>
 using namespace std;
 
+/* Return int value of number in given coordinate text field*/
+#define MOVIESOAP_GET_COORD_I(name) (name##Text->text().toInt())
 #define MOVIESOAP_DUMP_COORD_TEXT(name) (mod->mod.name = name##Text->text().toInt())
 #define MOVIESOAP_LOAD_COORD_TEXT(name) (name##Text->setText(QString::number(mod->mod.name)))
 #define MOVIESOAP_LOAD_COORD_TEXT_FINT(name) (name##Text->setText(QString::number(name)))
@@ -54,7 +56,7 @@ namespace Moviesoap
 		return output;
 	}
 
-	/* Returns block to bmp image (or null). Requires block_Release() */
+	/* Navigate input to time indicated. Return block to bmp image (or null). Requires block_Release() */
 	block_t * BlackoutFrame::takeSnapshot(mtime_t usec)
 	{
 		// seek time
@@ -94,8 +96,9 @@ namespace Moviesoap
 	{
 		// check for input
 		if ( !Moviesoap::p_input ) { return; }
+		cout << "MOd start: " << mod->mod.start * MOVIESOAP_MOD_TIME_FACTOR << endl;
 		// take snapshot
-		block_t * p_image = takeSnapshot(mod->mod.start); // todo should be mod->mod.start
+		block_t * p_image = takeSnapshot(mod->mod.start);
 		if ( p_image ) {
 			// write snapshot to file
 			if ( writeSnapshotToFile( p_image ) == MOVIESOAP_SUCCESS ) {
@@ -138,10 +141,25 @@ namespace Moviesoap
 	/* Set Mod fields according to GUI inputs */
 	void BlackoutFrame::dump(Mod * mod)
 	{
-		MOVIESOAP_DUMP_COORD_TEXT(x1);
-		MOVIESOAP_DUMP_COORD_TEXT(x2);
-		MOVIESOAP_DUMP_COORD_TEXT(y1);
-		MOVIESOAP_DUMP_COORD_TEXT(y2);
+		int
+			x1 = MOVIESOAP_GET_COORD_I(x1),
+			x2 = MOVIESOAP_GET_COORD_I(x2),
+			y1 = MOVIESOAP_GET_COORD_I(y1),
+			y2 = MOVIESOAP_GET_COORD_I(y2);
+		if (x1 < x2) {
+			mod->mod.x1 = x1;
+			mod->mod.x2 = x2;
+		} else {
+			mod->mod.x1 = x2;
+			mod->mod.x2 = x1;
+		}
+		if (y1 < y2) {
+			mod->mod.y1 = y1;
+			mod->mod.y2 = y2;
+		} else {
+			mod->mod.y1 = y2;
+			mod->mod.y2 = y1;
+		}
 	}
 
 	/* Not working */
@@ -181,7 +199,7 @@ namespace Moviesoap
 		layout->addWidget(okButton);
 		// thumbnail div
 		thumbnail = new Thumbnail(tr("If you have a video open,\na blackout preview will\nappear in this box."));
-		thumbnail->setFixedSize(400,350);
+		thumbnail->setFixedSize(MOVIESOAP_THUMBNAIL_MAX_WIDTH, MOVIESOAP_THUMBNAIL_MAX_HEIGHT);
 		connect( thumbnail, SIGNAL(blackoutChanged(int,int,int,int)), this, SLOT(load(int,int,int,int)) );
 		layout->addWidget(thumbnail);
 	}

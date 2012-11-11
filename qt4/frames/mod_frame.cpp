@@ -61,7 +61,11 @@ namespace Moviesoap
 		filterWin->toFilterFrame();
 	}
 
-	void ModFrame::blackoutClicked() { filterWin->toBlackoutFrame(); }
+	void ModFrame::blackoutClicked()
+	{
+		dump( filterWin->p_mod );
+		filterWin->toBlackoutFrame();
+	}
 
 	/* Constructor */
 	ModFrame::ModFrame(FilterWin *parent) : QFrame(parent), filterWin(parent)
@@ -99,7 +103,7 @@ namespace Moviesoap
 		frame = new QFrame;
 		vbox = new QVBoxLayout;
 		frame->setLayout(vbox);
-		addLabel(hbox, "Offensiveness (scarcely <-> very)");
+		addLabel(vbox, "Offensiveness (scarcely <-> very)");
 		hbox = new QHBoxLayout;
 		for (i = 0; i < MOVIESOAP_TOLERANCE_COUNT-1; i++) {
 			severityRadios[i] = addRadio(hbox);	}
