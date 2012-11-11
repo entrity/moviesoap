@@ -104,12 +104,20 @@ namespace Moviesoap
 	/* Slot. Add new mod to list */
 	void FilterFrame::newModClicked() { filterWin->editMod(); }
 
+	/* Slot. Delete selected mod from filter. */
+	void FilterFrame::delModClicked() {
+		int i = modListWidget->currentRow();
+		filterWin->deleteMod(i);
+	}
+
 	/* Slot. Edit currently selected mod in list */
 	void FilterFrame::editModClicked()
 	{
 		int i = modListWidget->currentRow();
 		filterWin->editMod(i);
 	}
+
+	// void FilterFrame::modDblClicked() { editModClicked(); }
 
 	void FilterFrame::refreshModListWidget(Filter * filter)
 	{
@@ -145,6 +153,7 @@ namespace Moviesoap
 		frameVLayout = new QVBoxLayout;
 		frameVLayout->addWidget(new QLabel("Edits"));
 		modListWidget = new QListWidget;
+		connect(modListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(editModClicked()));
 		frameVLayout->addWidget(modListWidget);
 		hbox->addLayout(frameVLayout);
 		// mods div (right)
@@ -154,8 +163,10 @@ namespace Moviesoap
 		QPushButton * delModButton = new QPushButton(tr("&Delete edit"));
 		connect(newModButton, SIGNAL(clicked()), this, SLOT(newModClicked()));
 		connect(editModButton, SIGNAL(clicked()), this, SLOT(editModClicked()));
+		connect(delModButton, SIGNAL(clicked()), this, SLOT(delModClicked()));
 		frameVLayout->addWidget(newModButton);
 		frameVLayout->addWidget(editModButton);
+		frameVLayout->addWidget(delModButton);
 		hbox->addLayout(frameVLayout);
 		layout->addWidget(frame);
 		// preview div

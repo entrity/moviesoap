@@ -49,6 +49,8 @@ namespace Moviesoap
 		void editMod(Mod * mod=NULL);
 		/* Load and open mod-editing pane */
 		void editMod(int i);
+		/* Delete mod from filter */
+		void deleteMod(int i);
 		/* Refreshes contents of list of mods */
 		void refreshModListWidget();
 		/* If p_mod points to a new mod, add it to filter.modList and sort list */

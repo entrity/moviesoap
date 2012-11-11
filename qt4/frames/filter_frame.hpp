@@ -33,7 +33,7 @@ namespace Moviesoap
 		void cancelClicked();
 		void newModClicked();
 		void editModClicked();
-		// void delModClicked();
+		void delModClicked();
 		// void modDblClicked();
 		// void previewClicked();
 	};

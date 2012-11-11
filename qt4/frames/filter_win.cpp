@@ -79,6 +79,19 @@ namespace Moviesoap
 		}
 	}
 
+	void FilterWin::deleteMod(int i) {
+		// ensure i corresponds to a mod in modList
+		if (i >= 0 && i < filter.modList.size()) {
+			// get iterator pointing to mod to be deleted
+			list<Mod>::iterator iter = filter.modList.begin();
+			advance(iter, i);
+			// delete mod
+			filter.modList.erase(iter);
+			// update mod list widget
+			filterFrame->refreshModListWidget(&filter);
+		}
+	}
+
 	void FilterWin::refreshModListWidget() { filterFrame->refreshModListWidget(&filter); }
 
 	void FilterWin::toFilterFrame()
