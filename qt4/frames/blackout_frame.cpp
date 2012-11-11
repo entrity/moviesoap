@@ -96,9 +96,8 @@ namespace Moviesoap
 	{
 		// check for input
 		if ( !Moviesoap::p_input ) { return; }
-		cout << "MOd start: " << mod->mod.start * MOVIESOAP_MOD_TIME_FACTOR << endl;
 		// take snapshot
-		block_t * p_image = takeSnapshot(mod->mod.start);
+		block_t * p_image = takeSnapshot(mod->mod.start * MOVIESOAP_MOD_TIME_FACTOR);
 		if ( p_image ) {
 			// write snapshot to file
 			if ( writeSnapshotToFile( p_image ) == MOVIESOAP_SUCCESS ) {
