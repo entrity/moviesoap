@@ -89,10 +89,11 @@ namespace Moviesoap
 		#ifdef MSDEBUG1
 		msg_Info( p_this, "!!! CALLBACK playlist item-change !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
-		// Add blackout filter to vout
+		input_thread_t * p_input = playlist_CurrentInput( p_playlist );
+		// Add blackout filter to vout if vout thread exists on input thread
 		if (p_input) {
-			if (vout_thread_exists( p_input )) {
-				var_DelCallback( p_playlist, "item-change", PlaylistCbItemChange, p_data );
+			if ( vout_thread_exists( p_input ) ) {
+				var_DelCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
 				add_blackout_filter_to_input( p_input );
 			} else {
 				msg_Err( p_this, "No vout thread found for blackout." );
@@ -109,18 +110,17 @@ namespace Moviesoap
 		#ifdef MSDEBUG1
 		msg_Info( p_this, "!!! CALLBACK playlist item-current !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
-		intf_thread_t * p_intf = ( intf_thread_t *) p_data;
-		p_playlist = pl_Get( p_intf );
+		p_playlist = (playlist_t *) p_data;
 		if (p_playlist)
 		{
+			// Add callback(s) to playlist (for purpose of adding video filter to chain)
+			var_AddCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
 			// Update p_input
 			p_input = playlist_CurrentInput( p_playlist );
 			if (p_input) {
-				// Add callback(s) to playlist (for purpose of adding video filter to chain)
-				/*var_AddCallback( p_playlist, "item-change", PlaylistCbItemChange, p_intf );*/
 				// Add callback(s) to input thread
-				var_AddCallback( p_input, "position", InputCbPosition, p_intf );
-				var_AddCallback( p_input, "time", InputCbTime, p_intf );
+				var_AddCallback( p_input, "position", InputCbPosition, p_data );
+				var_AddCallback( p_input, "time", InputCbTime, p_data );
 				var_AddCallback( p_input, "navigation", InputCbNavigation, p_data );
 				var_AddCallback( p_input, "state", InputCbState, p_data );
 				// start filter object if one exists
