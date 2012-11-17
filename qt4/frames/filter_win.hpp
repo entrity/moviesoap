@@ -13,6 +13,7 @@ namespace Moviesoap
 	class FilterFrame;
 	class ModFrame;
 	class BlackoutFrame;
+	class ConcludePreviewButton;
 
 	class FilterWin : public QStackedWidget
 	{
@@ -22,6 +23,8 @@ namespace Moviesoap
 		FilterFrame * filterFrame;
 		ModFrame * modFrame;
 		BlackoutFrame * blackoutFrame;
+		ConcludePreviewButton * concludePreviewButton;
+		Filter * holdingBayForLoadedFilter; // holds Moviesoap::p_loadedFilter during Mod previews
 	public:
 		Filter filter;
 		Filter blankFilter; // used to copy null fields to this->filter when new filter is wanted
@@ -30,7 +33,9 @@ namespace Moviesoap
 		Mod * p_mod; // pointer to mod currently being edited. Must point to either this->mod or a mod in filter.modList
 		/* Constructor */
 		FilterWin();
-		static FilterWin * window() { return p_window; } // todo del
+		/* Destructor */
+		~FilterWin() { free(concludePreviewButton); }
+		// static FilterWin * window() { return p_window; } // todo del
 		/* 'Open' this window */
 		static void openEditor(Filter *);
 		/* 'Close' this window */
@@ -61,5 +66,10 @@ namespace Moviesoap
 		void save();
 		/* Get filepath from user. Then call loadedFilter->save() */
 		void saveAs();
+		/* Swap this->filter for Moviesoap::filter, set play time, play main playing window, hide this, show concludePreviewButton */
+		void preview(mtime_t start);
+	public slots:
+		/* Swap back this->filter for Moviesoap::filter, pause play, hide concludePreviewButton, show this */
+		void concludePreview();
 	};
 }

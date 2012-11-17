@@ -105,9 +105,17 @@ namespace Moviesoap
 	void FilterFrame::newModClicked() { filterWin->editMod(); }
 
 	/* Slot. Delete selected mod from filter. */
-	void FilterFrame::delModClicked() {
+	void FilterFrame::delModClicked()
+	{
 		int i = modListWidget->currentRow();
 		filterWin->deleteMod(i);
+	}
+
+	Mod * FilterFrame::getSelectedMod()
+	{
+		int i = modListWidget->currentRow();
+		list<Mod>::iterator iter = filterWin->filter.getMod(i);
+		return &*iter;
 	}
 
 	/* Slot. Edit currently selected mod in list */
@@ -117,7 +125,20 @@ namespace Moviesoap
 		filterWin->editMod(i);
 	}
 
-	// void FilterFrame::modDblClicked() { editModClicked(); }
+	void FilterFrame::previewClicked()
+	{
+		Mod * mod = getSelectedMod();
+		if (mod == NULL)
+			return;
+		// get Mod's startT
+		mtime_t start = mod->startTime();
+		// Get value to backtrack from the mod's startTime from the GUI
+		mtime_t offset = MOVIESOAP_MOD_TIME_TO_US(strptime(previewOffsetText->text().toAscii().data()));
+		// Adjust start time by offset
+		start = (start > offset) ? start - offset : 0;
+		// call preview on the FilterWin
+		filterWin->preview( start );
+	}
 
 	void FilterFrame::refreshModListWidget(Filter * filter)
 	{
@@ -172,8 +193,12 @@ namespace Moviesoap
 		// preview div
 		hbox = new QHBoxLayout;
 		frame = newDiv(hbox);
-		QPushButton * previewButton = new QPushButton(tr("Preview"));
+		QPushButton * previewButton = new QPushButton(QString("Preview edit"));
 		hbox->addWidget(previewButton);
+		connect(previewButton, SIGNAL(clicked()), this, SLOT(previewClicked()));
+		QLabel * previewOffsetLabel = new QLabel(tr("preview offset (backward):"));
+		hbox->addWidget(previewOffsetLabel);
+		previewOffsetText = addText(hbox, "seconds");
 		layout->addWidget(frame);
 		// creation div
 		frameVLayout = new QVBoxLayout;

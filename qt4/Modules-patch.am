@@ -14,7 +14,8 @@ MOVIESOAP_GUI_MOCS = \
 	../../moviesoap/qt4/frames/filter_frame.moc.cpp \
 	../../moviesoap/qt4/frames/mod_frame.moc.cpp \
 	../../moviesoap/qt4/frames/blackout_frame.moc.cpp \
-	../../moviesoap/qt4/frames/thumbnail.moc.cpp
+	../../moviesoap/qt4/frames/thumbnail.moc.cpp \
+	../../moviesoap/qt4/frames/conclude_preview_button.moc.cpp
 
 MOVIESOAP_GUI_CPPS = \
 	../../moviesoap/qt4/main.cpp \
@@ -28,7 +29,8 @@ MOVIESOAP_GUI_CPPS = \
 	../../moviesoap/qt4/frames/filter_frame.cpp \
 	../../moviesoap/qt4/frames/mod_frame.cpp \
 	../../moviesoap/qt4/frames/blackout_frame.cpp \
-	../../moviesoap/qt4/frames/thumbnail.cpp
+	../../moviesoap/qt4/frames/thumbnail.cpp \
+	../../moviesoap/qt4/frames/conclude_preview_button.cpp
 
 MOVIESOAP_GUI_HPPS = \
 	../../moviesoap/qt4/main.hpp \
@@ -42,7 +44,8 @@ MOVIESOAP_GUI_HPPS = \
 	../../moviesoap/qt4/frames/mod_frame.hpp \
 	../../moviesoap/qt4/frames/blackout_frame.hpp \
 	../../moviesoap/qt4/frames/gui_helpers.hpp \
-	../../moviesoap/qt4/frames/thumbnail.hpp
+	../../moviesoap/qt4/frames/thumbnail.hpp \
+	../../moviesoap/qt4/frames/conclude_preview_button.hpp
 
 ################################################
 ### Include my tar stuff ###

@@ -6,11 +6,12 @@ BUGS
 
 TODO
 - add qmessage warnings when changes made to filter/mod w/out update call
-- add http break moviesoap feature
+- add http break moviesoap feature / check for updates
 - do I need to remove callbacks in main.cpp? (after playlist, input changes)?
 - activate mod only if severity exceeds tolerance
 - activate & deactivate functions on config
-- preview mod function
+- clear p_input when input thread changes to stop or switch
+
 
 DONE
 - test create and destroy timers
@@ -31,7 +32,8 @@ DONE
 - label radios in prefs
 - make blackout: drag over screenshot
 - new/edit mod
--------------
 - bugfix: segfault when opening filter file. Why? It worked before!
 - + delete mod ability
 - modDblClick opens mod for editing
+-------------
+- preview mod function

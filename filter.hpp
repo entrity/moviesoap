@@ -1,6 +1,5 @@
 #ifndef MOVIESOAP_FILTER_HPP
 #define MOVIESOAP_FILTER_HPP
-#define MOVIESOAP_MOD_TIME_FACTOR 10000
 
 #include <QWidget>
 
@@ -53,6 +52,8 @@ namespace Moviesoap {
 		string& saveDir();
 		/* Nullifies strings & pointers, empties lists */
 		void nullify();
+		/* Returns iterator to mod for index */
+		list<Mod>::iterator getMod(int i);
 				
 		// FILE IO
 		
@@ -107,6 +108,9 @@ namespace Moviesoap {
 		bool operator<(const Mod& otherMod) const;
 		/* Used for removing a Mod from a list. Returns true if their address' are the same (i.e. they are actually the same object) */
 		bool operator==(const Mod & other) const;
+
+		uint32_t startTime();
+		uint32_t stopTime();
 
 		void activate();
 		void deactivate();

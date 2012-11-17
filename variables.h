@@ -5,6 +5,8 @@
 #define MOVIESOAP_TOLERANCE_COUNT 6
 #define MOVIESOAP_FILE_EXT ".cln"
 #define MOVIESOAP_FILECHOOSER_FILTER "Filter files (*.cln)"
+#define MOVIESOAP_MOD_TIME_FACTOR 10000
+#define MOVIESOAP_MOD_TIME_TO_US(mod_time) (mod_time * MOVIESOAP_MOD_TIME_FACTOR) // calculate microseconds equivalent of moviesoap_mod_t times
 
 #include <vlc_common.h>
 

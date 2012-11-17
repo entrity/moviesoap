@@ -4,7 +4,9 @@
 #include "blackout_frame.hpp"
 #include "../main.hpp"
 #include "../../filter.hpp"
+#include "conclude_preview_button.hpp"
 
+#include <vlc_playlist.h>
 #include <QFileDialog>
 
 // test
@@ -26,6 +28,8 @@ namespace Moviesoap
 		addWidget(modFrame);
 		blackoutFrame = new BlackoutFrame(this);
 		addWidget(blackoutFrame);
+		concludePreviewButton = new ConcludePreviewButton(QString("Conclude Preview Button"), this);
+		connect(concludePreviewButton, SIGNAL(clicked()), this, SLOT(concludePreview()));
 	}
 
 	void FilterWin::openEditor(Filter * filterToEdit)
@@ -145,5 +149,27 @@ namespace Moviesoap
 			filter.filepath += MOVIESOAP_FILE_EXT;
 		// save
 		filter.save();
+	}
+
+	/* Set play time, play, hide this, show concludePreviewButton */
+	void FilterWin::preview(mtime_t start)
+	{
+		if (p_input == NULL || p_playlist == NULL)
+			return;
+		holdingBayForLoadedFilter = Moviesoap::p_loadedFilter;
+		Moviesoap::p_loadedFilter = &filter;
+		var_SetTime( p_input, "time", start );
+		playlist_Control( Moviesoap::p_playlist, PLAYLIST_PLAY, false );
+		hide();
+		concludePreviewButton->show();
+	}
+
+	/* Pause play, hide concludePreviewButton, show this */
+	void FilterWin::concludePreview()
+	{
+		concludePreviewButton->hide();
+		show();
+		playlist_Control( Moviesoap::p_playlist, PLAYLIST_PAUSE, false );
+		Moviesoap::p_loadedFilter = holdingBayForLoadedFilter;
 	}
 }

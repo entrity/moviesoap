@@ -13,7 +13,6 @@ using namespace std;
 # define INT64_C(c)  c ## LL
 #endif
 #define CALC_CLOCK_CYCLES(microseconds) (microseconds * CLOCK_FREQ / 1000000) // multiply microseconds by clock cycles per microsecond to get delay in terms of clock cycles
-#define MOVIESOAP_MOD_TIME_TO_US(mod_time) (mod_time * MOVIESOAP_MOD_TIME_FACTOR) // calculate microseconds equivalent of moviesoap_mod_t times
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -107,6 +106,16 @@ namespace Moviesoap
 		modList.clear();
 		scheduledMods.clear();
 		queuedMod = modList.begin();
+	}
+
+	/* Returns iterator to mod for index */
+	list<Mod>::iterator Filter::getMod(int i)
+	{
+		if (i < 0 || i > modList.size())
+			return list<Mod>::iterator(NULL);
+		list<Mod>::iterator iter = modList.begin();
+		advance(iter, i);
+		return iter;
 	}
 
 	// ACTIVATING AND DEACTIVATING MODS
@@ -256,6 +265,10 @@ namespace Moviesoap {
 	bool Mod::operator<(const Mod& otherMod) const { return mod.start < otherMod.mod.start; }
 
 	bool Mod::operator==(const Mod& otherMod) const { return this == &otherMod; }
+
+	uint32_t Mod::startTime() { return MOVIESOAP_MOD_TIME_TO_US(mod.start); }
+
+	uint32_t Mod::stopTime() { return MOVIESOAP_MOD_TIME_TO_US(mod.stop); }
 
 	void Mod::activate()
 	{

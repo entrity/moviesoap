@@ -17,7 +17,7 @@ namespace Moviesoap
 		Q_OBJECT
 	protected:
 		QLineEdit
-			*titleText, *yearText, *isbnText, *creatorText;
+			*titleText, *yearText, *isbnText, *creatorText, *previewOffsetText;
 		QListWidget *modListWidget;
 		FilterWin * filterWin;
 	public:
@@ -26,6 +26,7 @@ namespace Moviesoap
 		void dump(Filter * filter=NULL);
 		/* Refreshes contents of list of mods */
 		void refreshModListWidget(Filter *);
+		Mod * getSelectedMod();
 	public slots:
 		void saveClicked();
 		void saveAsClicked();
@@ -34,8 +35,7 @@ namespace Moviesoap
 		void newModClicked();
 		void editModClicked();
 		void delModClicked();
-		// void modDblClicked();
-		// void previewClicked();
+		void previewClicked();
 	};
 }
 
