@@ -10,6 +10,8 @@ namespace Moviesoap {
 
 	filter_t * p_blackout_filter = NULL;
 
+}
+
 	static inline filter_chain_t * get_filter_chain_static( vout_thread_t * p_vout )
 	{
 		return p_vout->p->filter.chain_static;
@@ -47,11 +49,10 @@ namespace Moviesoap {
 		filter_chain_t *p_filter_chain = get_first_filter_chain( p_input );
 		if ( !p_filter_chain )
 			return VLC_ENOOBJ; // No vout thread available (no biggie)
-		p_blackout_filter = filter_chain_AppendFilter( p_filter_chain, "moviesoap_video_filter", NULL, NULL, NULL );
+		Moviesoap::p_blackout_filter = filter_chain_AppendFilter( p_filter_chain, "moviesoap_video_filter", NULL, NULL, NULL );
 		return VLC_SUCCESS; // Not really an error. Just indicates we made the change.
 	} 
 
-}
 
 // typedef struct chained_filter_t
 // {

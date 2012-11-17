@@ -80,7 +80,7 @@ namespace Moviesoap
 		var_CreateGetAddress( p_obj->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME);
 		var_SetAddress( p_obj->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME, &blackout_config );
 		// Add callback(s) to playlist
-		var_AddCallback( p_playlist, "item-current", PlaylistCbItemCurrent, p_intf );
+		var_AddCallback( p_playlist, "item-current", PlaylistCbItemCurrent, NULL );
 	}
 
 	/* Set by PlaylistChangeCallback. If a vout_thread exists on input, removes this callback and attaches the blackout filter to the vout. */
@@ -110,19 +110,23 @@ namespace Moviesoap
 		#ifdef MSDEBUG1
 		msg_Info( p_this, "!!! CALLBACK playlist item-current !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
-		p_playlist = (playlist_t *) p_data;
+		p_playlist = (playlist_t *) p_this;
 		if (p_playlist)
 		{
+			msg_Info( p_this, "check 1" );
 			// Add callback(s) to playlist (for purpose of adding video filter to chain)
 			var_AddCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
+			msg_Info( p_this, "check 2" );
 			// Update p_input
 			p_input = playlist_CurrentInput( p_playlist );
+			msg_Info( p_this, "check 3" );
 			if (p_input) {
+				msg_Info( p_this, "check 4" );
 				// Add callback(s) to input thread
-				var_AddCallback( p_input, "position", InputCbPosition, p_data );
-				var_AddCallback( p_input, "time", InputCbTime, p_data );
-				var_AddCallback( p_input, "navigation", InputCbNavigation, p_data );
-				var_AddCallback( p_input, "state", InputCbState, p_data );
+				var_AddCallback( p_input, "position", InputCbPosition, NULL );
+				var_AddCallback( p_input, "time", InputCbTime, NULL );
+				var_AddCallback( p_input, "navigation", InputCbNavigation, NULL );
+				var_AddCallback( p_input, "state", InputCbState, NULL );
 				// start filter object if one exists
 				if (p_loadedFilter) p_loadedFilter->Restart();
 				return VLC_SUCCESS;
