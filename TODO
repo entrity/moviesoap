@@ -35,5 +35,5 @@ DONE
 - bugfix: segfault when opening filter file. Why? It worked before!
 - + delete mod ability
 - modDblClick opens mod for editing
--------------
 - preview mod function
+-------------

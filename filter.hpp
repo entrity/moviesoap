@@ -57,7 +57,7 @@ namespace Moviesoap {
 				
 		// FILE IO
 		
-		inline size_t metaSize();
+		size_t metaSize();
 		/* Write tar header, data and padding to stream */
 		int metaOut(ofstream &);
 		int metaIn(istream &);
