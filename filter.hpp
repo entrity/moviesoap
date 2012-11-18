@@ -14,10 +14,11 @@ namespace Moviesoap {
 	class Filter;
 	class Mod;
 
-	/* Implement mod effect, schedule stop, destroy start timer */
-	void activateMod(void * p_data);
-	/* Destroy stop timer. End effect. */
-	void deactivateMod(void * p_data);
+	/* Function prototypes */
+	void tryModStart(void * mod_pointer);
+	void tryModStop(void * mod_pointer);
+	void tryModStart(Mod * p_mod, mtime_t now);
+	void tryModStop(Mod * p_mod, mtime_t now);
 
 	class Filter
 	{
@@ -78,7 +79,7 @@ namespace Moviesoap {
 		/* Destroy timers. Undo any active effects (mute & blackout) */
 		void Stop();
 		/* Load queuedMod. */
-		void loadNextMod();
+		// void loadNextMod();
 		/* Load queuedMod. */
 		void loadNextMod(mtime_t);
 	};

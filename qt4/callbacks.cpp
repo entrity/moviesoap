@@ -154,7 +154,7 @@ namespace Moviesoap
 		msg_Info( p_this, "!!! CALLBACK input time !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
 		mtime_t new_time = newval.i_time;
-		// StopAndStartFilter(new_time);
+		// StopAndStartFilter(new_time); // todo
 		return 0;
 	}
 
@@ -162,7 +162,7 @@ namespace Moviesoap
 	static MOVIESOAP_CALLBACK(InputCbPosition)
 	{
 		#ifdef MSDEBUG3
-		msg_Info( p_this, "!!! CALLBACK input position !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
+		msg_Info( p_this, "!!! CALLBACK input position !!! : %s ... new: %f ... old: %f", psz_var, (float) newval.f_float, (float) oldval.f_float );
 		#endif
 		mtime_t new_time = newval.f_float * var_GetTime( p_input, "length" );
 		StopAndStartFilter(new_time);

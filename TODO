@@ -39,3 +39,4 @@ DONE
 - clean up filter.cpp so as to handle scheduledMods list and activation/deactivation in proper order
 -------------
 - when filter file loaded, stop old filter and start new one
+- handle queueing correct mod downstream of position change callback

@@ -29,12 +29,11 @@ using namespace std;
 /* Non-member functions */
 namespace Moviesoap
 {
-	/* Local function prototypes */
-	void tryModStart(void * mod_pointer);
-	void tryModStop(void * mod_pointer);
-
 	/* Get current time in play (in us) */
 	static inline mtime_t getNow() { return p_input ? var_GetTime( p_input, "time" ) : 0; }
+
+	void tryModStart(void * p_data) { tryModStart( (Mod *) p_data, getNow() ); }
+	void tryModStop(void * p_data) { tryModStop( (Mod *) p_data, getNow() ); }
 
 	/* 	Remove mod from scheduledMods list (if present).
 		Schedule start or activate mod.
@@ -42,13 +41,12 @@ namespace Moviesoap
 		If activated and has active effect, calls function to add to scheduledMods list and schedule deactivation.
 		Calls Filter::loadNextMod.
 		*/
-	void tryModStart(void * mod_pointer)
+	void tryModStart(Mod * p_mod, mtime_t now)
 	{
-		Mod * p_mod = (Mod *) mod_pointer;
 		// Remove from scheduled list
 		p_mod->removeFromScheduledList();
 		// Calculate delay until start in microseconds
-		mtime_t delay = p_mod->calcActivationDelay(getNow());
+		mtime_t delay = p_mod->calcActivationDelay(now);
 		if (delay) {
 			// Reschedule start if start time is not reached
 			p_mod->schedule( delay, tryModStart );
@@ -59,9 +57,9 @@ namespace Moviesoap
 			p_mod->activate();
 			// Schedule deactivation if mod produces an active effect
 			if ( p_mod->producesActiveEffect() )
-				tryModStop(mod_pointer);
+				tryModStop(p_mod);
 			// Tell Filter to load next Mod
-			p_mod->p_filter->loadNextMod(getNow());
+			p_mod->p_filter->loadNextMod(now);
 		}
 	}
 
@@ -69,13 +67,12 @@ namespace Moviesoap
 		Schedule stop or deactivate mod.
 		Add to scheduledMods list if timer was set.
 		*/
-	void tryModStop(void * mod_pointer)
+	void tryModStop(Mod * p_mod, mtime_t now)
 	{
-		Mod * p_mod = (Mod *) mod_pointer;
 		// Remove from scheduled list
 		p_mod->removeFromScheduledList();
 		// Calculate delay until stop in microseconds
-		mtime_t delay = p_mod->calcDeactivationDelay(getNow());
+		mtime_t delay = p_mod->calcDeactivationDelay(now);
 		if (delay) {
 			// Reschedule stop if stop time is not reached
 			p_mod->schedule( delay, tryModStop );
@@ -168,8 +165,8 @@ namespace Moviesoap
 		#endif
 	}
 
-	/* Load queuedMod. Stop Filter if end reached. */
-	void Filter::loadNextMod() { loadNextMod(getNow()); }
+	// /* Load queuedMod. Stop Filter if end reached. */
+	// void Filter::loadNextMod() { loadNextMod(getNow()); }
 
 	/* Load queuedMod. Stop Filter if end reached. (Arg 'now' should be in microseconds) */
 	void Filter::loadNextMod(mtime_t now)
@@ -187,7 +184,7 @@ namespace Moviesoap
 				Mod * p_mod = &*queuedMod;
 				p_mod->p_filter = this;
 				queuedMod++;
-				tryModStart( p_mod );
+				tryModStart( p_mod, now );
 				return; // break
 			}
 		}
