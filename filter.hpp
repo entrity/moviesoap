@@ -105,7 +105,7 @@ namespace Moviesoap {
 		bool operator==(const Mod& otherMod) const { return this == &otherMod; }
 
 		/* Returns true if this Mod's mode yields an active effect (requiring scheduling of its stop time) */
-		bool producesActiveEffect() { return mod.mode == MOVIESOAP_SKIP; }
+		bool producesActiveEffect() { return mod.mode != MOVIESOAP_SKIP; }
 
 		/* Return Mod's start time in microseconds */
 		uint32_t startTime() { return MOVIESOAP_MOD_TIME_TO_US(mod.start); }

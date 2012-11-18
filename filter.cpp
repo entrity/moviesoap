@@ -34,7 +34,7 @@ namespace Moviesoap
 	void tryModStop(void * mod_pointer);
 
 	/* Get current time in play (in us) */
-	static inline mtime_t getNow() { return var_GetTime( p_input, "time" ); }
+	static inline mtime_t getNow() { return p_input ? var_GetTime( p_input, "time" ) : 0; }
 
 	/* 	Remove mod from scheduledMods list (if present).
 		Schedule start or activate mod.
@@ -129,6 +129,9 @@ namespace Moviesoap
 
 	/* Set queuedMod to first mod. Call loadNextMod */
 	void Filter::Restart(mtime_t now) {
+		// Do nothing if there is no input thread.
+		if (!p_input)
+			return;
 		queuedMod = modList.begin();
 		#ifdef MSDEBUG2
 			cout << "FILTER RESTART (first mod: " << (*queuedMod).description << ")" << endl;
@@ -181,8 +184,9 @@ namespace Moviesoap
 					cout << setw(18) << "QUEUE MOD: " << "now(" << now / MOVIESOAP_MOD_TIME_FACTOR << ") ";
 				#endif
 				queuedMod->out(cout);
-				Mod * p_mod = &*queuedMod++;
+				Mod * p_mod = &*queuedMod;
 				p_mod->p_filter = this;
+				queuedMod++;
 				tryModStart( p_mod );
 				return; // break
 			}
