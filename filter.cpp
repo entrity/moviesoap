@@ -29,57 +29,62 @@ using namespace std;
 /* Non-member functions */
 namespace Moviesoap
 {
+	/* Local function prototypes */
+	void tryModStart(void * mod_pointer);
+	void tryModStop(void * mod_pointer);
+
 	/* Get current time in play (in us) */
 	static inline mtime_t getNow() { return var_GetTime( p_input, "time" ); }
 
-	/* mtime_t args should be in us (microseconds) */
-	static inline void scheduleMod(Mod * p_mod, mtime_t now, mtime_t trigger_us, void (*callback)(void *))
+	/* 	Remove mod from scheduledMods list (if present).
+		Schedule start or activate mod.
+		Add to scheduledMods list if timer was set.
+		If activated and has active effect, calls function to add to scheduledMods list and schedule deactivation.
+		Calls Filter::loadNextMod.
+		*/
+	void tryModStart(void * mod_pointer)
 	{
-		// calc delay
-		mtime_t delay = CALC_CLOCK_CYCLES(trigger_us - now);
-		// create, schedule timer
-		vlc_timer_create( &p_mod->timer, callback, p_mod );
-		vlc_timer_schedule( p_mod->timer, false, delay, 0 );
+		Mod * p_mod = (Mod *) mod_pointer;
+		// Remove from scheduled list
+		p_mod->removeFromScheduledList();
+		// Calculate delay until start in microseconds
+		mtime_t delay = p_mod->calcActivationDelay(getNow());
+		if (delay) {
+			// Reschedule start if start time is not reached
+			p_mod->schedule( delay, tryModStart );
+			// add to scheduled list
+			p_mod->addToScheduledList();
+		} else {
+			// Activate effect
+			p_mod->activate();
+			// Schedule deactivation if mod produces an active effect
+			if ( p_mod->producesActiveEffect() )
+				tryModStop(mod_pointer);
+			// Tell Filter to load next Mod
+			p_mod->p_filter->loadNextMod(getNow());
+		}
 	}
 
-	/* Remove from scheduledMods list */
-	static inline void unscheduleMod(Mod * p_mod) {
-		p_mod->p_filter->scheduledMods.remove( p_mod ); 
-	}
-
-	/* 	Callback. Implement mod effect.
-		Schedule mod deactivation or unscheduleMod. 
-		Load next Mod. */
-	void activateMod(void * p_data)
+	/*	Remove mod from scheduledMods list (if present).
+		Schedule stop or deactivate mod.
+		Add to scheduledMods list if timer was set.
+		*/
+	void tryModStop(void * mod_pointer)
 	{
-		Mod * p_mod = (Mod *) p_data;
-		// Begin effect
-		p_mod->activate();
-		// Destroy timer and remove from scheduledMods list (if SKIP)
-		if (p_mod->mod.mode == MOVIESOAP_SKIP) {
-			unscheduleMod(p_mod); }
-		// Schedule mod deactivation (if MUTE or BLACKOUT)
-		else {
-			scheduleMod( p_mod, getNow(), MOVIESOAP_MOD_TIME_TO_US(p_mod->mod.stop), deactivateMod ); }
-		// load next mod
-		p_mod->p_filter->loadNextMod( getNow() );
-	}
-
-	/* Callback. Remove from list scheduledMods. End effect. */
-	void deactivateMod(void * p_data)
-	{
-		Mod * p_mod = (Mod *) p_data;
-		// Remove from scheduledMods list
-		unscheduleMod(p_mod);
-		// End effect or reschedule deactivation
-		mtime_t now = getNow();
-		mtime_t stop = MOVIESOAP_MOD_TIME_TO_US(p_mod->mod.stop);
-		// End effect
-		if ( stop <= now ) {
-			p_mod->deactivate(); }
-		// Reschedule deactivation if stop not met
-		else {
-			scheduleMod( p_mod, now, stop, deactivateMod ); }
+		Mod * p_mod = (Mod *) mod_pointer;
+		// Remove from scheduled list
+		p_mod->removeFromScheduledList();
+		// Calculate delay until stop in microseconds
+		mtime_t delay = p_mod->calcDeactivationDelay(getNow());
+		if (delay) {
+			// Reschedule stop if stop time is not reached
+			p_mod->schedule( delay, tryModStop );
+			// add to scheduled list
+			p_mod->addToScheduledList();
+		} else {
+			// Deactivate effect
+			p_mod->deactivate();
+		}
 	}
 
 	inline void setMute( bool on_off ) { // todo: needs intf lock; otherwise, danger of race condition (which, unfortunately, leads to interface freeze)
@@ -137,6 +142,7 @@ namespace Moviesoap
 		#ifdef MSDEBUG2
 			cout << "FILTER STOP. " << scheduledMods.size() << " mods active." << endl;
 		#endif
+		// iterate through scheduled/active mods
 		list<Mod*>::iterator iter;
 		for ( iter = scheduledMods.begin(); iter != scheduledMods.end(); iter++ ) {
 			Mod * p_mod = *iter;
@@ -165,8 +171,6 @@ namespace Moviesoap
 	/* Load queuedMod. Stop Filter if end reached. (Arg 'now' should be in microseconds) */
 	void Filter::loadNextMod(mtime_t now)
 	{
-		list<Mod>::iterator iter;
-		// cout << "loadNextMod called. queuedMod: " << queuedMod->description << endl;
 		// Find next mod whose stop time is not passed
 		for ( ; queuedMod != modList.end(); queuedMod++ ) {
 			#ifdef MSDEBUG2
@@ -178,27 +182,12 @@ namespace Moviesoap
 				#endif
 				queuedMod->out(cout);
 				Mod * p_mod = &*queuedMod++;
-				loadMod( p_mod, now ); // Load mod if stop time is not passed
+				p_mod->p_filter = this;
+				tryModStart( p_mod );
 				return; // break
 			}
 		}
 		cout << "No further mods to load." << endl;
-	}
-
-	/* Schedule start of mod or activate mod. Arg 'now' should be in us (microseconds). */
-	void Filter::loadMod(Mod * p_mod, mtime_t now)
-	{
-		// add to scheduledMods
-		p_mod->p_filter = this;
-		scheduledMods.push_back(p_mod);
-		// calc start time in microseconds (us)
-		mtime_t start_us = MOVIESOAP_MOD_TIME_TO_US(p_mod->mod.start);
-		// schedule start (if start not passed)
-		if (now < start_us)
-			{ scheduleMod( p_mod, now, start_us, activateMod ); }
-		// activate (if start passed)
-		else
-			{ activateMod( p_mod ); }
 	}
 	
 	/* Create a filter with a few test mods for testing */
@@ -257,27 +246,15 @@ namespace Moviesoap {
 		mod.y2 = y2;
 	}
 
-	/* Constructor. Reads moviesoap_mod_t data from stream. Creates mod with same. */
-	Mod::Mod(istream & ins) { ins.read( (char *) &mod, sizeof(moviesoap_mod_t) ); }
-
-	Mod::~Mod() { /*vlc_timer_destroy( timer );*/ }
-
-	bool Mod::operator<(const Mod& otherMod) const { return mod.start < otherMod.mod.start; }
-
-	bool Mod::operator==(const Mod& otherMod) const { return this == &otherMod; }
-
-	uint32_t Mod::startTime() { return MOVIESOAP_MOD_TIME_TO_US(mod.start); }
-
-	uint32_t Mod::stopTime() { return MOVIESOAP_MOD_TIME_TO_US(mod.stop); }
-
 	void Mod::activate()
 	{
 		#ifdef MSDEBUG2
 			cout << setw(18) << "ACTIVATE MOD: " << "now(" << getNow() / MOVIESOAP_MOD_TIME_FACTOR << ") " << description << endl;
 		#endif
+		// Implement effect
 		switch(mod.mode) {
 			case MOVIESOAP_SKIP:
-				var_SetTime( Moviesoap::p_input, "time", MOVIESOAP_MOD_TIME_TO_US( mod.stop ) );
+				var_SetTime( Moviesoap::p_input, "time", stopTime() );
 				break;
 			case MOVIESOAP_MUTE:
 				setMute( true );
@@ -294,6 +271,10 @@ namespace Moviesoap {
 	
 	void Mod::deactivate()
 	{
+		#ifdef MSDEBUG2
+			cout << setw(18) << "DEACTIVATE MOD: " << "now(" << getNow() / MOVIESOAP_MOD_TIME_FACTOR << ") " << description << endl;
+		#endif
+		// Unimplement effect
 		switch(mod.mode) {
 			case MOVIESOAP_MUTE:
 				setMute( false );
@@ -302,9 +283,6 @@ namespace Moviesoap {
 				blackout_config.b_active = false;
 				break;
 		}
-		#ifdef MSDEBUG2
-			cout << setw(18) << "DEACTIVATE MOD: " << "now(" << getNow() / MOVIESOAP_MOD_TIME_FACTOR << ") " << description << endl;
-		#endif
 	}
 
 	void Mod::out(ostream & stream) { stream << "Mod: " << description << " (" << mod.start << "-" << mod.stop << ")" << endl; }
@@ -315,6 +293,17 @@ namespace Moviesoap {
 		description.clear();
 		memset(&timer, 0, sizeof(timer));
 	}
+
+	void Mod::schedule( mtime_t delay_in_us, void (*callback)(void *) )
+	{
+		// create timer
+		vlc_timer_create( &timer, callback, this );
+		// calc delay in terms of clock cycles
+		mtime_t delay = CALC_CLOCK_CYCLES(delay_in_us);
+		// schedule timer
+		vlc_timer_schedule( timer, false, delay, 0 );
+	}
+
 }
 
 #undef CALC_CLOCK_CYCLES

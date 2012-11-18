@@ -37,3 +37,4 @@ DONE
 - modDblClick opens mod for editing
 - preview mod function
 -------------
+- clean up filter.cpp so as to handle scheduledMods list and activation/deactivation in proper order

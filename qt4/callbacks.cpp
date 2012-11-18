@@ -93,8 +93,8 @@ namespace Moviesoap
 		// Add blackout filter to vout if vout thread exists on input thread
 		if (p_input) {
 			if ( vout_thread_exists( p_input ) ) {
-				var_DelCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
-				add_blackout_filter_to_input( p_input );
+				// var_DelCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
+				// add_blackout_filter_to_input( p_input );
 			} else {
 				msg_Err( p_this, "No vout thread found for blackout." );
 				if (p_blackout_filter)
@@ -113,15 +113,11 @@ namespace Moviesoap
 		p_playlist = (playlist_t *) p_this;
 		if (p_playlist)
 		{
-			msg_Info( p_this, "check 1" );
 			// Add callback(s) to playlist (for purpose of adding video filter to chain)
 			var_AddCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
-			msg_Info( p_this, "check 2" );
 			// Update p_input
 			p_input = playlist_CurrentInput( p_playlist );
-			msg_Info( p_this, "check 3" );
 			if (p_input) {
-				msg_Info( p_this, "check 4" );
 				// Add callback(s) to input thread
 				var_AddCallback( p_input, "position", InputCbPosition, NULL );
 				var_AddCallback( p_input, "time", InputCbTime, NULL );
@@ -144,6 +140,10 @@ namespace Moviesoap
 		#ifdef MSDEBUG3
 		msg_Info( p_this, "!!! CALLBACK input state !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
+		// Stop filter if PAUSE
+		// todo
+		// Start filter if PLAY
+		// todo
 		return 0;
 	}
 
@@ -154,7 +154,7 @@ namespace Moviesoap
 		msg_Info( p_this, "!!! CALLBACK input time !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
 		mtime_t new_time = newval.i_time;
-		StopAndStartFilter(new_time);
+		// StopAndStartFilter(new_time);
 		return 0;
 	}
 
