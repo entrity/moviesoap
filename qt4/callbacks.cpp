@@ -38,7 +38,7 @@ namespace Moviesoap
 
 	/* Initialize local static fields */
 	static mtime_t target_time;
-	static vlc_thread_t thread_for_restarting_filter; // used after Time change callback
+	static vlc_thread_t thread_for_filter_restart, thread_for_item_change_cb; // used after Time change callback
 	
 	/* Playlist callbacks */
 	static MOVIESOAP_CALLBACK(PlaylistCbItemChange);
@@ -51,7 +51,7 @@ namespace Moviesoap
 	/* Other local prototypes */
 	static inline void StopAndStartFilter(mtime_t new_time);
 	static void* StopAndStartFilterEntryPoint(void *data);
-	static inline void SpawnStopAndStartFilter(mtime_t);
+	static void* EnableBlackoutEntryPoint(void *data);
 
 
 	/* Set vars, config. (Called by VLCMenuBar::createMenuBar in menus.cpp) */
@@ -81,18 +81,9 @@ namespace Moviesoap
 		#ifdef MSDEBUG1
 		msg_Info( p_this, "!!! CALLBACK playlist item-change !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
-		input_thread_t * p_input = playlist_CurrentInput( p_playlist );
-		// Add blackout filter to vout if vout thread exists on input thread
-		if (p_input) {
-			if ( vout_thread_exists( p_input ) ) {
-				// var_DelCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
-				// add_blackout_filter_to_input( p_input );
-			} else {
-				msg_Err( p_this, "No vout thread found for blackout." );
-				if (p_blackout_filter)
-					p_blackout_filter = NULL;
-			}
-		}
+		
+		// spawn new thread to handle blackout and removal of this callback
+		vlc_clone( &thread_for_item_change_cb, EnableBlackoutEntryPoint, NULL, VLC_THREAD_PRIORITY_LOW );
 		return MOVIESOAP_SUCCESS;
 	}
 
@@ -166,7 +157,12 @@ namespace Moviesoap
 		msg_Info( p_this, "!!! CALLBACK input time !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
 		
-		SpawnStopAndStartFilter(newval.i_time);
+		// ensures that if ancillary thread already exists, it has completed before new spawning
+		vlc_join( thread_for_filter_restart, NULL );
+		// sets new time to a heap variable
+		target_time = newval.i_time;
+		// spawn new thread to handle Filter restart
+		vlc_clone( &thread_for_filter_restart, StopAndStartFilterEntryPoint, NULL, VLC_THREAD_PRIORITY_LOW );
 		return 0;
 	}
 
@@ -196,15 +192,6 @@ namespace Moviesoap
 	 * Support functions
 	 */
 
-	/* Spawns a new thread to handle the stopping and restarting of the loaded Filter (if any) */
-	static inline void SpawnStopAndStartFilter(mtime_t new_target_time)
-	{
-		// ensures that if ancillary thread already exists, it has completed before new spawning
-		vlc_join( thread_for_restarting_filter, NULL );
-		target_time = new_target_time;
-		vlc_clone( &thread_for_restarting_filter, StopAndStartFilterEntryPoint, NULL, VLC_THREAD_PRIORITY_LOW );
-	}
-
 	/* Entry point for a thread created by a callback to stop and restart the filter */
 	static void* StopAndStartFilterEntryPoint(void *data)
 	{
@@ -228,5 +215,27 @@ namespace Moviesoap
 			vlc_mutex_unlock( &lock );
 		}
 	}
+
+	/* If vout thread exists on input thread, add blackout filter to vout and remove item-change callback */
+	static void* EnableBlackoutEntryPoint(void *data)
+	{
+		bool b_no_vout_thread_found = true;
+		if (p_input) {
+			if ( vout_thread_exists( p_input ) ) {
+				b_no_vout_thread_found = false;
+				vlc_mutex_lock( &lock );
+				if (!p_blackout_filter) {
+					var_DelCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
+					add_blackout_filter_to_input( p_input );
+				}
+				vlc_mutex_unlock( &lock );
+				return NULL;
+			}
+		}
+		if (b_no_vout_thread_found && p_blackout_filter)
+			p_blackout_filter = NULL;
+		return NULL;
+	}
+
 
 }

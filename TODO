@@ -3,14 +3,14 @@ BUGS
 - jumping into mute zone does not start mute
 - jumping into zone of two effects only implements first
 
-
 TODO
+- ensure callback for navigation is setting correct time
 - add qmessage warnings when changes made to filter/mod w/out update call
 - add http break moviesoap feature / check for updates
-- do I need to remove callbacks in main.cpp? (after playlist, input changes)?
 - activate mod only if severity exceeds tolerance
 - activate & deactivate functions on config
 - set p_input to NULL when input thread changes to stop or switch
+- add behaviour for interface events in callbacks.cpp
 
 DONE
 - test create and destroy timers
@@ -40,3 +40,4 @@ DONE
 - handle queueing correct mod downstream of position change callback
 - Fixed: interface becomes unresponsive when pos changed into a SKIP zone?
 -------------
+- remove input-change callback when blackout video filter is enabled
