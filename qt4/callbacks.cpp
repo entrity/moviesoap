@@ -22,6 +22,7 @@
 #include <vlc_interface.h>
 #include <vlc_modules.h>
 #include <vlc_aout_intf.h>	// aout_ToggleMute
+#include <vlc_threads.h> // temp used for vlc_timer...
 
 #include "main.hpp"
 #include "config.hpp"
@@ -37,7 +38,6 @@
 
 // test
 #include <vlc_input.h> // temp used for input_GetState()
-#include <vlc_threads.h> // temp used for vlc_timer...
 #include <iostream>
 using namespace std;
 
@@ -53,6 +53,9 @@ namespace Moviesoap
 	vlc_mutex_t lock;
 	moviesoap_blackout_config_t blackout_config;
 
+	/* Initialize local static fields */
+	static mtime_t target_time;
+	static vlc_thread_t thread_for_restarting_filter; // used after Time change callback
 	
 	/* Playlist callbacks */
 	static MOVIESOAP_CALLBACK(PlaylistCbItemChange);
@@ -65,7 +68,10 @@ namespace Moviesoap
 	/* Other local prototypes */
 	static inline void StopAndStartFilter();
 	static inline void StopAndStartFilter(mtime_t new_time);
-	
+	static void* StopAndStartFilterEntryPoint(void *data);
+	static inline void SpawnStopAndStartFilter(mtime_t);
+
+
 	/* Set vars, config. (Called by VLCMenuBar::createMenuBar in menus.cpp) */
 	void init( intf_thread_t * p_intf, MainInterface * mainInterface )
 	{
@@ -147,23 +153,24 @@ namespace Moviesoap
 		return 0;
 	}
 
-	/* (Re)start Filter object. (This will kill existing timers.) Fires when someone moves forward or backward. */
+	/* Fires when someone moves forward or backward or when program sets Time. - Restart loaded Filter. */
 	static MOVIESOAP_CALLBACK(InputCbTime)
 	{
 		#ifdef MSDEBUG3
 		msg_Info( p_this, "!!! CALLBACK input time !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
-		mtime_t new_time = newval.i_time;
-		// StopAndStartFilter(new_time); // todo
+		
+		SpawnStopAndStartFilter(newval.i_time);
 		return 0;
 	}
 
-	/* (Re)start Filter object. (This will kill existing timers.) Fires when user clicks position bar. */
+	/* Fires when user clicks position bar. - Restart loaded Filter. */
 	static MOVIESOAP_CALLBACK(InputCbPosition)
 	{
 		#ifdef MSDEBUG3
 		msg_Info( p_this, "!!! CALLBACK input position !!! : %s ... new: %f ... old: %f", psz_var, (float) newval.f_float, (float) oldval.f_float );
 		#endif
+
 		mtime_t new_time = newval.f_float * var_GetTime( p_input, "length" );
 		StopAndStartFilter(new_time);
 		return 0;
@@ -174,6 +181,7 @@ namespace Moviesoap
 		#ifdef MSDEBUG3
 		msg_Info( p_this, "!!! CALLBACK input navigation !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
+
 		StopAndStartFilter();
 		return 0;
 	}
@@ -198,6 +206,32 @@ namespace Moviesoap
 			p_loadedFilter->Restart( new_time );
 			vlc_mutex_unlock( &lock );
 		}
+	}
+
+	/*
+	 * Support functions
+	 */
+
+	/* Spawns a new thread to handle the stopping and restarting of the loaded Filter (if any) */
+	static inline void SpawnStopAndStartFilter(mtime_t new_target_time)
+	{
+		// ensures that if ancillary thread already exists, it has completed before new spawning
+		vlc_join( thread_for_restarting_filter, NULL );
+		target_time = new_target_time;
+		vlc_clone( &thread_for_restarting_filter, StopAndStartFilterEntryPoint, NULL, VLC_THREAD_PRIORITY_LOW );
+	}
+
+	/* Entry point for a thread created by a callback to stop and restart the filter */
+	static void* StopAndStartFilterEntryPoint(void *data)
+	{
+		vlc_mutex_lock( &Moviesoap::lock );
+		if (p_loadedFilter) {
+			p_loadedFilter->Stop();
+			if (target_time != MOVIESOAP_NO_RESTART)
+				p_loadedFilter->Restart( target_time );
+		}
+		vlc_mutex_unlock( &Moviesoap::lock );
+		return NULL;
 	}
 
 }
