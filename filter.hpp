@@ -6,6 +6,7 @@
 #include "variables.h"
 #include <vlc_common.h>
 #include <vlc_threads.h>
+#include <vlc_input.h>
 #include <list>
 #include <string>
 using namespace std;
@@ -13,6 +14,11 @@ using namespace std;
 namespace Moviesoap {
 	class Filter;
 	class Mod;
+	
+	/* Inline functions */
+	/* Get current time in play (in us) */
+	static inline mtime_t MoviesoapGetNow(input_thread_t * p_input)
+		{ int64_t us = 0;	if (p_input) input_Control( p_input, INPUT_GET_TIME, &us );	return us; }
 
 	/* Function prototypes */
 	void tryModStart(void * mod_pointer);

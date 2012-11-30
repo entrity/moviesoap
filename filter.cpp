@@ -6,7 +6,9 @@
 #include <vlc_playlist.h> // needed for var_GetTime(input_thread_t *, char *)
 #include <vlc_aout_intf.h>	// aout_ToggleMute
 
-#include <cstdio>
+#include <list>
+#include <algorithm> // for list::advance
+#include <cstdio>	// for file io
 using namespace std;
 
 #ifndef INT64_C
@@ -18,22 +20,17 @@ using namespace std;
 # include "config.h"
 #endif
 // temp
-#include <iomanip>
-#include <list>
-#include <algorithm>
 #ifdef MSDEBUG1
-# include <iostream>
+	#include <iomanip>
+	#include <iostream>
 using namespace std;
 #endif
 
 /* Non-member functions */
 namespace Moviesoap
 {
-	/* Get current time in play (in us) */
-	static inline mtime_t getNow() { return p_input ? var_GetTime( p_input, "time" ) : 0; }
-
-	void tryModStart(void * p_data) { tryModStart( (Mod *) p_data, getNow() ); }
-	void tryModStop(void * p_data) { tryModStop( (Mod *) p_data, getNow() ); }
+	void tryModStart(void * p_data) { tryModStart( (Mod *) p_data, MoviesoapGetNow(p_input) ); }
+	void tryModStop(void * p_data) { tryModStop( (Mod *) p_data, MoviesoapGetNow(p_input) ); }
 
 	/* 	Remove mod from scheduledMods list (if present).
 		Schedule start or activate mod.
@@ -122,7 +119,7 @@ namespace Moviesoap
 
 	// ACTIVATING AND DEACTIVATING MODS
 
-	void Filter::Restart() { Restart(getNow()); }
+	void Filter::Restart() { Restart(MoviesoapGetNow(p_input)); }
 
 	/* Set queuedMod to first mod. Call loadNextMod */
 	void Filter::Restart(mtime_t now) {
@@ -166,7 +163,7 @@ namespace Moviesoap
 	}
 
 	// /* Load queuedMod. Stop Filter if end reached. */
-	// void Filter::loadNextMod() { loadNextMod(getNow()); }
+	// void Filter::loadNextMod() { loadNextMod(MoviesoapGetNow(p_input)); }
 
 	/* Load queuedMod. Stop Filter if end reached. (Arg 'now' should be in microseconds) */
 	void Filter::loadNextMod(mtime_t now)
@@ -250,7 +247,7 @@ namespace Moviesoap {
 	void Mod::activate()
 	{
 		#ifdef MSDEBUG2
-			cout << setw(18) << "ACTIVATE MOD: " << "now(" << getNow() / MOVIESOAP_MOD_TIME_FACTOR << ") " << description << endl;
+			cout << setw(18) << "ACTIVATE MOD: " << "now(" << MoviesoapGetNow(p_input) / MOVIESOAP_MOD_TIME_FACTOR << ") " << description << endl;
 		#endif
 		// Implement effect
 		switch(mod.mode) {
@@ -273,7 +270,7 @@ namespace Moviesoap {
 	void Mod::deactivate()
 	{
 		#ifdef MSDEBUG2
-			cout << setw(18) << "DEACTIVATE MOD: " << "now(" << getNow() / MOVIESOAP_MOD_TIME_FACTOR << ") " << description << endl;
+			cout << setw(18) << "DEACTIVATE MOD: " << "now(" << MoviesoapGetNow(p_input) / MOVIESOAP_MOD_TIME_FACTOR << ") " << description << endl;
 		#endif
 		// Unimplement effect
 		switch(mod.mode) {

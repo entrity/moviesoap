@@ -1,20 +1,3 @@
-/* INPUT EVEN VARIABLES
- * The read-write variables are:
- *  - state (\see input_state_e)
- *  - rate
- *  - position, position-offset
- *  - time, time-offset
- *  - title, next-title, prev-title
- *  - chapter, next-chapter, next-chapter-prev
- *  - program, audio-es, video-es, spu-es
- *  - audio-delay, spu-delay
- *  - bookmark (bookmark list)
- *  - record
- *  - frame-next
- *  - navigation (list of "title %2i")
- *  - "title %2i"
- */
-
 #include <cstdio>
 #include <cassert>
 
@@ -66,7 +49,6 @@ namespace Moviesoap
 	static MOVIESOAP_CALLBACK(InputCbPosition);
 	static MOVIESOAP_CALLBACK(InputCbTime);
 	/* Other local prototypes */
-	static inline void StopAndStartFilter();
 	static inline void StopAndStartFilter(mtime_t new_time);
 	static void* StopAndStartFilterEntryPoint(void *data);
 	static inline void SpawnStopAndStartFilter(mtime_t);
@@ -88,6 +70,10 @@ namespace Moviesoap
 		// Add callback(s) to playlist
 		var_AddCallback( p_playlist, "item-current", PlaylistCbItemCurrent, NULL );
 	}
+
+	/*
+	 * Playlist callbacks
+	 */
 
 	/* Set by PlaylistChangeCallback. If a vout_thread exists on input, removes this callback and attaches the blackout filter to the vout. */
 	static MOVIESOAP_CALLBACK(PlaylistCbItemChange)
@@ -141,6 +127,26 @@ namespace Moviesoap
 		return VLC_ENOOBJ;
 	}
 
+	/* 
+	 * Input thread callbacks
+	 * 
+	 * INPUT EVEN VARIABLES
+	 * The read-write variables are:
+	 *  - state (\see input_state_e)
+	 *  - rate
+	 *  - position, position-offset
+	 *  - time, time-offset
+	 *  - title, next-title, prev-title
+	 *  - chapter, next-chapter, next-chapter-prev
+	 *  - program, audio-es, video-es, spu-es
+	 *  - audio-delay, spu-delay
+	 *  - bookmark (bookmark list)
+	 *  - record
+	 *  - frame-next
+	 *  - navigation (list of "title %2i")
+	 *  - "title %2i"
+	 */
+
 	static MOVIESOAP_CALLBACK(InputCbState)
 	{
 		#ifdef MSDEBUG3
@@ -182,30 +188,8 @@ namespace Moviesoap
 		msg_Info( p_this, "!!! CALLBACK input navigation !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
 
-		StopAndStartFilter();
+		StopAndStartFilter( MoviesoapGetNow(p_input) );
 		return 0;
-	}
-
-	/* Does nothing if p_loadedFilter is null. Else, stops filter & restarts it. */
-	static inline void StopAndStartFilter()
-	{
-		if (p_loadedFilter) {
-			vlc_mutex_lock( &lock );
-			p_loadedFilter->Stop();
-			p_loadedFilter->Restart();
-			vlc_mutex_unlock( &lock );
-		}
-	}
-
-	/* Does nothing if p_loadedFilter is null. Else, stops filter & restarts it. */
-	static inline void StopAndStartFilter(mtime_t new_time)
-	{
-		if (p_loadedFilter) {
-			vlc_mutex_lock( &lock );
-			p_loadedFilter->Stop();
-			p_loadedFilter->Restart( new_time );
-			vlc_mutex_unlock( &lock );
-		}
 	}
 
 	/*
@@ -232,6 +216,17 @@ namespace Moviesoap
 		}
 		vlc_mutex_unlock( &Moviesoap::lock );
 		return NULL;
+	}
+
+	/* Does nothing if p_loadedFilter is null. Else, stops filter & restarts it. */
+	static inline void StopAndStartFilter(mtime_t new_time)
+	{
+		if (p_loadedFilter) {
+			vlc_mutex_lock( &lock );
+			p_loadedFilter->Stop();
+			p_loadedFilter->Restart( new_time );
+			vlc_mutex_unlock( &lock );
+		}
 	}
 
 }

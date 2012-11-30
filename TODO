@@ -1,6 +1,6 @@
 BUGS
-- ! interface becomes unresponsive when pos changed into a SKIP zone?
 - jumping from mute zone to outside mute does not kill mute
+- jumping into mute zone does not start mute
 - jumping into zone of two effects only implements first
 
 
@@ -10,8 +10,7 @@ TODO
 - do I need to remove callbacks in main.cpp? (after playlist, input changes)?
 - activate mod only if severity exceeds tolerance
 - activate & deactivate functions on config
-- clear p_input when input thread changes to stop or switch
-
+- set p_input to NULL when input thread changes to stop or switch
 
 DONE
 - test create and destroy timers
@@ -37,6 +36,7 @@ DONE
 - modDblClick opens mod for editing
 - preview mod function
 - clean up filter.cpp so as to handle scheduledMods list and activation/deactivation in proper order
--------------
 - when filter file loaded, stop old filter and start new one
 - handle queueing correct mod downstream of position change callback
+- Fixed: interface becomes unresponsive when pos changed into a SKIP zone?
+-------------
