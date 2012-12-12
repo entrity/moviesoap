@@ -58,6 +58,7 @@
 #include <QStatusBar>
 
 #include "../../moviesoap/qt4/menu.hpp" // Added by Markham
+#include "../../moviesoap/qt4/main.hpp" // Added by Markham
 
 /*
   This file defines the main menus and the pop-up menu (right-click menu)
