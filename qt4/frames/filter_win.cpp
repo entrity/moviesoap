@@ -157,8 +157,10 @@ namespace Moviesoap
 		if (p_input == NULL || p_playlist == NULL)
 			return;
 		holdingBayForLoadedFilter = Moviesoap::p_loadedFilter;
-		Moviesoap::p_loadedFilter = &filter;
+		// Moviesoap::p_loadedFilter = &filter;
+		vlc_mutex_lock(&Moviesoap::lock); // todo del?
 		var_SetTime( p_input, "time", start );
+		// vlc_mutex_unlock(&Moviesoap::lock); // todo del?
 		playlist_Control( Moviesoap::p_playlist, PLAYLIST_PLAY, false );
 		hide();
 		concludePreviewButton->show();

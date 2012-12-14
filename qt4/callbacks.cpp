@@ -5,6 +5,7 @@
 #include <vlc_interface.h>
 #include <vlc_modules.h>
 #include <vlc_aout_intf.h>	// aout_ToggleMute
+#include <vlc_threads.h> // temp used for vlc_timer...
 
 #include "main.hpp"
 #include "config.hpp"
@@ -16,195 +17,195 @@
 # define INT64_C(c)  c ## LL
 #endif
 
+#define MOVIESOAP_CALLBACK(name) int name( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data )
+
 // test
 #include <vlc_input.h> // temp used for input_GetState()
-#include <vlc_threads.h> // temp used for vlc_timer...
 #include <iostream>
 using namespace std;
 
 namespace Moviesoap
 {
 	/* Initialize static fields */
-	vlc_object_t * p_obj;
-	playlist_t * p_playlist;
-	input_thread_t * p_input;
-	Filter * p_loadedFilter;
-	filter_chain_t * p_filter_chain; // chain holds blackout video filter
+	vlc_object_t * p_obj = NULL;
+	playlist_t * p_playlist = NULL;
+	input_thread_t * p_input = NULL;
+	Filter * p_loadedFilter = NULL;
+	filter_chain_t * p_filter_chain = NULL; // chain holds blackout video filter
 	audio_volume_t volume;
 	vlc_mutex_t lock;
 	moviesoap_blackout_config_t blackout_config;
 
-	/* Local prototypes */
-	static int PlaylistChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
-	static int ItemChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
-	static int StateChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
-	static int InputChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
-	static int PositionChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
-	static int TimeChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
-	static inline void StopAndStartFilter(mtime_t new_time);
+	/* Initialize local static fields */
+	static mtime_t target_time;
+	static vlc_thread_t thread_for_filter_restart, thread_for_item_change_cb; // used after Time change callback
 	
-	/* Temp protoypes and vars */
-	vlc_timer_t test_timer;
-	char * test_str = "foo bar baz qux";
-	static void tempCallback( void * p_data );
-	static int TempCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data );
+	/* Playlist callbacks */
+	static MOVIESOAP_CALLBACK(PlaylistCbItemChange);
+	static MOVIESOAP_CALLBACK(PlaylistCbItemCurrent);
+	/* Input callbacks */
+	static MOVIESOAP_CALLBACK(InputCbState);
+	static MOVIESOAP_CALLBACK(InputCbNavigation);
+	static MOVIESOAP_CALLBACK(InputCbPosition);
+	static MOVIESOAP_CALLBACK(InputCbTime);
+	/* Other local prototypes */
+	static inline void StopAndStartFilter(mtime_t new_time);
+	static void* StopAndStartFilterEntryPoint(void *data);
+	static void* EnableBlackoutEntryPoint(void *data);
 
-	static void test()
-	{
-		// supply dummy values for blackout config
-		blackout_config.b_active = false;
-		blackout_config.i_x1 = 30;
-		blackout_config.i_y1 = 10;
-		blackout_config.i_x2 = 150;
-		blackout_config.i_y2 = 100;
-
-		/* test dummy filter */
-		p_loadedFilter = Moviesoap::Filter::dummy();
-		#ifdef MSDEBUG3
-			p_loadedFilter->toStdout();
-		#endif
-	}
 
 	/* Set vars, config. (Called by VLCMenuBar::createMenuBar in menus.cpp) */
 	void init( intf_thread_t * p_intf, MainInterface * mainInterface )
 	{
 		// Set namespace vars
-		p_obj = VLC_OBJECT(p_intf);
-		#ifdef MSDEBUG1
-			msg_Info( p_obj, "---- ---- IN MOVIEOSAP INIT." );
-		#endif
+		Moviesoap::p_obj = VLC_OBJECT(p_intf);
+		Moviesoap::p_playlist = pl_Get(p_intf);
 		vlc_mutex_init( &lock );
-		// test (dummy filter)
-		/*test();*/
-		// build config (tolerances)
+		// build config (tolerances) from file or defaults
 		config.load();
-		// Get playlist pointer
-		playlist_t * p_playlist = pl_Get( p_intf );
 		// Create variable pointer to blackout config
 		#define MOVIESOAP_BLACKOUT_CONFIG_POINTER
 		var_CreateGetAddress( p_obj->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME);
 		var_SetAddress( p_obj->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME, &blackout_config );
 		// Add callback(s) to playlist
-		var_AddCallback( p_playlist, "item-current", PlaylistChangeCallback, p_intf );
-		// var_AddCallback( p_playlist, "activity", TempCallback, p_intf );
-		// var_AddCallback( p_playlist, "input-current", TempCallback, p_intf );
+		var_AddCallback( p_playlist, "item-current", PlaylistCbItemCurrent, NULL );
+	}
+
+	/*
+	 * Playlist callbacks
+	 */
+
+	/* Set by PlaylistChangeCallback. If a vout_thread exists on input, removes this callback and attaches the blackout filter to the vout. */
+	static MOVIESOAP_CALLBACK(PlaylistCbItemChange)
+	{
+		#ifdef MSDEBUG1
+		msg_Info( p_this, "!!! CALLBACK playlist item-change !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
+		#endif
+		
+		// spawn new thread to handle blackout and removal of this callback
+		vlc_clone( &thread_for_item_change_cb, EnableBlackoutEntryPoint, NULL, VLC_THREAD_PRIORITY_LOW );
+		return MOVIESOAP_SUCCESS;
 	}
 
 	/* Add callback to Input change. Start Filter object. */
-	static int PlaylistChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data )
+	static MOVIESOAP_CALLBACK(PlaylistCbItemCurrent)
 	{
 		#ifdef MSDEBUG1
-		msg_Info( p_this, "!!! playlist change !!! : %s : %d", psz_var, newval.i_int );
+		msg_Info( p_this, "!!! CALLBACK playlist item-current !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
-		intf_thread_t * p_intf = ( intf_thread_t *) p_data;
-		p_playlist = pl_Get( p_intf );
+		p_playlist = (playlist_t *) p_this;
 		if (p_playlist)
 		{
-			// Add callback to item-change (gets removed as soon as there is a vout_thread_t available)
-			var_AddCallback( p_playlist, "item-change", ItemChangeCallback, NULL ); //needs to be added elsewhere
-			// Get input thread
+			// Add callback(s) to playlist (for purpose of adding video filter to chain)
+			var_AddCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
+			// Update p_input
 			p_input = playlist_CurrentInput( p_playlist );
 			if (p_input) {
-				// add callbacks for input change (see vlc_input.h "Input events and variables")
-				var_AddCallback( p_input, "position", PositionChangeCallback, p_data );
-				var_AddCallback( p_input, "time", TimeChangeCallback, p_data );
-				// todo/unused
-				var_AddCallback( p_input, "state", StateChangeCallback, p_data );
-				// var_AddCallback( p_input, "time-offset", TempCallback, p_data );
-				var_AddCallback( p_input, "navigation", InputChangeCallback, p_data );
+				// Add callback(s) to input thread
+				var_AddCallback( p_input, "position", InputCbPosition, NULL );
+				var_AddCallback( p_input, "time", InputCbTime, NULL );
+				var_AddCallback( p_input, "navigation", InputCbNavigation, NULL );
+				var_AddCallback( p_input, "state", InputCbState, NULL );
 				// start filter object if one exists
 				if (p_loadedFilter) p_loadedFilter->Restart();
 				return VLC_SUCCESS;
-			} else
-			msg_Err( p_this, "No current input thread found." );
-		} else
-		msg_Err( p_this, "No playlist found." );
+			} else {
+				msg_Err( p_this, "No current input thread found." );
+			}
+		} else {
+			msg_Err( p_this, "No playlist found." );
+		}
 		return VLC_ENOOBJ;
 	}
 
-	/* Dummy function */
-	static int StateChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data )
+	/* 
+	 * Input thread callbacks
+	 * 
+	 * INPUT EVEN VARIABLES
+	 * The read-write variables are:
+	 *  - state (\see input_state_e)
+	 *  - rate
+	 *  - position, position-offset
+	 *  - time, time-offset
+	 *  - title, next-title, prev-title
+	 *  - chapter, next-chapter, next-chapter-prev
+	 *  - program, audio-es, video-es, spu-es
+	 *  - audio-delay, spu-delay
+	 *  - bookmark (bookmark list)
+	 *  - record
+	 *  - frame-next
+	 *  - navigation (list of "title %2i")
+	 *  - "title %2i"
+	 */
+
+	static MOVIESOAP_CALLBACK(InputCbState)
 	{
 		#ifdef MSDEBUG3
-		msg_Info( p_this, "!!! state change !!! : %s : %d", psz_var, newval.i_int );
+		msg_Info( p_this, "!!! CALLBACK input state !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
+		// Stop filter if PAUSE
+		// todo
+		// Start filter if PLAY
+		// todo
 		return 0;
 	}
 
-	/* (Re)start Filter object. (This will kill existing timers.) Fires when someone moves forward or backward. */
-	static int TimeChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data )
+	/* Fires when someone moves forward or backward or when program sets Time. - Restart loaded Filter. */
+	static MOVIESOAP_CALLBACK(InputCbTime)
 	{
 		#ifdef MSDEBUG3
-		msg_Info( p_this, "!!! time change !!! : %s", psz_var );
+		msg_Info( p_this, "!!! CALLBACK input time !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
-		mtime_t new_time = newval.i_time;
-		StopAndStartFilter(new_time);
+		
+		// ensures that if ancillary thread already exists, it has completed before new spawning
+		vlc_join( thread_for_filter_restart, NULL );
+		// sets new time to a heap variable
+		target_time = newval.i_time;
+		// spawn new thread to handle Filter restart
+		vlc_clone( &thread_for_filter_restart, StopAndStartFilterEntryPoint, NULL, VLC_THREAD_PRIORITY_LOW );
 		return 0;
 	}
 
-	/* (Re)start Filter object. (This will kill existing timers.) Fires when user clicks position bar. */
-	static int PositionChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data )
+	/* Fires when user clicks position bar. - Restart loaded Filter. */
+	static MOVIESOAP_CALLBACK(InputCbPosition)
 	{
-		// todo del:
-		// analFCs( p_input );
-		//
 		#ifdef MSDEBUG3
-		msg_Info( p_this, "!!! position change !!! : %s", psz_var );
+		msg_Info( p_this, "!!! CALLBACK input position !!! : %s ... new: %f ... old: %f", psz_var, (float) newval.f_float, (float) oldval.f_float );
 		#endif
+
 		mtime_t new_time = newval.f_float * var_GetTime( p_input, "length" );
-		cout << "new time: " << new_time / 100000 << endl;
 		StopAndStartFilter(new_time);
 		return 0;
 	}
 
-	static int InputChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data )
+	static MOVIESOAP_CALLBACK(InputCbNavigation)
 	{
 		#ifdef MSDEBUG3
-		msg_Info( p_this, "!!! input change !!! : %s : %d", psz_var, newval.i_int );
+		msg_Info( p_this, "!!! CALLBACK input navigation !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
+
+		StopAndStartFilter( MoviesoapGetNow(p_input) );
 		return 0;
 	}
 
-	/* Set by PlaylistChangeCallback. If a vout_thread exists on input, removes this callback and attaches the blackout filter to the vout. */
-	static int ItemChangeCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data )
+	/*
+	 * Support functions
+	 */
+
+	/* Entry point for a thread created by a callback to stop and restart the filter */
+	static void* StopAndStartFilterEntryPoint(void *data)
 	{
-		msg_Info( p_this, "ItemChangeCallback: %s", psz_var );
-		cout << newval.i_int << endl << newval.f_float << endl;
-		if (p_input) {
-			size_t n_vout;
-			vout_thread_t **pp_vout;
-			input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &n_vout );
-			cout << n_vout << " vout threads." << endl;
-			if (n_vout) {
-
-				// Unattach this callback from playlist
-				// vlc_mutex_lock( &lock );
-				// var_DelCallback( p_playlist, "item-change", ItemChangeCallback, NULL );
-				// vlc_mutex_unlock( &lock );
-
-				// Attach blackout filter to vout
-				add_blackout_filter_to_input( p_input );
-			}
+		vlc_mutex_lock( &Moviesoap::lock );
+		if (p_loadedFilter) {
+			p_loadedFilter->Stop();
+			if (target_time != MOVIESOAP_NO_RESTART)
+				p_loadedFilter->Restart( target_time );
 		}
-		return 0;
+		vlc_mutex_unlock( &Moviesoap::lock );
+		return NULL;
 	}
 
-
-	// todo del
-	static void tempCallback( void * p_data )
-	{
-		char *p_str = (char *) p_data;
-		cout << "temp callback " << p_str << endl;
-	}
-
-	// todo del
-	static int TempCallback( vlc_object_t *p_this, const char *psz_var, vlc_value_t oldval, vlc_value_t newval, void *p_data )
-	{
-		msg_Info( p_this, "TempCallback: %s", psz_var );
-		cout << newval.i_int << endl << newval.f_float << endl;
-		return 0;
-	}
-
+	/* Does nothing if p_loadedFilter is null. Else, stops filter & restarts it. */
 	static inline void StopAndStartFilter(mtime_t new_time)
 	{
 		if (p_loadedFilter) {
@@ -214,5 +215,27 @@ namespace Moviesoap
 			vlc_mutex_unlock( &lock );
 		}
 	}
+
+	/* If vout thread exists on input thread, add blackout filter to vout and remove item-change callback */
+	static void* EnableBlackoutEntryPoint(void *data)
+	{
+		bool b_no_vout_thread_found = true;
+		if (p_input) {
+			if ( vout_thread_exists( p_input ) ) {
+				b_no_vout_thread_found = false;
+				vlc_mutex_lock( &lock );
+				if (!p_blackout_filter) {
+					var_DelCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
+					add_blackout_filter_to_input( p_input );
+				}
+				vlc_mutex_unlock( &lock );
+				return NULL;
+			}
+		}
+		if (b_no_vout_thread_found && p_blackout_filter)
+			p_blackout_filter = NULL;
+		return NULL;
+	}
+
 
 }

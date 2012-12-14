@@ -17,6 +17,7 @@ namespace Moviesoap
 	public:
 		static Menu * create(QMenuBar * bar);
 		Menu( QWidget * parent );
+		bool isActiveSelected() { return actionActive->isChecked(); }
 	public slots:
 		void activeTriggered();
 		void editPreferences();

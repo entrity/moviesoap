@@ -56,17 +56,28 @@ namespace Moviesoap
 	void Menu::newFilter() { Moviesoap::FilterWin::openEditor(NULL); }
 
 	void Menu::loadFilter() {
+		// Get filepath from user
 		QString filepath = QFileDialog::getOpenFileName( this,
 			QString("Open Moviesoap filter file"),
 			QString(saveDir().c_str()),
 			QString(MOVIESOAP_FILECHOOSER_FILTER));
-		if ( !filepath.isEmpty() ) {
-			cout << "filepath: " << filepath.toStdString() << endl; // todo del
+		if ( !filepath.isEmpty() ) {			
 			vlc_mutex_lock( &Moviesoap::lock );
+			// Ensure existence of loaded filter
 			if (p_loadedFilter == NULL)
 				p_loadedFilter = new Filter;
+			// Stop loaded filter in case it is running
+			p_loadedFilter->Stop();
+			// Overwrite loaded filter with data from filter file
 			int err = p_loadedFilter->load( filepath.toStdString() );
+			cout << "OLD FILTER OVERWRITTEN" << endl;
+			// Start loaded filter if menu has active selected
+			cout << "IS ACTIVE SELECTED" << isActiveSelected() << endl;
+			if ( isActiveSelected() )
+				p_loadedFilter->Restart();
+			cout << "NEW FILTER STARTED" << endl;
 			vlc_mutex_unlock( &Moviesoap::lock );
+			// Display error (if any) in QMessageBox
 			if (err) {
 				stringstream msgs;
 				msgs << "Failure to load filter from file.\nError code " << err;

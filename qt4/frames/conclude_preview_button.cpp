@@ -5,7 +5,12 @@ namespace Moviesoap
 {
 	ConcludePreviewButton::ConcludePreviewButton(QString text, FilterWin *p_filterWin) : QPushButton(text)
 	{
-		connect(this, SIGNAL(close()), p_filterWin, SLOT(concludePreview()));
+		// connect(this, SIGNAL(close()), p_filterWin, SLOT(concludePreview()));
 	}
 
+	// bool ConcludePreviewButton::close()
+	// {
+	// 	emit( closeSignal() );
+	// 	return QPushButton::close();
+	// }
 }

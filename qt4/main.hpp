@@ -43,6 +43,12 @@ namespace Moviesoap
 	extern void init( intf_thread_t * p_intf, MainInterface * mainInterface );
 }
 
+// BLACKOUT (filter-chain.h)
+namespace Moviesoap
+{
+	extern filter_t *p_blackout_filter;
+}
+
 // CONFIG (config.cpp)
 namespace Moviesoap
 {

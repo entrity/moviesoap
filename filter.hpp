@@ -6,6 +6,7 @@
 #include "variables.h"
 #include <vlc_common.h>
 #include <vlc_threads.h>
+#include <vlc_input.h>
 #include <list>
 #include <string>
 using namespace std;
@@ -13,11 +14,17 @@ using namespace std;
 namespace Moviesoap {
 	class Filter;
 	class Mod;
+	
+	/* Inline functions */
+	/* Get current time in play (in us) */
+	static inline mtime_t MoviesoapGetNow(input_thread_t * p_input)
+		{ int64_t us = 0;	if (p_input) input_Control( p_input, INPUT_GET_TIME, &us );	return us; }
 
-	/* Implement mod effect, schedule stop, destroy start timer */
-	void activateMod(void * p_data);
-	/* Destroy stop timer. End effect. */
-	void deactivateMod(void * p_data);
+	/* Function prototypes */
+	void tryModStart(void * mod_pointer);
+	void tryModStop(void * mod_pointer);
+	void tryModStart(Mod * p_mod, mtime_t now);
+	void tryModStop(Mod * p_mod, mtime_t now);
 
 	class Filter
 	{
@@ -57,7 +64,7 @@ namespace Moviesoap {
 				
 		// FILE IO
 		
-		inline size_t metaSize();
+		size_t metaSize();
 		/* Write tar header, data and padding to stream */
 		int metaOut(ofstream &);
 		int metaIn(istream &);
@@ -78,11 +85,9 @@ namespace Moviesoap {
 		/* Destroy timers. Undo any active effects (mute & blackout) */
 		void Stop();
 		/* Load queuedMod. */
-		void loadNextMod();
+		// void loadNextMod();
 		/* Load queuedMod. */
 		void loadNextMod(mtime_t);
-		/* Schedule start of mod or activate mod */
-		void loadMod(Mod *, mtime_t);
 	};
 
 	class Mod
@@ -92,29 +97,44 @@ namespace Moviesoap {
 		moviesoap_mod_t mod; // struct holding data for implementation of mod
 		string description; // used for meta file
 		vlc_timer_t timer; // holds data for activation or deactivation of mod
-		Filter * p_filter; // Largely safe to ignore. Set by Filter::loadMod(). Points to mod's owner so that mod can find Filter::scheduledMods, so that mod can remove itself from Filter::scheduledMods when Filter::deactivateMod() callback fires.
+		Filter * p_filter; // Largely safe to ignore. Set by Filter::loadNextMod(). Points to mod's owner so that mod can find Filter::scheduledMods, so that mod can remove itself from Filter::scheduledMods when tryModStop callback fires.
 		
 		/* Constructor(s) */
 		Mod(uint8_t mode=0,
 		uint32_t start=0, uint32_t stop=0,
 		uint8_t category=0, uint8_t severity=0,
 		uint16_t x1=0, uint16_t y1=0, uint16_t x2=0, uint16_t y2=0);
+
 		/* Constructor. Reads moviesoap_mod_t data from stream. Creates mod with same. */
-		Mod(istream &);
-		/* Destructor */
-		~Mod();
-		
-		/* Used for sorting. */
-		bool operator<(const Mod& otherMod) const;
-		/* Used for removing a Mod from a list. Returns true if their address' are the same (i.e. they are actually the same object) */
-		bool operator==(const Mod & other) const;
+		Mod(istream & ins) { ins.read( (char *) &mod, sizeof(moviesoap_mod_t) ); }
 
-		uint32_t startTime();
-		uint32_t stopTime();
+		bool operator<(const Mod& otherMod) const { return mod.start < otherMod.mod.start; }
+		bool operator==(const Mod& otherMod) const { return this == &otherMod; }
 
+		/* Returns true if this Mod's mode yields an active effect (requiring scheduling of its stop time) */
+		bool producesActiveEffect() { return mod.mode != MOVIESOAP_SKIP; }
+
+		/* Return Mod's start time in microseconds */
+		uint32_t startTime() { return MOVIESOAP_MOD_TIME_TO_US(mod.start); }
+		/* Return Mod's stop time in microseconds */
+		uint32_t stopTime() { return MOVIESOAP_MOD_TIME_TO_US(mod.stop); }
+		/* Return microseconds until Mod's start time */
+		mtime_t calcActivationDelay(mtime_t now) { mtime_t stime = startTime(); return now < stime ? (stime - now) : 0; }
+		/* Return microseconds until Mod's stop time */
+		mtime_t calcDeactivationDelay(mtime_t now) { mtime_t stime = stopTime(); return now < stime ? (stime - now) : 0; }
+
+		void addToScheduledList() { p_filter->scheduledMods.push_back( this ); }
+		void removeFromScheduledList() { p_filter->scheduledMods.remove( this ); }
+
+		/* Create and schedule timer. This does NOT add the Mod to scheduledMods list. */
+		void schedule( mtime_t delay_in_us, void (*callback)(void *) );
+		/* Implement effect */
 		void activate();
+		/* Unimplement effect */
 		void deactivate();
+		/* Debugging method: describes Mod in plain text */
 		void out(ostream & stream);
+		/* Sets all fields to 0 */
 		void nullify();
 	};
 }
