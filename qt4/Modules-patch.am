@@ -23,6 +23,7 @@ MOVIESOAP_GUI_CPPS = \
 	../../moviesoap/qt4/menu.cpp \
 	../../moviesoap/filter.cpp \
 	../../moviesoap/filter_fileio.cpp \
+	../../moviesoap/updates.cpp \
 	../../moviesoap/qt4/config.cpp \
 	../../moviesoap/qt4/frames/preferences.cpp \
 	../../moviesoap/qt4/frames/filter_win.cpp \
@@ -37,6 +38,7 @@ MOVIESOAP_GUI_HPPS = \
 	../../moviesoap/qt4/menu.hpp \
 	../../moviesoap/variables.h \
 	../../moviesoap/filter.hpp \
+	../../moviesoap/updates.hpp \
 	../../moviesoap/filter-chain.h \
 	../../moviesoap/qt4/frames/preferences.hpp \
 	../../moviesoap/qt4/frames/filter_win.hpp \

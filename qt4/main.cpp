@@ -4,6 +4,11 @@
 
 namespace Moviesoap
 {
+
+	/* initialize misc fields extern'ed from main.hpp */
+	Moviesoap::Menu * p_GuiMenu = NULL;
+
+
 	const char * toleranceLabels[] = {
 		"(unspecified)",
 		"Bigotry",

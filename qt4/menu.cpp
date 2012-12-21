@@ -42,6 +42,8 @@ namespace Moviesoap
 		connect( actionPreferences, SIGNAL(triggered()), this, SLOT(editPreferences()) );
 		connect( actionEdit, SIGNAL(triggered()), this, SLOT(editFilter()) );
 		connect( actionNew, SIGNAL(triggered()), this, SLOT(newFilter()) );
+		// connect other slots
+		connect( this, SIGNAL(updatesAvailable()), this, SLOT(openUpdatesMessageBox()) );
 	}
 
 	/* Called by menu creation in modules/gui/qt4/... */
@@ -87,6 +89,16 @@ namespace Moviesoap
 					QMessageBox::Ok);
 			}
 		}
+	}
+
+	void Menu::notifyUpdatesAvailable() { emit updatesAvailable(); }
+	
+	void Menu::openUpdatesMessageBox()
+	{
+		QMessageBox::information( Moviesoap::p_GuiMenu, 
+					QMessageBox::tr("Update notification"),
+					QString("Updates are available for Moviesoap.\nPlease go to http://moviesoap.org to download the latest version."),
+					QMessageBox::Ok);
 	}
 
 }

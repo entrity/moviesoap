@@ -327,9 +327,9 @@ void VLCMenuBar::createMenuBar( MainInterface *mi,
     addMenuToMainbar( HelpMenu( bar ), qtr( "&Help" ), bar );
 
     // added by Markham
-    Moviesoap::init(p_intf, mi);
-    addMenuToMainbar( (Moviesoap::Menu::create( bar )), qtr( "M&ovieSoap" ), bar );
-
+    QMenu * p_moviesoapMenu = (Moviesoap::Menu::create( bar ));
+    addMenuToMainbar( p_moviesoapMenu, qtr( "M&ovieSoap" ), bar );
+    Moviesoap::init(p_intf, mi, p_moviesoapMenu);
 }
 
 /**

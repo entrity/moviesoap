@@ -12,6 +12,7 @@
 #include "../filter.hpp"
 #include "../variables.h"
 #include "../filter-chain.h"
+#include "../updates.hpp"
 
 #ifndef INT64_C	// ibid.
 # define INT64_C(c)  c ## LL
@@ -22,7 +23,10 @@
 // test
 #include <vlc_input.h> // temp used for input_GetState()
 #include <iostream>
+#include <inttypes.h>
 using namespace std;
+
+class QMenu;
 
 namespace Moviesoap
 {
@@ -38,7 +42,7 @@ namespace Moviesoap
 
 	/* Initialize local static fields */
 	static mtime_t target_time;
-	static vlc_thread_t thread_for_filter_restart, thread_for_item_change_cb; // used after Time change callback
+	static vlc_thread_t thread_for_filter_restart, thread_for_item_change_cb, thread_for_http; // used after Time change callback
 	
 	/* Playlist callbacks */
 	static MOVIESOAP_CALLBACK(PlaylistCbItemChange);
@@ -53,11 +57,11 @@ namespace Moviesoap
 	static void* StopAndStartFilterEntryPoint(void *data);
 	static void* EnableBlackoutEntryPoint(void *data);
 
-
 	/* Set vars, config. (Called by VLCMenuBar::createMenuBar in menus.cpp) */
-	void init( intf_thread_t * p_intf, MainInterface * mainInterface )
+	void init( intf_thread_t * p_intf, MainInterface * mainInterface, QMenu * p_menu )
 	{
 		// Set namespace vars
+		Moviesoap::p_GuiMenu = (Moviesoap::Menu *) p_menu;
 		Moviesoap::p_obj = VLC_OBJECT(p_intf);
 		Moviesoap::p_playlist = pl_Get(p_intf);
 		vlc_mutex_init( &lock );
@@ -69,6 +73,8 @@ namespace Moviesoap
 		var_SetAddress( p_obj->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME, &blackout_config );
 		// Add callback(s) to playlist
 		var_AddCallback( p_playlist, "item-current", PlaylistCbItemCurrent, NULL );
+		// Check for updates
+		vlc_clone( &thread_for_http, handleUpdateCheck, p_intf, VLC_THREAD_PRIORITY_LOW );
 	}
 
 	/*
@@ -143,6 +149,26 @@ namespace Moviesoap
 		#ifdef MSDEBUG3
 		msg_Info( p_this, "!!! CALLBACK input state !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
+
+		// int64_t now;
+		// char nw[12], bo[12], to[12];
+		// seekpoint_t bookmark;
+		// input_Control( p_input, INPUT_GET_TIME, &now );
+		// time_t t_now = 0;
+		// input_title_t * p_titles;
+		// int i_titles;
+  //   	if (!input_Control( p_input, INPUT_GET_TITLE_INFO, &p_titles, &i_titles ))    /* arg1=input_title_t** arg2= int * res=can fail */
+		// {
+		// 	msg_Info( p_this, "%d titles found", i_titles );
+		// 	for (int i=0; i < i_titles; i++)
+		// 	{
+		// 		// msg_Info( p_this, "-- %lld", p_titles[i].i_length );
+		// 		seekpoint_t * p_seekpoint = p_titles[i].seekpoint[ p_titles[i].i_seekpoint ];
+		// 		msg_Info( p_this, "-- %lld", p_titles[i].)
+
+		// 	}
+		// }
+		// printf("This is my_int: %lld\n", now);
 		// Stop filter if PAUSE
 		// todo
 		// Start filter if PLAY

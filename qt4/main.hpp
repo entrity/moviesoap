@@ -13,18 +13,19 @@ using namespace std;
 #include <vlc_configuration.h>
 #include <vlc_aout.h>			// audio_volume_t
 #include <vlc_playlist.h>		// playlist_t
-#include <QMenu>
 
 class MainInterface;
-class QWidget;
-class QMenuBar;
+class QMenu;
 
 // MISC (main.cpp)
 namespace Moviesoap 
 {
+	class Menu;
+
 	extern string saveDir();
 	extern string extractDir(const string& str);
-	extern const char * toleranceLabels[];	
+	extern const char * toleranceLabels[];
+	extern Moviesoap::Menu * p_GuiMenu; // this is the 'Moviesoap' menu in the main menu bar
 }
 
 // CALLBACKS (callbacks.cpp)
@@ -40,7 +41,7 @@ namespace Moviesoap
 	extern moviesoap_blackout_config_t blackout_config;
 
 	/* Functions */
-	extern void init( intf_thread_t * p_intf, MainInterface * mainInterface );
+	extern void init( intf_thread_t * p_intf, MainInterface * mainInterface, QMenu * p_menu );
 }
 
 // BLACKOUT (filter-chain.h)
