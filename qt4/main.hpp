@@ -1,6 +1,5 @@
 #ifndef MOVIESOAP_MAIN_H
 #define MOVIESOAP_MAIN_H
-#define MOVIESOAP_VERSION 0.3.0
 
 #include "../filter.hpp"
 #include "../variables.h"

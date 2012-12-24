@@ -150,25 +150,9 @@ namespace Moviesoap
 		msg_Info( p_this, "!!! CALLBACK input state !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
 
-		// int64_t now;
-		// char nw[12], bo[12], to[12];
-		// seekpoint_t bookmark;
-		// input_Control( p_input, INPUT_GET_TIME, &now );
-		// time_t t_now = 0;
-		// input_title_t * p_titles;
-		// int i_titles;
-  //   	if (!input_Control( p_input, INPUT_GET_TITLE_INFO, &p_titles, &i_titles ))    /* arg1=input_title_t** arg2= int * res=can fail */
-		// {
-		// 	msg_Info( p_this, "%d titles found", i_titles );
-		// 	for (int i=0; i < i_titles; i++)
-		// 	{
-		// 		// msg_Info( p_this, "-- %lld", p_titles[i].i_length );
-		// 		seekpoint_t * p_seekpoint = p_titles[i].seekpoint[ p_titles[i].i_seekpoint ];
-		// 		msg_Info( p_this, "-- %lld", p_titles[i].)
+		int i = var_GetInteger(p_input, "title");
+		msg_Info(p_this, "title: %d", i);
 
-		// 	}
-		// }
-		// printf("This is my_int: %lld\n", now);
 		// Stop filter if PAUSE
 		// todo
 		// Start filter if PLAY

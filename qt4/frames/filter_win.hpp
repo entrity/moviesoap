@@ -25,6 +25,7 @@ namespace Moviesoap
 		BlackoutFrame * blackoutFrame;
 		ConcludePreviewButton * concludePreviewButton;
 		Filter * holdingBayForLoadedFilter; // holds Moviesoap::p_loadedFilter during Mod previews
+		void defaultizeMod(Mod * p_mod); // loads times and title from p_input
 	public:
 		Filter filter;
 		Filter blankFilter; // used to copy null fields to this->filter when new filter is wanted

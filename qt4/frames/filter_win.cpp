@@ -61,7 +61,7 @@ namespace Moviesoap
 	{
 		// initialize null mod if arg == NULL
 		if (!modToLoad) {
-			mod = blankMod;
+			defaultizeMod(&mod);
 			p_mod = &mod;
 		} else {
 			p_mod = modToLoad;
@@ -173,5 +173,23 @@ namespace Moviesoap
 		show();
 		playlist_Control( Moviesoap::p_playlist, PLAYLIST_PAUSE, false );
 		Moviesoap::p_loadedFilter = holdingBayForLoadedFilter;
+	}
+
+	/* Set intial values for new mod. */
+	void FilterWin::defaultizeMod(Mod * p_mod)
+	{
+		if (Moviesoap::p_input) {
+			p_mod->mod.start = MoviesoapGetNow(Moviesoap::p_input);
+			p_mod->mod.stop = p_mod->mod.start + (100 * MOVIESOAP_MOD_TIME_FACTOR);
+			p_mod->mod.title = var_GetInteger(Moviesoap::p_input, "title");
+		} else {
+			p_mod->mod.start = 0;
+			p_mod->mod.stop = 100 * MOVIESOAP_MOD_TIME_FACTOR;
+			p_mod->mod.title = -1;
+		}
+		p_mod->mod.mode = MOVIESOAP_SKIP;
+		p_mod->mod.category = MOVIESOAP_CAT_NONE;
+		p_mod->mod.severity = MOVIESOAP_TOLERANCE_COUNT;
+		p_mod->description = "";
 	}
 }

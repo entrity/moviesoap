@@ -166,14 +166,14 @@ namespace Moviesoap
 	// void Filter::loadNextMod() { loadNextMod(MoviesoapGetNow(p_input)); }
 
 	/* Load queuedMod. Stop Filter if end reached. (Arg 'now' should be in microseconds) */
-	void Filter::loadNextMod(mtime_t now)
+	void Filter::loadNextMod(int64_t now)
 	{
 		// Find next mod whose stop time is not passed
 		for ( ; queuedMod != modList.end(); queuedMod++ ) {
 			#ifdef MSDEBUG2
 				cout << "MOD SEEK -- now: " << now / MOVIESOAP_MOD_TIME_FACTOR << " start: " << queuedMod->mod.start << " stop: " << queuedMod->mod.stop << " " << (*queuedMod).description << endl;
 			#endif
-			if ( (queuedMod->mod.stop * MOVIESOAP_MOD_TIME_FACTOR) > now ) {
+			if ( shouldEnqueueMod(&*queuedMod, now, -1, p_input) ) {
 				#ifdef MSDEBUG2
 					cout << setw(18) << "QUEUE MOD: " << "now(" << now / MOVIESOAP_MOD_TIME_FACTOR << ") ";
 				#endif

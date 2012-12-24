@@ -14,11 +14,6 @@ using namespace std;
 namespace Moviesoap {
 	class Filter;
 	class Mod;
-	
-	/* Inline functions */
-	/* Get current time in play (in us) */
-	static inline mtime_t MoviesoapGetNow(input_thread_t * p_input)
-		{ int64_t us = 0;	if (p_input) input_Control( p_input, INPUT_GET_TIME, &us );	return us; }
 
 	/* Function prototypes */
 	void tryModStart(void * mod_pointer);
@@ -137,6 +132,29 @@ namespace Moviesoap {
 		/* Sets all fields to 0 */
 		void nullify();
 	};
+
+	/* Inline functions */
+	/* Get current time in play (in us) */
+	static inline int64_t MoviesoapGetNow(input_thread_t * p_input)
+		{ int64_t us = 0; if (p_input) input_Control( p_input, INPUT_GET_TIME, &us ); return us; }
+
+	/* If this function should derive current time and title on its own, set those to -1. */
+	static inline bool shouldEnqueueMod(Mod * mod, int64_t i_now, int i_title, input_thread_t * p_input)
+	{
+		if (p_input) {
+			if (i_now == -1) i_now = MoviesoapGetNow(p_input);
+			if (i_title == -1 && mod->mod.title != -1) i_title = var_GetInteger(p_input, "title");
+			if (
+				// check that current title matches mod title
+				(mod->mod.title == -1 || mod->mod.title == i_title)
+				// check that stop time is not past
+				&& (mod->mod.stop * MOVIESOAP_MOD_TIME_FACTOR) > i_now
+				// check that mod severity exceeds user tolerance
+				&& true // todo
+				) return true;
+		}
+		return false;
+	}
 }
 
 #endif

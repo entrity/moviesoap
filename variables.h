@@ -1,5 +1,6 @@
 #ifndef MOVIESOAP_VARIABLES_H
 #define MOVIESOAP_VARIABLES_H
+#define MOVIESOAP_VERSION "0.3.0"
 #define MOVIESOAP_FILTER_VARNAME "moviesoap-filter"
 #define MOVIESOAP_BLACKOUT_VARNAME "moviesoap-blackout-config"
 #define MOVIESOAP_TOLERANCE_COUNT 6
@@ -42,10 +43,10 @@ typedef struct {
 typedef struct {
 	uint8_t mode,	// MOVIESOAP_SKIP, MOVIESOAP_MUTE, MOVIESOAP_BLACKOUT
 		category,	// MOVIESOAP_CAT_NONE, MOVIESOAP_CAT_BIGOTRY, MOVIESOAP_CAT_BLASPHEMY, etc.
-		severity,	// 1..5
-		unused;	
+		severity;	// 1..5
 	uint32_t start, stop;		// trigger to start and cease this mod's application
-	uint16_t x1, y1, x2, y2;	// for blackout box, if applicable
+	uint16_t x1, y1, x2, y2,	// for blackout box, if applicable
+		title;		// which 'title', e.g. if DVD of TV episodes is playing
 } moviesoap_mod_t;
 
 /************************************************
