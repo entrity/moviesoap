@@ -12,7 +12,9 @@ namespace Moviesoap
 	{
 		int fd = net_ConnectTCP (p_obj, MOVIESOAP_UPDATES_HOST, 80);
 		if (fd != -1 ) {
-			ssize_t resp1 = net_Printf( p_obj, fd, NULL,  "GET " MOVIESOAP_UPDATES_PATH " HTTP/1.1\r\nHost: markhamanderson.com\r\n\r\n" );
+			ssize_t resp1 = net_Printf( p_obj, fd, NULL,
+			  "GET " MOVIESOAP_UPDATES_PATH "?ver=" MOVIESOAP_VERSION " HTTP/1.1\r\nHost: " MOVIESOAP_UPDATES_HOST "\r\n\r\n" 
+			  );
 			char * resp;
 			bool readingHeaders = true;
 			while (readingHeaders) {

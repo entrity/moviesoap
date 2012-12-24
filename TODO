@@ -6,7 +6,6 @@ BUGS
 TODO
 - ensure callback for navigation is setting correct time
 - add qmessage warnings when changes made to filter/mod w/out update call
-- add http break moviesoap feature / check for updates
 - activate mod only if severity exceeds tolerance
 - activate & deactivate functions on config
 - set p_input to NULL when input thread changes to stop or switch
@@ -39,5 +38,6 @@ DONE
 - when filter file loaded, stop old filter and start new one
 - handle queueing correct mod downstream of position change callback
 - Fixed: interface becomes unresponsive when pos changed into a SKIP zone?
--------------
 - remove input-change callback when blackout video filter is enabled
+- add auto check for updates
+-------------

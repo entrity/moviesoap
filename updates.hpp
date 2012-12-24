@@ -2,7 +2,7 @@
 #define MOVIESOAP_UPDATES_H
 
 #define MOVIESOAP_UPDATES_HOST "moviesoap.org"
-#define MOVIESOAP_UPDATES_PATH "/update_check?ver=0.3.0"
+#define MOVIESOAP_UPDATES_PATH "/update_check"
 
 namespace Moviesoap
 {
