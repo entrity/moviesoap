@@ -3,7 +3,14 @@
 
 #include <QWidget>
 
+namespace Moviesoap {
+	class Filter;
+	class Mod;
+}
+
 #include "variables.h"
+#include "qt4/main.hpp"
+#include "qt4/config.hpp"
 #include <vlc_common.h>
 #include <vlc_threads.h>
 #include <vlc_input.h>
@@ -12,9 +19,7 @@
 using namespace std;
 
 namespace Moviesoap {
-	class Filter;
-	class Mod;
-
+	
 	/* Function prototypes */
 	void tryModStart(void * mod_pointer);
 	void tryModStop(void * mod_pointer);
@@ -143,14 +148,14 @@ namespace Moviesoap {
 	{
 		if (p_input) {
 			if (i_now == -1) i_now = MoviesoapGetNow(p_input);
-			if (i_title == 0 && mod->mod.title != 0) i_title = var_GetInteger(p_input, "title");
+			if (i_title == MOVIESOAP_UNIVERSAL_TITLE && mod->mod.title != MOVIESOAP_UNIVERSAL_TITLE) i_title = var_GetInteger(p_input, "title");
 			if (
 				// check that current title matches mod title
-				(mod->mod.title == 0 || mod->mod.title == i_title)
+				(mod->mod.title == MOVIESOAP_UNIVERSAL_TITLE || mod->mod.title == i_title)
 				// check that stop time is not past
 				&& (mod->mod.stop * MOVIESOAP_MOD_TIME_FACTOR) > i_now
 				// check that mod severity exceeds user tolerance
-				&& true // todo
+				&& Moviesoap::config.modExceedsTolerance(mod)
 				) return true;
 		}
 		return false;

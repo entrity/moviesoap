@@ -1,5 +1,4 @@
 #include "filter.hpp"
-#include "qt4/main.hpp"
 
 #include <vlc_threads.h>
 #include <vlc_variables.h>

@@ -12,11 +12,11 @@ namespace Moviesoap
 	/* Initialize extern vars */
 	struct config_t config;
 
-	/* Returns true if given content for given mod is tolerable to user's config. */
-	bool config_t::ignoreMod(Moviesoap::Mod & mod)
+	/* Returns true if given content for given mod is not tolerable to user's config. */
+	bool config_t::modExceedsTolerance(Moviesoap::Mod * p_mod)
 	{
-		uint8_t tolerance = tolerances[mod.mod.category];
-		return tolerance > mod.mod.severity;
+		uint8_t tolerance = tolerances[p_mod->mod.category];
+		return tolerance < p_mod->mod.severity;
 	}
 
 	void config_t::save()

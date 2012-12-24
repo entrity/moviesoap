@@ -4,12 +4,8 @@ BUGS
 - jumping into zone of two effects only implements first
 
 TODO
-- ensure callback for navigation is setting correct time
-- add qmessage warnings when changes made to filter/mod w/out update call
-- activate mod only if severity exceeds tolerance
 - activate & deactivate functions on config
-- set p_input to NULL when input thread changes to stop or switch
-- add behaviour for interface events in callbacks.cpp
+- test p_input is NULL when play is done (playlist item-current callback. should it change to item-changed?)
 
 DONE
 - test create and destroy timers
@@ -40,4 +36,7 @@ DONE
 - Fixed: interface becomes unresponsive when pos changed into a SKIP zone?
 - remove input-change callback when blackout video filter is enabled
 - add auto check for updates
+- add behaviour for interface events in callbacks.cpp
+- add title to mod, mod check, mod edit gui
 -------------
+- activate mod only if severity exceeds tolerance
