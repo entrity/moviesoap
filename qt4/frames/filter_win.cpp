@@ -125,7 +125,11 @@ namespace Moviesoap
 		}
 	}
 
-	void FilterWin::updateLoadedFilter() { *p_loadedFilter = filter; }
+	void FilterWin::updateLoadedFilter() {
+		if (Moviesoap::p_loadedFilter == NULL)
+			Moviesoap::p_loadedFilter = new Moviesoap::Filter;
+		*Moviesoap::p_loadedFilter = filter;
+	}
 
 	void FilterWin::save()
 	{
@@ -179,13 +183,13 @@ namespace Moviesoap
 	void FilterWin::defaultizeMod(Mod * p_mod)
 	{
 		if (Moviesoap::p_input) {
-			p_mod->mod.start = MoviesoapGetNow(Moviesoap::p_input);
-			p_mod->mod.stop = p_mod->mod.start + (100 * MOVIESOAP_MOD_TIME_FACTOR);
+			p_mod->mod.start = MoviesoapGetNow(Moviesoap::p_input) / MOVIESOAP_MOD_TIME_FACTOR;
+			p_mod->mod.stop = p_mod->mod.start + (100);
 			p_mod->mod.title = var_GetInteger(Moviesoap::p_input, "title");
 		} else {
 			p_mod->mod.start = 0;
-			p_mod->mod.stop = 100 * MOVIESOAP_MOD_TIME_FACTOR;
-			p_mod->mod.title = -1;
+			p_mod->mod.stop = 100;
+			p_mod->mod.title = 0;
 		}
 		p_mod->mod.mode = MOVIESOAP_SKIP;
 		p_mod->mod.category = MOVIESOAP_CAT_NONE;
