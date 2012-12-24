@@ -56,7 +56,7 @@ namespace Moviesoap
 	/* Set value of QLineEdit */
 	inline void setText(QLineEdit * input, const string &text) { input->setText(QObject::tr(text.c_str())); }
 	/* Return a string 00:00:00.00 for time_t in us*MOVIESOAP_MOD_TIME_FACTOR (= centiseconds) */
-	inline void strftime(time_t t, char dst[12]) {
+	inline void strftime(uint32_t t, char dst[12]) {
 		uint8_t cs, sec, min, hr;
 		cs = t % 100;
 		t /= 100;

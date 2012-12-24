@@ -103,7 +103,7 @@ namespace Moviesoap {
 		/* Constructor. Reads moviesoap_mod_t data from stream. Creates mod with same. */
 		Mod(istream & ins) { ins.read( (char *) &mod, sizeof(moviesoap_mod_t) ); }
 
-		bool operator<(const Mod& otherMod) const { return mod.start < otherMod.mod.start; }
+		bool operator<(const Mod& otherMod) const;
 		bool operator==(const Mod& otherMod) const { return this == &otherMod; }
 
 		/* Returns true if this Mod's mode yields an active effect (requiring scheduling of its stop time) */
@@ -143,10 +143,10 @@ namespace Moviesoap {
 	{
 		if (p_input) {
 			if (i_now == -1) i_now = MoviesoapGetNow(p_input);
-			if (i_title == -1 && mod->mod.title != -1) i_title = var_GetInteger(p_input, "title");
+			if (i_title == 0 && mod->mod.title != 0) i_title = var_GetInteger(p_input, "title");
 			if (
 				// check that current title matches mod title
-				(mod->mod.title == -1 || mod->mod.title == i_title)
+				(mod->mod.title == 0 || mod->mod.title == i_title)
 				// check that stop time is not past
 				&& (mod->mod.stop * MOVIESOAP_MOD_TIME_FACTOR) > i_now
 				// check that mod severity exceeds user tolerance

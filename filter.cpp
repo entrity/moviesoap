@@ -168,14 +168,18 @@ namespace Moviesoap
 	/* Load queuedMod. Stop Filter if end reached. (Arg 'now' should be in microseconds) */
 	void Filter::loadNextMod(int64_t now)
 	{
+		cout << "--loadNextMod" << endl;
 		// Find next mod whose stop time is not passed
 		for ( ; queuedMod != modList.end(); queuedMod++ ) {
 			#ifdef MSDEBUG2
-				cout << "MOD SEEK -- now: " << now / MOVIESOAP_MOD_TIME_FACTOR << " start: " << queuedMod->mod.start << " stop: " << queuedMod->mod.stop << " " << (*queuedMod).description << endl;
+				cout << "MOD SEEK -- now: " 
+					<< now / MOVIESOAP_MOD_TIME_FACTOR << 
+					" start: " << queuedMod->mod.start <<
+					" stop: " << queuedMod->mod.stop << " " << (*queuedMod).description << endl;
 			#endif
-			if ( shouldEnqueueMod(&*queuedMod, now, -1, p_input) ) {
+			if ( shouldEnqueueMod(&*queuedMod, now, MOVIESOAP_UNIVERSAL_TITLE, p_input) ) {
 				#ifdef MSDEBUG2
-					cout << setw(18) << "QUEUE MOD: " << "now(" << now / MOVIESOAP_MOD_TIME_FACTOR << ") ";
+					cout << "LOADING MOD..." << endl;
 				#endif
 				queuedMod->out(cout);
 				Mod * p_mod = &*queuedMod;
@@ -184,6 +188,11 @@ namespace Moviesoap
 				tryModStart( p_mod, now );
 				return; // break
 			}
+			#ifdef MSDEBUG2
+				else {
+					cout << "NOT LOADED" << endl;
+				}
+			#endif
 		}
 		cout << "No further mods to load." << endl;
 	}
@@ -243,6 +252,15 @@ namespace Moviesoap {
 		mod.y1 = y1;
 		mod.y2 = y2;
 	}
+
+	bool Mod::operator<(const Mod& otherMod) const
+	{
+		if (mod.title == otherMod.mod.title)
+			return mod.start < otherMod.mod.start;
+		else
+			return mod.title < otherMod.mod.title;
+	}
+
 
 	void Mod::activate()
 	{

@@ -49,7 +49,7 @@ namespace Moviesoap
 	static MOVIESOAP_CALLBACK(PlaylistCbItemCurrent);
 	/* Input callbacks */
 	static MOVIESOAP_CALLBACK(InputCbState);
-	static MOVIESOAP_CALLBACK(InputCbNavigation);
+	static MOVIESOAP_CALLBACK(InputCbGeneric);
 	static MOVIESOAP_CALLBACK(InputCbPosition);
 	static MOVIESOAP_CALLBACK(InputCbTime);
 	/* Other local prototypes */
@@ -110,10 +110,11 @@ namespace Moviesoap
 				// Add callback(s) to input thread
 				var_AddCallback( p_input, "position", InputCbPosition, NULL );
 				var_AddCallback( p_input, "time", InputCbTime, NULL );
-				var_AddCallback( p_input, "navigation", InputCbNavigation, NULL );
+				var_AddCallback( p_input, "intf-event", InputCbGeneric, NULL );
 				var_AddCallback( p_input, "state", InputCbState, NULL );
 				// start filter object if one exists
 				if (p_loadedFilter) p_loadedFilter->Restart();
+				cout << "loaded filter: " << hex << p_loadedFilter << endl;
 				return VLC_SUCCESS;
 			} else {
 				msg_Err( p_this, "No current input thread found." );
@@ -153,10 +154,15 @@ namespace Moviesoap
 		int i = var_GetInteger(p_input, "title");
 		msg_Info(p_this, "title: %d", i);
 
-		// Stop filter if PAUSE
-		// todo
-		// Start filter if PLAY
-		// todo
+		// Stop or Start filter
+		if (p_loadedFilter) {
+			vlc_mutex_lock( &lock );
+			if (newval.i_int == PLAYING_S)
+				p_loadedFilter->Restart();
+			else			
+				p_loadedFilter->Stop();
+			vlc_mutex_unlock( &lock );
+		}
 		return 0;
 	}
 
@@ -188,13 +194,21 @@ namespace Moviesoap
 		return 0;
 	}
 
-	static MOVIESOAP_CALLBACK(InputCbNavigation)
+	static MOVIESOAP_CALLBACK(InputCbGeneric)
 	{
-		#ifdef MSDEBUG3
-		msg_Info( p_this, "!!! CALLBACK input navigation !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
-		#endif
-
-		StopAndStartFilter( MoviesoapGetNow(p_input) );
+		if (p_loadedFilter) {
+			switch(newval.i_int) {
+				case INPUT_EVENT_TITLE:
+				case INPUT_EVENT_CHAPTER:
+				case INPUT_EVENT_PROGRAM:
+    			case INPUT_EVENT_BOOKMARK:
+					StopAndStartFilter( MoviesoapGetNow(p_input) );
+					#ifdef MSDEBUG3
+					msg_Info( p_this, "!!! CALLBACK input generic !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
+					#endif
+					break;
+			}
+		}
 		return 0;
 	}
 

@@ -189,7 +189,7 @@ namespace Moviesoap
 		} else {
 			p_mod->mod.start = 0;
 			p_mod->mod.stop = 100;
-			p_mod->mod.title = 0;
+			p_mod->mod.title = MOVIESOAP_UNIVERSAL_TITLE;
 		}
 		p_mod->mod.mode = MOVIESOAP_SKIP;
 		p_mod->mod.category = MOVIESOAP_CAT_NONE;

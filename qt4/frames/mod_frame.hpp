@@ -19,7 +19,7 @@ namespace Moviesoap
 	{
 		Q_OBJECT
 	protected:
-		QLineEdit *startText, *stopText, *descText;
+		QLineEdit *startText, *stopText, *titleText, *descText;
 		QRadioButton
 			*modeRadios[MOVIESOAP_MOD_MODE_COUNT],
 			*severityRadios[MOVIESOAP_TOLERANCE_COUNT],

@@ -18,6 +18,7 @@ namespace Moviesoap
 		// times
 		mod->mod.start = strptime(startText->text().toAscii().data());
 		mod->mod.stop = strptime(stopText->text().toAscii().data());
+		mod->mod.title = titleText->text().toInt();
 		// severity
 		mod->mod.severity = getChecked(severityRadios, MOVIESOAP_TOLERANCE_COUNT);
 		// category
@@ -32,11 +33,12 @@ namespace Moviesoap
 		// mode
 		modeRadios[mod->mod.mode]->setChecked(true);
 		// times
-		char buffer[12];		
+		char buffer[12];
 		strftime(mod->mod.start, buffer);
 		startText->setText(buffer);
 		strftime(mod->mod.stop,  buffer);
 		stopText->setText(buffer);
+		titleText->setText(QString::number(mod->mod.title));
 		// severity
 		if (mod->mod.severity >= 0 && mod->mod.severity < MOVIESOAP_TOLERANCE_COUNT)
 			severityRadios[mod->mod.severity]->setChecked(true);
@@ -92,12 +94,15 @@ namespace Moviesoap
 		// time div
 		addLabelRow(layout, "Time:");
 		hbox = new QHBoxLayout;
-		hbox->addWidget(new QLabel(QString("from")));
+		hbox->addWidget(new QLabel(tr("from")));
 		startText = addText(hbox, "00:00:00.00");
 		startText->setFixedWidth(110);
-		hbox->addWidget(new QLabel(QString("to")));
+		hbox->addWidget(new QLabel(tr("to")));
 		stopText = addText(hbox, "00:00:00.00");
 		stopText->setFixedWidth(110);
+		hbox->addWidget(new QLabel(tr("title")));
+		titleText = addText(hbox, "-1");
+		titleText->setFixedWidth(50);
 		layout->addLayout(hbox);
 		// severity/tolerance div
 		frame = new QFrame;

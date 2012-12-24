@@ -6,9 +6,10 @@
 #define MOVIESOAP_TOLERANCE_COUNT 6
 #define MOVIESOAP_FILE_EXT ".cln"
 #define MOVIESOAP_FILECHOOSER_FILTER "Filter files (*.cln)"
-#define MOVIESOAP_MOD_TIME_FACTOR 10000
+#define MOVIESOAP_MOD_TIME_FACTOR 10000 // start and stop times on mod are stored in centiseconds, but the application uses microseconds for its time measurements
 #define MOVIESOAP_MOD_TIME_TO_US(mod_time) (mod_time * MOVIESOAP_MOD_TIME_FACTOR) // calculate microseconds equivalent of moviesoap_mod_t times
 #define MOVIESOAP_NO_RESTART -1
+#define MOVIESOAP_UNIVERSAL_TITLE -1 // if a mod has a title of -1, it can be queued for any title on the DVD
 
 #include <vlc_common.h>
 
@@ -44,9 +45,9 @@ typedef struct {
 	uint8_t mode,	// MOVIESOAP_SKIP, MOVIESOAP_MUTE, MOVIESOAP_BLACKOUT
 		category,	// MOVIESOAP_CAT_NONE, MOVIESOAP_CAT_BIGOTRY, MOVIESOAP_CAT_BLASPHEMY, etc.
 		severity;	// 1..5
+	short title;		// which 'title', e.g. if DVD of TV episodes is playing
 	uint32_t start, stop;		// trigger to start and cease this mod's application
-	uint16_t x1, y1, x2, y2,	// for blackout box, if applicable
-		title;		// which 'title', e.g. if DVD of TV episodes is playing
+	uint16_t x1, y1, x2, y2;	// for blackout box, if applicable
 } moviesoap_mod_t;
 
 /************************************************
