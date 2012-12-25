@@ -1,11 +1,8 @@
 BUGS
-- jumping from mute zone to outside mute does not kill mute
-- jumping into mute zone does not start mute
-- jumping into zone of two effects only implements first
 
 TODO
-- activate & deactivate functions on config
 - test p_input is NULL when play is done (playlist item-current callback. should it change to item-changed?)
+- test active button in menu
 
 DONE
 - test create and destroy timers
@@ -38,5 +35,7 @@ DONE
 - add auto check for updates
 - add behaviour for interface events in callbacks.cpp
 - add title to mod, mod check, mod edit gui
--------------
 - activate mod only if severity exceeds tolerance
+-------------
+- jumping into mute zone does not start mute
+- jumping into zone of two effects only implements first

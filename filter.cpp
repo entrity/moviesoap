@@ -22,12 +22,16 @@ using namespace std;
 #ifdef MSDEBUG1
 	#include <iomanip>
 	#include <iostream>
+	#include "qt4/frames/gui_helpers.hpp"
 using namespace std;
 #endif
 
 /* Non-member functions */
 namespace Moviesoap
 {
+	static char buffer[12], buffer3[12], buffer2[12];
+	
+	/* These functions are used as callbacks for timers. Don't delete them. */
 	void tryModStart(void * p_data) { tryModStart( (Mod *) p_data, MoviesoapGetNow(p_input) ); }
 	void tryModStop(void * p_data) { tryModStop( (Mod *) p_data, MoviesoapGetNow(p_input) ); }
 
@@ -53,7 +57,7 @@ namespace Moviesoap
 			p_mod->activate();
 			// Schedule deactivation if mod produces an active effect
 			if ( p_mod->producesActiveEffect() )
-				tryModStop(p_mod);
+				tryModStop(p_mod, now);
 			// Tell Filter to load next Mod
 			p_mod->p_filter->loadNextMod(now);
 		}
@@ -167,20 +171,24 @@ namespace Moviesoap
 	/* Load queuedMod. Stop Filter if end reached. (Arg 'now' should be in microseconds) */
 	void Filter::loadNextMod(int64_t now)
 	{
-		cout << "--loadNextMod" << endl;
+		#ifdef MSDEBUG1
+		strftime(now/MOVIESOAP_MOD_TIME_FACTOR, buffer);
+		cout << "-- loadNextMod -- now: " << buffer << endl;
+		#endif
+
 		// Find next mod whose stop time is not passed
 		for ( ; queuedMod != modList.end(); queuedMod++ ) {
 			#ifdef MSDEBUG2
-				cout << "MOD SEEK -- now: " 
-					<< now / MOVIESOAP_MOD_TIME_FACTOR << 
-					" start: " << queuedMod->mod.start <<
-					" stop: " << queuedMod->mod.stop << " " << (*queuedMod).description << endl;
+				strftime(queuedMod->mod.start, buffer);
+				strftime(queuedMod->mod.stop, buffer2);
+				cout << "ITER. MOD --" <<
+					" start: " << buffer <<
+					" stop: " << buffer2 << " " << (*queuedMod).description << endl;
 			#endif
 			if ( shouldEnqueueMod(&*queuedMod, now, MOVIESOAP_UNIVERSAL_TITLE, p_input) ) {
 				#ifdef MSDEBUG2
 					cout << "LOADING MOD..." << endl;
 				#endif
-				queuedMod->out(cout);
 				Mod * p_mod = &*queuedMod;
 				p_mod->p_filter = this;
 				queuedMod++;
@@ -264,7 +272,9 @@ namespace Moviesoap {
 	void Mod::activate()
 	{
 		#ifdef MSDEBUG2
-			cout << setw(18) << "ACTIVATE MOD: " << "now(" << MoviesoapGetNow(p_input) / MOVIESOAP_MOD_TIME_FACTOR << ") " << description << endl;
+			strftime(MoviesoapGetNow(p_input) / MOVIESOAP_MOD_TIME_FACTOR, buffer);
+			cout << setw(18) << "ACTIVATE MOD: " << 
+			"now(" << buffer << ") " << description << endl;
 		#endif
 		// Implement effect
 		switch(mod.mode) {
@@ -287,7 +297,9 @@ namespace Moviesoap {
 	void Mod::deactivate()
 	{
 		#ifdef MSDEBUG2
-			cout << setw(18) << "DEACTIVATE MOD: " << "now(" << MoviesoapGetNow(p_input) / MOVIESOAP_MOD_TIME_FACTOR << ") " << description << endl;
+			strftime(MoviesoapGetNow(p_input) / MOVIESOAP_MOD_TIME_FACTOR, buffer);
+			cout << setw(18) << "DEACTIVATE MOD: " <<
+			"now(" << buffer << ") " << description << endl;
 		#endif
 		// Unimplement effect
 		switch(mod.mode) {

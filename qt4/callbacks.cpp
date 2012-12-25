@@ -25,6 +25,7 @@
 #include <iostream>
 #include <inttypes.h>
 using namespace std;
+#include "frames/gui_helpers.hpp"
 
 class QMenu;
 
@@ -190,6 +191,9 @@ namespace Moviesoap
 		#endif
 
 		mtime_t new_time = newval.f_float * var_GetTime( p_input, "length" );
+		char buffer[12];
+		strftime(new_time / MOVIESOAP_MOD_TIME_FACTOR, buffer);
+		msg_Info(p_this, "new time %lld\n%s", new_time, &buffer[0]);
 		StopAndStartFilter(new_time);
 		return 0;
 	}
