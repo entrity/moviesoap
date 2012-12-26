@@ -10,8 +10,10 @@
 #include <QFileDialog>
 
 // test
+#ifdef MSDEBUG1
 #include <iostream>
 using namespace std;
+#endif
 
 namespace Moviesoap
 {
@@ -34,6 +36,9 @@ namespace Moviesoap
 
 	void FilterWin::openEditor(Filter * filterToEdit)
 	{
+		// pause play
+		if (Moviesoap::p_input)
+			input_Control( Moviesoap::p_input, INPUT_SET_STATE, PAUSE_S );
 		// create filter if necessary
 		if (p_window == NULL)
 			p_window = new FilterWin;
@@ -112,7 +117,13 @@ namespace Moviesoap
 	
 	void FilterWin::toBlackoutFrame()
 	{
+		#ifdef MSDEBUG1
+		cout << "calling blackoutFrame->load" << endl;
+		#endif
 		blackoutFrame->load(p_mod);
+		#ifdef MSDEBUG1
+		cout << "done blackoutFrame->load" << endl;
+		#endif
 		setCurrentWidget(blackoutFrame);
 	}
 

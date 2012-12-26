@@ -13,6 +13,7 @@ namespace Moviesoap
 	/* Read fields into Mod */
 	void ModFrame::dump(Mod * mod)
 	{
+		int n = 1;
 		// mode
 		mod->mod.mode = getChecked(modeRadios, MOVIESOAP_MOD_MODE_COUNT);
 		// times
@@ -20,7 +21,7 @@ namespace Moviesoap
 		mod->mod.stop = strptime(stopText->text().toAscii().data());
 		mod->mod.title = titleText->text().toInt();
 		// severity
-		mod->mod.severity = getChecked(severityRadios, MOVIESOAP_TOLERANCE_COUNT);
+		mod->mod.severity = getChecked(severityRadios, MOVIESOAP_TOLERANCE_COUNT-1);
 		// category
 		mod->mod.category = categoryBox->currentIndex();
 		// description
