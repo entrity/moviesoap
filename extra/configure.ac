@@ -426,10 +426,10 @@ dnl
 AM_GNU_GETTEXT_VERSION([0.18.1])
 AM_GNU_GETTEXT([external])
 
-dnl <Added by Markham>
+dnl <Moviesoap>
 VLC_ADD_LIBS([qt4],[-lz])
 VLC_ADD_PLUGIN([moviesoap_video_filter])
-dnl </Added by Markham>
+dnl </Moviesoap>
 
 dnl
 dnl Iconv stuff

@@ -57,8 +57,8 @@
 #include <QSignalMapper>
 #include <QStatusBar>
 
-#include "../../moviesoap/qt4/menu.hpp" // Added by Markham
-#include "../../moviesoap/qt4/main.hpp" // Added by Markham
+#include "../../moviesoap/qt4/menu.hpp" // Moviesoap
+#include "../../moviesoap/qt4/main.hpp" // Moviesoap
 
 /*
   This file defines the main menus and the pop-up menu (right-click menu)
@@ -326,10 +326,11 @@ void VLCMenuBar::createMenuBar( MainInterface *mi,
 
     addMenuToMainbar( HelpMenu( bar ), qtr( "&Help" ), bar );
 
-    // added by Markham
+    // start Moviesoap code
     QMenu * p_moviesoapMenu = (Moviesoap::Menu::create( bar ));
     addMenuToMainbar( p_moviesoapMenu, qtr( "M&ovieSoap" ), bar );
     Moviesoap::init(p_intf, mi, p_moviesoapMenu);
+    // end Moviesoap code
 }
 
 /**

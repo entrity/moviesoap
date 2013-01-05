@@ -137,7 +137,7 @@ namespace Moviesoap
 	}
 
 	/* Destroy active timers. Undo any active effects (mute & blackout). Empty scheduledMods list. */
-	void Filter::Stop()
+	void Filter::StopAndCleanup(bool deactivate_effects)
 	{
 		#ifdef MSDEBUG2
 			cout << "FILTER STOP. " << scheduledMods.size() << " mods active." << endl;
@@ -148,13 +148,20 @@ namespace Moviesoap
 			Mod * p_mod = *iter;
 			// Continue if iterator points to nothing
 			if (!p_mod) continue;
+			#ifdef MSDEBUG2
 			cout << "-- stop mod: " << p_mod->description << endl;
+			#endif
 			// End effect
-			p_mod->deactivate();
+			if (deactivate_effects)
+				p_mod->deactivate();
+			#ifdef MSDEBUG2
 			cout << "-- stop mod: deactivated" << endl;
+			#endif
 			// Destroy active timer
 			vlc_timer_destroy( p_mod->timer );
+			#ifdef MSDEBUG2
 			cout << "-- stop mod: timer destroyed" << endl;
+			#endif
 		}
 		#ifdef MSDEBUG2
 			cout << "FILTER STOP: timers destroyed. " << endl;
@@ -164,6 +171,12 @@ namespace Moviesoap
 			cout << "FILTER STOP COMPLETE. " << endl;
 		#endif
 	}
+
+	/* Destroy active timers. Undo any active effects (mute & blackout). Empty scheduledMods list. */
+	void Filter::Stop() { StopAndCleanup(true); }
+
+	/* Destroy timers, and but leave active effects (mute & blackout) as they are. */
+	void Filter::KillTimers() { StopAndCleanup(false); }
 
 	// /* Load queuedMod. Stop Filter if end reached. */
 	// void Filter::loadNextMod() { loadNextMod(MoviesoapGetNow(p_input)); }

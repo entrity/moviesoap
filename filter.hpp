@@ -82,8 +82,14 @@ namespace Moviesoap {
 		void Restart();
 		/* Set p_queuedMod to first mod, load same. */
 		void Restart(mtime_t);
-		/* Destroy timers. Undo any active effects (mute & blackout) */
+		/* Destroy timers. Undo any active effects (mute & blackout). */
+		void StopAndCleanup(bool leave_active_effects);
+		/* Convenience method for StopAndCleanup. Destroy timers. Undo any active effects (mute & blackout). */
 		void Stop();
+		/* Convenience method for StopAndCleanup. Destroy timers, but leave active effects (mute & blackout) as they are. */
+		void KillTimers();
+		
+
 		/* Load queuedMod. */
 		// void loadNextMod();
 		/* Load queuedMod. */

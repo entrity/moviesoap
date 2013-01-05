@@ -42,7 +42,7 @@ namespace Moviesoap
 	moviesoap_blackout_config_t blackout_config;
 
 	/* Initialize local static fields */
-	static mtime_t target_time;
+	static mtime_t target_time; // gets set by a callback that forks another thread
 	static vlc_thread_t thread_for_filter_restart, thread_for_item_change_cb, thread_for_http; // used after Time change callback
 	
 	/* Playlist callbacks */
@@ -56,6 +56,9 @@ namespace Moviesoap
 	/* Other local prototypes */
 	static inline void StopAndStartFilter(mtime_t new_time);
 	static void* StopAndStartFilterEntryPoint(void *data);
+	static void* StartFilterEntryPoint(void *data);
+	static void* StopFilterEntryPoint(void *data);
+	static void* KillTimersEntryPoint(void *data);
 	static void* EnableBlackoutEntryPoint(void *data);
 
 	/* Set vars, config. (Called by VLCMenuBar::createMenuBar in menus.cpp) */
@@ -152,17 +155,15 @@ namespace Moviesoap
 		msg_Info( p_this, "!!! CALLBACK input state !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
 
-		int i = var_GetInteger(p_input, "title");
-		msg_Info(p_this, "title: %d", i);
-
 		// Stop or Start filter
 		if (p_loadedFilter) {
-			vlc_mutex_lock( &lock );
+			// ensures that if ancillary thread already exists, it has completed before new spawning
+			vlc_join( thread_for_filter_restart, NULL );
+			// spawn new thread to handle Filter restart
 			if (newval.i_int == PLAYING_S)
-				p_loadedFilter->Restart();
-			else			
-				p_loadedFilter->Stop();
-			vlc_mutex_unlock( &lock );
+				vlc_clone( &thread_for_filter_restart, StartFilterEntryPoint, NULL, VLC_THREAD_PRIORITY_LOW );
+			else
+				vlc_clone( &thread_for_filter_restart, KillTimersEntryPoint, NULL, VLC_THREAD_PRIORITY_LOW );
 		}
 		return 0;
 	}
@@ -231,6 +232,33 @@ namespace Moviesoap
 		}
 		vlc_mutex_unlock( &Moviesoap::lock );
 		return NULL;
+	}
+
+	static void* KillTimersEntryPoint(void *data)
+	{
+		vlc_mutex_lock( &Moviesoap::lock );
+		if (p_loadedFilter)
+			p_loadedFilter->KillTimers();
+		vlc_mutex_unlock( &Moviesoap::lock );
+		return NULL;	
+	} 
+
+	static void* StopFilterEntryPoint(void *data)
+	{
+		vlc_mutex_lock( &Moviesoap::lock );
+		if (p_loadedFilter)
+			p_loadedFilter->Stop();
+		vlc_mutex_unlock( &Moviesoap::lock );
+		return NULL;	
+	}
+
+	static void* StartFilterEntryPoint(void *data)
+	{
+		vlc_mutex_lock( &Moviesoap::lock );
+		if (p_loadedFilter)
+				p_loadedFilter->Restart();
+		vlc_mutex_unlock( &Moviesoap::lock );
+		return NULL;	
 	}
 
 	/* Does nothing if p_loadedFilter is null. Else, stops filter & restarts it. */
