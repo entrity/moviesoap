@@ -33,19 +33,19 @@ using namespace std;
 namespace Moviesoap
 {
 	/* Given a block containing an image, write image to filesystem */
-	inline int writeSnapshotToFile(block_t *p_image)
-	{
-		FILE *file = vlc_fopen(MOVIESOAP_SNAPSHOT_FNAME, "wb");
-		int success = MOVIESOAP_SUCCESS;
-		if (!file)
-			return MOVIESOAP_ENOFILE;
-		else if (fwrite(p_image->p_buffer, p_image->i_buffer, 1, file) != 1)
-			success = MOVIESOAP_EFILEIO;
-		else
-			return MOVIESOAP_SUCCESS;
-		fclose( file );
-		return success;
-	}
+	// inline int writeSnapshotToFile(block_t *p_image)
+	// {
+	// 	FILE *file = vlc_fopen(MOVIESOAP_SNAPSHOT_FNAME, "wb");
+	// 	int success = MOVIESOAP_SUCCESS;
+	// 	if (!file)
+	// 		return MOVIESOAP_ENOFILE;
+	// 	else if (fwrite(p_image->p_buffer, p_image->i_buffer, 1, file) != 1)
+	// 		success = MOVIESOAP_EFILEIO;
+	// 	else
+	// 		return MOVIESOAP_SUCCESS;
+	// 	fclose( file );
+	// 	return success;
+	// }
 
 	/* Conveneience method */
 	inline uint32_t bytes_to_int(char * data, int length)
@@ -57,32 +57,32 @@ namespace Moviesoap
 	}
 
 	/* Navigate input to time indicated. Return block to bmp image (or null). Requires block_Release() */
-	block_t * BlackoutFrame::takeSnapshot(mtime_t usec)
-	{
-		// seek time
-		var_SetTime( Moviesoap::p_input, "time", usec );
-		// get vout thread
-		vout_thread_t * p_vout = input_GetVout( Moviesoap::p_input );
-		if ( !p_vout ) { return NULL; }
-		// take snapshot
-		picture_t *p_picture = NULL;
-    	block_t *p_image = NULL;
-    	video_format_t fmt;
-    	if ( vout_GetSnapshot( p_vout, &p_image, &p_picture, &fmt, "bmp", 500*1000 ) ) {
-    		// handle failure in vout_GetSnapshot()
-    		if (p_image) {
-    			free(p_image);
-    			p_image = NULL;
-    		}
-    	}
-    	// cleanup
-    	if (p_vout)
-			vlc_object_release( p_vout );
-		if (p_picture)
-			picture_Release( p_picture );
-		// return
-		return p_image;
-	}
+	// block_t * BlackoutFrame::takeSnapshot(mtime_t usec)
+	// {
+	// 	// seek time
+	// 	var_SetTime( Moviesoap::p_input, "time", usec );
+	// 	// get vout thread
+	// 	vout_thread_t * p_vout = input_GetVout( Moviesoap::p_input );
+	// 	if ( !p_vout ) { return NULL; }
+	// 	// take snapshot
+	// 	picture_t *p_picture = NULL;
+ //    	block_t *p_image = NULL;
+ //    	video_format_t fmt;
+ //    	if ( vout_GetSnapshot( p_vout, &p_image, &p_picture, &fmt, "bmp", 500*1000 ) ) {
+ //    		// handle failure in vout_GetSnapshot()
+ //    		if (p_image) {
+ //    			free(p_image);
+ //    			p_image = NULL;
+ //    		}
+ //    	}
+ //    	// cleanup
+ //    	if (p_vout)
+	// 		vlc_object_release( p_vout );
+	// 	if (p_picture)
+	// 		picture_Release( p_picture );
+	// 	// return
+	// 	return p_image;
+	// }
 
 	/* Takes .bmp file and loads it into thumbnail QLabel */
 	void BlackoutFrame::loadImageFromFile() {
@@ -92,22 +92,22 @@ namespace Moviesoap
 
 
 	/* If vout thread is available. Move to start_time of mod, take snapshot, load snapshot. */
-	void BlackoutFrame::captureAndLoadImage(Mod * mod)
-	{
-		// check for input
-		if ( !Moviesoap::p_input ) { return; }
-		// take snapshot
-		block_t * p_image = takeSnapshot(mod->mod.start * MOVIESOAP_MOD_TIME_FACTOR);
-		if ( p_image ) {
-			// write snapshot to file
-			if ( writeSnapshotToFile( p_image ) == MOVIESOAP_SUCCESS ) {
-				// load the image to the GUI
-				loadImageFromFile();
-			}
-			// cleanup
-			block_Release( p_image );
-		}
-	}
+	// void BlackoutFrame::captureAndLoadImage(Mod * mod)
+	// {
+	// 	// check for input
+	// 	if ( !Moviesoap::p_input ) { return; }
+	// 	// take snapshot
+	// 	block_t * p_image = takeSnapshot(mod->mod.start * MOVIESOAP_MOD_TIME_FACTOR);
+	// 	if ( p_image ) {
+	// 		// write snapshot to file
+	// 		if ( writeSnapshotToFile( p_image ) == MOVIESOAP_SUCCESS ) {
+	// 			// load the image to the GUI
+	// 			loadImageFromFile();
+	// 		}
+	// 		// cleanup
+	// 		block_Release( p_image );
+	// 	}
+	// }
 
 	/* Cb: OK button clicked. Dump fields to Mod. Change frame to modFrame */
 	void BlackoutFrame::okClicked()
@@ -134,7 +134,7 @@ namespace Moviesoap
 		MOVIESOAP_LOAD_COORD_TEXT(x2);
 		MOVIESOAP_LOAD_COORD_TEXT(y1);
 		MOVIESOAP_LOAD_COORD_TEXT(y2);
-		captureAndLoadImage(mod);
+		// captureAndLoadImage(mod);
 	}
 
 	/* Set Mod fields according to GUI inputs */
@@ -159,25 +159,6 @@ namespace Moviesoap
 			mod->mod.y1 = y2;
 			mod->mod.y2 = y1;
 		}
-	}
-
-	/* Not working */
-	void BlackoutFrame::loadImageFromBlock(block_t *p_block) {
-		char * data = (char *) p_block->p_buffer;
-		bmp_file_header_t * file_header = (bmp_file_header_t *) data;
-		
-		uint32_t offset = bytes_to_int(file_header->bf_off_bits, 4);
-		cout << "offset :" << dec << offset << endl;
-		bmp_img_header_t * img_header = (bmp_img_header_t *) data + offset;
-
-		cout << "header size: " << endl
-		<< dec << bytes_to_int(img_header->size, 4) << endl
-		<< dec << (int) img_header->size << endl
-		<< dec << (uint32_t) img_header->size << endl;
-		
-		// char * bits = data + offset;
-		// QBitmap bitmap = QBitmap::fromData(QSize(), bits);
-		// thumbnail->setPixmap(bitmap);
 	}
 	
 	/* Constructor */

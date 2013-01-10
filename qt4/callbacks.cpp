@@ -4,8 +4,8 @@
 #include <vlc_common.h>
 #include <vlc_interface.h>
 #include <vlc_modules.h>
-#include <vlc_aout_intf.h>	// aout_ToggleMute
-#include <vlc_threads.h> // temp used for vlc_timer...
+#include <vlc_aout_volume.h>	// aout_ToggleMute
+// #include <vlc_threads.h> // temp used for vlc_timer...
 
 #include "main.hpp"
 #include "config.hpp"

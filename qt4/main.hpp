@@ -10,7 +10,7 @@ using namespace std;
 #include <vlc_common.h>
 #include <vlc_interface.h>
 #include <vlc_configuration.h>
-#include <vlc_aout.h>			// audio_volume_t
+#include <vlc_aout_volume.h>			// audio_volume_t
 #include <vlc_playlist.h>		// playlist_t
 
 class MainInterface;

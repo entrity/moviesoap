@@ -1,6 +1,6 @@
-#include <vlc_common.h>
-#include "variables.h"
-#include "video-filter.h"
+// #include <vlc_common.h>
+// #include "variables.h"
+// #include "video-filter.h"
 
 /* 
  * Return pointer to currently loaded Moviesoap filter.
