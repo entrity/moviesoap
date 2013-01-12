@@ -42,19 +42,7 @@ namespace Moviesoap
 	/* Functions */
 	extern void init( intf_thread_t * p_intf, MainInterface * mainInterface, QMenu * p_menu );
 	// Sets var Moviesoap::p_input & Moviesoap::p_playlist if not set or `force_overwrite`
-	inline void setInputThread(bool force_overwrite)
-	{
-		if (p_obj) {
-			vlc_mutex_lock( &Moviesoap::lock );	
-			if (force_overwrite || p_playlist == NULL)
-				p_playlist = pl_Get( p_obj );
-			if (p_playlist) {
-				if (force_overwrite || p_input == NULL)
-					p_input = playlist_CurrentInput( p_playlist );
-			}
-			vlc_mutex_unlock( &Moviesoap::lock );	
-		}
-	}
+	extern void set_p_input(bool force_overwrite);
 }
 
 // BLACKOUT (filter-chain.h)

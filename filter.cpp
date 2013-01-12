@@ -132,7 +132,7 @@ namespace Moviesoap
 			return;
 		queuedMod = modList.begin();
 		#ifdef MSDEBUG2
-			cout << "FILTER RESTART (first mod: " << (*queuedMod).description << ")" << endl;
+			cout << "\tFILTER RESTART (first mod: " << (*queuedMod).description << ")" << endl;
 		#endif
 		loadNextMod( now );
 	}

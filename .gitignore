@@ -8,3 +8,5 @@ extra
 .dirstamp
 qt4/*.moc.cpp
 qt4/frames/*.moc.cpp
+*.sublime-project
+*.sublime-workspace
