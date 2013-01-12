@@ -96,6 +96,7 @@ nodist_SOURCES_qt4 = \
 		ui/messages_panel.h \
 		ui/about.h \
 		ui/update.h \
+		styles/seekstyle.moc.cpp \
 		dialogs/ml_configuration.moc.cpp \
 		components/playlist/ml_model.moc.cpp \
 		ui/sout.h
@@ -132,6 +133,7 @@ DEPS_res = \
 	pixmaps/playlist/repeat_one.png \
 	pixmaps/playlist/shuffle_off.png \
 	pixmaps/playlist/shuffle_on.png \
+	pixmaps/playlist/dropzone.png \
 	pixmaps/prefs/advprefs_audio.png \
 	pixmaps/prefs/advprefs_codec.png \
 	pixmaps/prefs/advprefs_extended.png \
@@ -208,6 +210,7 @@ DEPS_res = \
 	pixmaps/win7/win7thumbnail_next.png \
 	pixmaps/win7/win7thumbnail_play.png \
 	pixmaps/update.png \
+	pixmaps/valid.png \
 	pixmaps/search_clear.png \
 	pixmaps/lock.png
 
@@ -312,7 +315,8 @@ SOURCES_qt4 = 	qt4.cpp \
 		util/pictureflow.cpp \
 		util/buttons/BrowseButton.cpp \
 		util/buttons/DeckButtonsLayout.cpp \
-		util/buttons/RoundButton.cpp
+		util/buttons/RoundButton.cpp \
+		styles/seekstyle.cpp
 
 if HAVE_WIN32
 SOURCES_qt4 += main_interface_win32.cpp
@@ -391,7 +395,8 @@ noinst_HEADERS = \
 	util/singleton.hpp \
 	util/buttons/RoundButton.hpp \
 	util/buttons/DeckButtonsLayout.hpp \
-	util/buttons/BrowseButton.hpp
+	util/buttons/BrowseButton.hpp \
+	styles/seekstyle.hpp
 
 
 EXTRA_DIST += \

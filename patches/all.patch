@@ -1,0 +1,212 @@
+Only in ./../../..: ABOUT-NLS
+Only in ./../../..: aclocal.m4
+Only in ./../../..: AUTHORS
+Only in ./../../..: autom4te.cache
+Only in ./../../..: autotools
+Only in ./../../..: bin
+Only in ./../../..: bindings
+Only in ./../../..: bootstrap
+Only in ./../../..: compat
+Only in ./../../..: compile
+Only in ./../../..: config.h
+Only in ./../../..: config.h.in
+Only in ./../../..: config.log
+Only in ./../../..: config.status
+Only in ./../../..: configure
+diff -crB ./../../../configure.ac vlc/configure.ac
+*** ./../../../configure.ac	2013-01-12 11:31:43.699844198 -0800
+--- vlc/configure.ac	2013-01-12 12:24:32.363556751 -0800
+***************
+*** 407,412 ****
+--- 407,416 ----
+  AM_GNU_GETTEXT_VERSION([0.18.1])
+  AM_GNU_GETTEXT([external], [need-ngettext])
+  
++ dnl <Moviesoap>
++ VLC_ADD_PLUGIN([moviesoap_video_filter])
++ dnl </Moviesoap>
++ 
+  dnl
+  dnl Iconv stuff
+  dnl
+***************
+*** 4077,4082 ****
+--- 4081,4087 ----
+    modules/meta_engine/Makefile
+    modules/misc/Makefile
+    modules/media_library/Makefile
++   modules/moviesoap/Makefile
+    modules/mux/Makefile
+    modules/notify/Makefile
+    modules/packetizer/Makefile
+Only in ./../../..: contrib
+Only in ./../../..: COPYING
+Only in ./../../..: COPYING.LIB
+Only in ./../../..: doc
+Only in ./../../..: doltcompile
+Only in ./../../..: doltlibtool
+Only in ./../../..: extras
+Only in ./../../..: .git
+Only in ./../../..: .gitattributes
+Only in ./../../..: .gitignore
+Only in ./../../..: include
+Only in ./../../..: INSTALL
+Only in ./../../..: lib
+Only in ./../../..: libtool
+Only in ./../../..: m4
+Only in ./../../..: .mailmap
+Only in ./../../..: make-alias
+Only in ./../../..: Makefile
+Only in ./../../..: Makefile.am
+Only in ./../../..: Makefile.in
+Only in ./../../../modules: access
+Only in ./../../../modules: access_output
+Only in ./../../../modules: altivec
+Only in ./../../../modules: arm_neon
+Only in ./../../../modules: audio_filter
+Only in ./../../../modules: audio_mixer
+Only in ./../../../modules: audio_output
+Only in ./../../../modules: codec
+Only in ./../../../modules: common.am
+Only in ./../../../modules: control
+Only in ./../../../modules: demux
+Only in ./../../../modules: genmf
+Only in ./../../../modules: .gitignore
+Only in ./../../../modules/gui: .deps
+Only in ./../../../modules/gui: eject.c
+Only in ./../../../modules/gui: .gitignore
+Only in ./../../../modules/gui: macosx
+Only in ./../../../modules/gui: macosx_dialog_provider
+Only in ./../../../modules/gui: Makefile
+Only in ./../../../modules/gui: Makefile.am
+Only in ./../../../modules/gui: Makefile.in
+Only in ./../../../modules/gui: minimal_macosx
+Only in ./../../../modules/gui: Modules.am
+Only in ./../../../modules/gui: ncurses.c
+Only in ./../../../modules/gui/qt4: actions_manager.cpp
+Only in ./../../../modules/gui/qt4: actions_manager.hpp
+Only in ./../../../modules/gui/qt4: actions_manager.moc.cpp
+Only in ./../../../modules/gui/qt4: adapters
+Only in ./../../../modules/gui/qt4: components
+Only in ./../../../modules/gui/qt4: .deps
+Only in ./../../../modules/gui/qt4: dialogs
+Only in ./../../../modules/gui/qt4: dialogs_provider.cpp
+Only in ./../../../modules/gui/qt4: dialogs_provider.hpp
+Only in ./../../../modules/gui/qt4: dialogs_provider.moc.cpp
+Only in ./../../../modules/gui/qt4: extensions_manager.cpp
+Only in ./../../../modules/gui/qt4: extensions_manager.hpp
+Only in ./../../../modules/gui/qt4: extensions_manager.moc.cpp
+Only in ./../../../modules/gui/qt4: .gitignore
+Only in ./../../../modules/gui/qt4: HACKING
+Only in ./../../../modules/gui/qt4: input_manager.cpp
+Only in ./../../../modules/gui/qt4: input_manager.hpp
+Only in ./../../../modules/gui/qt4: input_manager.moc.cpp
+Only in ./../../../modules/gui/qt4: libqt4_plugin_la-qt4.lo
+Only in ./../../../modules/gui/qt4: .libs
+Only in ./../../../modules/gui/qt4: main_interface.cpp
+Only in ./../../../modules/gui/qt4: main_interface.hpp
+Only in ./../../../modules/gui/qt4: main_interface.moc.cpp
+Only in ./../../../modules/gui/qt4: main_interface_win32.cpp
+Only in ./../../../modules/gui/qt4: Makefile
+Only in ./../../../modules/gui/qt4: Makefile.am
+Only in ./../../../modules/gui/qt4: Makefile.in
+diff -crB ./../../../modules/gui/qt4/menus.cpp vlc/modules/gui/qt4/menus.cpp
+*** ./../../../modules/gui/qt4/menus.cpp	2013-01-12 11:47:40.300587725 -0800
+--- vlc/modules/gui/qt4/menus.cpp	2013-01-12 12:18:37.165795415 -0800
+***************
+*** 58,63 ****
+--- 58,66 ----
+  #include <QSignalMapper>
+  #include <QStatusBar>
+  
++ #include "../../moviesoap/qt4/menu.hpp" // Moviesoap
++ #include "../../moviesoap/qt4/main.hpp" // Moviesoap
++ 
+  /*
+    This file defines the main menus and the pop-up menu (right-click menu)
+    and the systray menu (in that order in the file)
+***************
+*** 329,334 ****
+--- 332,342 ----
+  
+      addMenuToMainbar( HelpMenu( bar ), qtr( "&Help" ), bar );
+  
++     // start Moviesoap code
++     QMenu * p_moviesoapMenu = (Moviesoap::Menu::create( bar ));
++     addMenuToMainbar( p_moviesoapMenu, qtr( "M&ovieSoap" ), bar );
++     Moviesoap::init(p_intf, mi, p_moviesoapMenu);
++     // end Moviesoap code
+  }
+  
+  /**
+Only in ./../../../modules/gui/qt4: menus.hpp
+Only in ./../../../modules/gui/qt4: menus.moc.cpp
+diff -crB ./../../../modules/gui/qt4/Modules.am vlc/modules/gui/qt4/Modules.am
+*** ./../../../modules/gui/qt4/Modules.am	2013-01-12 12:11:56.535808808 -0800
+--- vlc/modules/gui/qt4/Modules.am	2013-01-12 12:18:57.949898475 -0800
+***************
+*** 423,425 ****
+--- 423,426 ----
+  	ui/vlm.ui \
+  	$(DEPS_res)
+  
++ include $(srcdir)/../../moviesoap/qt4/Modules-patch.am
+\ No newline at end of file
+Only in ./../../../modules/gui/qt4: pixmaps
+Only in ./../../../modules/gui/qt4: qt4.cpp
+Only in ./../../../modules/gui/qt4: qt4.hpp
+Only in ./../../../modules/gui/qt4: recents.cpp
+Only in ./../../../modules/gui/qt4: recents.hpp
+Only in ./../../../modules/gui/qt4: recents.moc.cpp
+Only in ./../../../modules/gui/qt4: resources.cpp
+Only in ./../../../modules/gui/qt4: styles
+Only in ./../../../modules/gui/qt4: ui
+Only in ./../../../modules/gui/qt4: util
+Only in ./../../../modules/gui/qt4: variables.cpp
+Only in ./../../../modules/gui/qt4: variables.hpp
+Only in ./../../../modules/gui/qt4: variables.moc.cpp
+Only in ./../../../modules/gui/qt4: vlc.qrc
+Only in ./../../../modules/gui: skins2
+Only in ./../../../modules: LIST
+Only in ./../../../modules: list.sh
+Only in ./../../../modules: lua
+Only in ./../../../modules: Makefile
+diff -crB ./../../../modules/Makefile.am vlc/modules/Makefile.am
+*** ./../../../modules/Makefile.am	2013-01-12 12:11:40.131727465 -0800
+--- vlc/modules/Makefile.am	2013-01-12 12:19:13.685976523 -0800
+***************
+*** 11,16 ****
+--- 11,17 ----
+  	meta_engine \
+  	misc \
+  	media_library \
++ 	moviesoap \
+  	notify \
+  	packetizer \
+  	services_discovery \
+Only in ./../../../modules: Makefile.in
+Only in ./../../../modules: media_library
+Only in ./../../../modules: meta_engine
+Only in ./../../../modules: misc
+Only in ./../../../modules: mmx
+Only in ./../../../modules: moviesoap
+Only in ./../../../modules: mux
+Only in ./../../../modules: notify
+Only in ./../../../modules: packetizer
+Only in ./../../../modules: services_discovery
+Only in ./../../../modules: sse2
+Only in ./../../../modules: stream_filter
+Only in ./../../../modules: stream_out
+Only in ./../../../modules: text_renderer
+Only in ./../../../modules: video_chroma
+Only in ./../../../modules: video_filter
+Only in ./../../../modules: video_output
+Only in ./../../../modules: visualization
+Only in ./../../..: NEWS
+Only in ./../../..: po
+Only in ./../../..: README
+Only in ./../../..: share
+Only in ./../../..: src
+Only in ./../../..: stamp-h1
+Only in ./../../..: test
+Only in ./../../..: THANKS
