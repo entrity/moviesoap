@@ -69,6 +69,9 @@ namespace Moviesoap
 		Moviesoap::p_obj = VLC_OBJECT(p_intf);
 		Moviesoap::p_playlist = pl_Get(p_intf);
 		vlc_mutex_init( &lock );
+		#ifdef MSDEBUG1
+			msg_Info( p_obj, "Moviesoap::init in progress..." );
+		#endif
 		// build config (tolerances) from file or defaults
 		config.load();
 		// Create variable pointer to blackout config
@@ -76,7 +79,7 @@ namespace Moviesoap
 		var_CreateGetAddress( p_obj->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME);
 		var_SetAddress( p_obj->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME, &blackout_config );
 		// Add callback(s) to playlist
-		var_AddCallback( p_playlist, "item-current", PlaylistCbItemCurrent, NULL );
+		var_AddCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
 		// Check for updates
 		vlc_clone( &thread_for_http, handleUpdateCheck, p_intf, VLC_THREAD_PRIORITY_LOW );
 	}
@@ -88,12 +91,27 @@ namespace Moviesoap
 	/* Set by PlaylistChangeCallback. If a vout_thread exists on input, removes this callback and attaches the blackout filter to the vout. */
 	static MOVIESOAP_CALLBACK(PlaylistCbItemChange)
 	{
-		#ifdef MSDEBUG1
-		msg_Info( p_this, "!!! CALLBACK playlist item-change !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
-		#endif
+		// #ifdef MSDEBUG1
+		// msg_Info( p_this, "!!! CALLBACK playlist item-change !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
+		// #endif
+
+
+		// if input item has changed: (newval.p_address is a input_item_t *)
+		if (newval.p_address != oldval.p_address) {
+			vlc_mutex_lock( &Moviesoap::lock );	
+			msg_Info( p_this, "input item changed" );
+			msg_Info( p_this, "input item changed [2] %x", &p_playlist );
+			// p_playlist = pl_Get( p_obj );
+			msg_Info( p_this, "input item changed [2.5] " );
+			input_thread_t * p = playlist_CurrentInput( p_playlist );
+			msg_Info( p_this, "input item changed [3] " );
+			vlc_mutex_unlock( &Moviesoap::lock );	
+			
+		}
 		
+		// todo (reimplement with control so that it doesn't get added repeatedly)
 		// spawn new thread to handle blackout and removal of this callback
-		vlc_clone( &thread_for_item_change_cb, EnableBlackoutEntryPoint, NULL, VLC_THREAD_PRIORITY_LOW );
+		// vlc_clone( &thread_for_item_change_cb, EnableBlackoutEntryPoint, NULL, VLC_THREAD_PRIORITY_LOW );
 		return MOVIESOAP_SUCCESS;
 	}
 
@@ -109,7 +127,7 @@ namespace Moviesoap
 			// Add callback(s) to playlist (for purpose of adding video filter to chain)
 			var_AddCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
 			// Update p_input
-			p_input = playlist_CurrentInput( p_playlist );
+			Moviesoap::setInputThread(true);
 			if (p_input) {
 				// Add callback(s) to input thread
 				var_AddCallback( p_input, "position", InputCbPosition, NULL );
@@ -281,7 +299,7 @@ namespace Moviesoap
 				b_no_vout_thread_found = false;
 				vlc_mutex_lock( &lock );
 				if (!p_blackout_filter) {
-					var_DelCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
+					// var_DelCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
 					add_blackout_filter_to_input( p_input );
 				}
 				vlc_mutex_unlock( &lock );
