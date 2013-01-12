@@ -62,7 +62,7 @@ namespace Moviesoap
 	static void* EP_StopFilter(void *data);
 	static void* EP_KillTimers(void *data);
 	static void* EP_EnableBlackout(void *data);
-	static void* EP_GetCurrentInput(void *data);
+	static void* EP_SetMoviesoapP_Input(void *data);
 
 	/* Set vars, config. (Called by VLCMenuBar::createMenuBar in menus.cpp) */
 	void init( intf_thread_t * p_intf, MainInterface * mainInterface, QMenu * p_menu )
@@ -108,7 +108,6 @@ namespace Moviesoap
 		// if input item has changed: (newval.p_address is a input_item_t *)
 		if (newval.p_address != oldval.p_address) {
 			spawn_set_p_input(true);
-			// vlc_clone( &thread_for_item_change_cb, EP_GetCurrentInput, p_this, VLC_THREAD_PRIORITY_LOW );
 		}
 		
 		// todo (reimplement with control so that it doesn't get added repeatedly)
@@ -195,12 +194,14 @@ namespace Moviesoap
 		msg_Info( p_this, "!!! CALLBACK input time !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 		#endif
 		
-		// ensures that if ancillary thread already exists, it has completed before new spawning
-		vlc_join( thread_for_filter_restart, NULL );
-		// sets new time to a heap variable
-		target_time = newval.i_time;
-		// spawn new thread to handle Filter restart
-		vlc_clone( &thread_for_filter_restart, EP_StopAndStartFilter, NULL, VLC_THREAD_PRIORITY_LOW );
+		if (p_loadedFilter) {
+			// ensures that if ancillary thread already exists, it has completed before new spawning
+			vlc_join( thread_for_filter_restart, NULL );
+			// sets new time to a heap variable
+			target_time = newval.i_time;
+			// spawn new thread to handle Filter restart
+			vlc_clone( &thread_for_filter_restart, EP_StopAndStartFilter, NULL, VLC_THREAD_PRIORITY_LOW );
+		}
 		return 0;
 	}
 
@@ -211,11 +212,15 @@ namespace Moviesoap
 		msg_Info( p_this, "!!! CALLBACK input position !!! : %s ... new: %f ... old: %f", psz_var, (float) newval.f_float, (float) oldval.f_float );
 		#endif
 
-		mtime_t new_time = newval.f_float * var_GetTime( p_input, "length" );
-		char buffer[12];
-		strftime(new_time / MOVIESOAP_MOD_TIME_FACTOR, buffer);
-		msg_Info(p_this, "new time %lld\n%s", new_time, &buffer[0]);
-		StopAndStartFilter(new_time);
+		if (p_loadedFilter) {
+			mtime_t new_time = newval.f_float * var_GetTime( p_input, "length" );
+			#ifdef MSDEBUG2
+				char buffer[12];
+				strftime(new_time / MOVIESOAP_MOD_TIME_FACTOR, buffer);
+				msg_Info(p_this, "new time %lld\n%s", new_time, &buffer[0]);
+			#endif
+			StopAndStartFilter(new_time);
+		}
 		return 0;
 	}
 
@@ -229,7 +234,7 @@ namespace Moviesoap
     			case INPUT_EVENT_BOOKMARK:
 					StopAndStartFilter( MoviesoapGetNow(p_input) );
 					#ifdef MSDEBUG3
-					msg_Info( p_this, "!!! CALLBACK input generic !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
+						msg_Info( p_this, "!!! CALLBACK input generic !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
 					#endif
 					break;
 			}
@@ -314,12 +319,22 @@ namespace Moviesoap
 	}
 
 	/* Sets Moviesoap::p_input */
-	static void* EP_GetCurrentInput(void *data)
+	static void* EP_SetMoviesoapP_Input(void *data)
 	{
 		input_thread_t * p_input = playlist_CurrentInput( p_playlist );
 		vlc_mutex_lock( &Moviesoap::lock );
 		Moviesoap::p_input = playlist_CurrentInput( p_playlist );
-		vlc_mutex_unlock( &Moviesoap::lock );		
+		vlc_mutex_unlock( &Moviesoap::lock );
+
+		if (Moviesoap::p_input) {
+			// Add callback(s) to input thread
+			var_AddCallback( p_input, "position", InputCbPosition, NULL );
+			var_AddCallback( p_input, "time", InputCbTime, NULL );
+			var_AddCallback( p_input, "intf-event", InputCbGeneric, NULL );
+			var_AddCallback( p_input, "state", InputCbState, NULL );
+			// start filter object if one exists
+			if (Moviesoap::p_loadedFilter) Moviesoap::p_loadedFilter->Restart();
+		}
 	}
 
 	/* Set Moviesoap::p_input using a new thread */
@@ -330,8 +345,9 @@ namespace Moviesoap
 			if (p_playlist == NULL)
 				p_playlist = pl_Get( Moviesoap::p_obj );
 			if (p_playlist) {
-				if (force_overwrite || p_input == NULL)
-					vlc_clone( &thread_for_getting_input_thread, EP_GetCurrentInput, NULL, VLC_THREAD_PRIORITY_LOW );
+				if (force_overwrite || p_input == NULL) {
+					vlc_clone( &thread_for_getting_input_thread, EP_SetMoviesoapP_Input, NULL, VLC_THREAD_PRIORITY_LOW );
+				}
 			}
 			vlc_mutex_unlock( &Moviesoap::lock );	
 		}
