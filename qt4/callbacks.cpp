@@ -107,7 +107,7 @@ namespace Moviesoap
 
 		// if input item has changed: (newval.p_address is a input_item_t *)
 		if (newval.p_address != oldval.p_address) {
-			set_p_input(true);
+			spawn_set_p_input(true);
 			// vlc_clone( &thread_for_item_change_cb, EP_GetCurrentInput, p_this, VLC_THREAD_PRIORITY_LOW );
 		}
 		
@@ -322,8 +322,8 @@ namespace Moviesoap
 		vlc_mutex_unlock( &Moviesoap::lock );		
 	}
 
-	/* Sets Moviesoap::p_input */
-	void set_p_input(bool force_overwrite)
+	/* Set Moviesoap::p_input using a new thread */
+	void spawn_set_p_input(bool force_overwrite)
 	{
 		if (p_obj) {
 			vlc_mutex_lock( &Moviesoap::lock );
@@ -337,6 +337,10 @@ namespace Moviesoap
 		}
 	}
 
+	/* Call Filter::Restart in a new thread */
+	void spawn_restart_filter() { vlc_clone( &thread_for_filter_restart, EP_StartFilter, NULL, VLC_THREAD_PRIORITY_LOW ); }
 
+	/* Call Filter::Stop in a new thread */
+	void spawn_stop_filter() { vlc_clone( &thread_for_filter_restart, EP_StopFilter, NULL, VLC_THREAD_PRIORITY_LOW ); }
 
 }
