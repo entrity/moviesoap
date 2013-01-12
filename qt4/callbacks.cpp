@@ -1,18 +1,18 @@
 #include <cstdio>
 #include <cassert>
 
-#include <vlc_common.h>
-#include <vlc_interface.h>
-#include <vlc_modules.h>
-#include <vlc_aout_volume.h>	// aout_ToggleMute
-// #include <vlc_threads.h> // temp used for vlc_timer...
-
 #include "main.hpp"
 #include "config.hpp"
 #include "../filter.hpp"
 #include "../variables.h"
 #include "../filter-chain.h"
 #include "../updates.hpp"
+
+#include <vlc_common.h>
+#include <vlc_interface.h>
+#include <vlc_modules.h>
+#include <vlc_aout_volume.h>	// aout_ToggleMute
+// #include <vlc_threads.h> // temp used for vlc_timer...
 
 #ifndef INT64_C	// ibid.
 # define INT64_C(c)  c ## LL

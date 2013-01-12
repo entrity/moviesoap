@@ -71,7 +71,9 @@ namespace Moviesoap
 			// Stop loaded filter in case it is running
 			p_loadedFilter->Stop();
 			// Overwrite loaded filter with data from filter file
-			int err = p_loadedFilter->load( filepath.toStdString() );
+			const char * c_filepath = qPrintable(filepath);
+			int err = p_loadedFilter->load( c_filepath );
+			free( (void *) c_filepath );
 			cout << "OLD FILTER OVERWRITTEN" << endl;
 			// Start loaded filter if menu has active selected
 			cout << "IS ACTIVE SELECTED" << isActiveSelected() << endl;

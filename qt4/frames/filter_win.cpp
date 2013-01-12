@@ -158,7 +158,9 @@ namespace Moviesoap
 		if (fileName.isNull())
 			return;
 		// set filepath on filter obj
-		filter.filepath = fileName.toStdString();
+		char * cstr = (char *) fileName.toAscii().data();
+		filter.filepath = cstr;
+		free(cstr);
 		// force file extension (*.cln)
 		if ( !fileName.endsWith(QString(MOVIESOAP_FILE_EXT)) )
 			filter.filepath += MOVIESOAP_FILE_EXT;

@@ -17,6 +17,11 @@
 #include <cstdio> // unused
 #include <iostream>
 
+// todo : needs freeing?
+#define QSTRING_TO_C(dst, qstr) do { \
+	dst = qstr.toAscii().data(); \
+	} while (0)
+
 
 /* Create padded, bordered QFrame, using given layout */
 static inline QFrame *newDiv(QLayout * layout)
@@ -65,11 +70,15 @@ namespace Moviesoap
 		// default to use filterWin->p_editingFilter;
 		if (!filter) filter = &filterWin->filter;
 		// Get string values
-		filter->title = titleText->text().toStdString();
-		filter->year = yearText->text().toStdString();
-		filter->isbn = isbnText->text().toStdString();
-		filter->creator = creatorText->text().toStdString();
-		// Mods should be updated as they are changed in the QListWidget
+		QSTRING_TO_C( filter->title, titleText->text() );
+		QSTRING_TO_C( filter->year, yearText->text() );
+		QSTRING_TO_C( filter->isbn, isbnText->text() );
+		QSTRING_TO_C( filter->creator, creatorText->text() );
+		// filter->title = titleText->text().toStdString();
+		// filter->year = yearText->text().toStdString();
+		// filter->isbn = isbnText->text().toStdString();
+		// filter->creator = creatorText->text().toStdString();
+		// // Mods should be updated as they are changed in the QListWidget
 	}
 
 	/* Slot. Save filter. */

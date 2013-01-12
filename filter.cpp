@@ -4,7 +4,7 @@
 // #include <vlc_threads.h>
 #include <vlc_variables.h>
 #include <vlc_playlist.h> // needed for var_GetTime(input_thread_t *, char *)
-#include <vlc_aout_intf.h>	// aout_ToggleMute
+#include <vlc_aout_volume.h>	// aout_ToggleMute
 
 #include <list>
 #include <algorithm> // for list::advance
