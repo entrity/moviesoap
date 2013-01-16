@@ -74,14 +74,6 @@ namespace Moviesoap
 			// Overwrite loaded filter with data from filter file
 			const char * c_filepath = qPrintable(filepath);
 			int err = Moviesoap::p_loadedFilter->load( c_filepath );
-			// free( (void *) c_filepath );
-			cout << "OLD FILTER OVERWRITTEN" << endl;
-			// Start loaded filter if menu has active selected
-			cout << "IS ACTIVE SELECTED: " << isActiveSelected() << endl;
-			if ( isActiveSelected() ) {
-				Moviesoap::spawn_set_p_input(false);
-				Moviesoap::spawn_restart_filter();
-			}
 			// Display error (if any) in QMessageBox
 			if (err) {
 				stringstream msgs;
@@ -90,6 +82,17 @@ namespace Moviesoap
 					tr("File IO failure"),
 					QString(msgs.str().c_str()),
 					QMessageBox::Ok);
+				return;
+			}
+			// if no error:
+			#ifdef MSDEBUG1
+				msg_Info( p_obj, "OLD FILTER OVERWRITTEN" );
+				msg_Info( p_obj, "IS ACTIVE SELECTED: %d", isActiveSelected() );
+			#endif
+			// Start loaded filter if menu has active selected
+			if ( isActiveSelected() ) {
+				Moviesoap::spawn_set_p_input(false);
+				Moviesoap::spawn_restart_filter();
 			}
 		}
 	}

@@ -249,7 +249,7 @@ namespace Moviesoap
 	{
 		vlc_mutex_lock( &Moviesoap::lock );
 		if (p_loadedFilter)
-				p_loadedFilter->Restart();
+			p_loadedFilter->Restart();
 		vlc_mutex_unlock( &Moviesoap::lock );
 		return NULL;	
 	}
@@ -321,6 +321,7 @@ namespace Moviesoap
 				p_playlist = pl_Get( Moviesoap::p_obj );
 			if (p_playlist) {
 				if (force_overwrite || p_input == NULL) {
+					vlc_join( thread_for_getting_input_thread, NULL );
 					vlc_clone( &thread_for_getting_input_thread, EP_SetMoviesoapP_Input, NULL, VLC_THREAD_PRIORITY_LOW );
 				}
 			}
@@ -329,9 +330,15 @@ namespace Moviesoap
 	}
 
 	/* Call Filter::Restart in a new thread */
-	void spawn_restart_filter() { vlc_clone( &thread_for_filter_restart, EP_StartFilter, NULL, VLC_THREAD_PRIORITY_LOW ); }
+	void spawn_restart_filter()
+	{
+		vlc_join( thread_for_filter_restart, NULL );
+		vlc_clone( &thread_for_filter_restart, EP_StartFilter, NULL, VLC_THREAD_PRIORITY_LOW );
+	}
 
 	/* Call Filter::Stop in a new thread */
-	void spawn_stop_filter() { vlc_clone( &thread_for_filter_restart, EP_StopFilter, NULL, VLC_THREAD_PRIORITY_LOW ); }
+	void spawn_stop_filter() {
+		vlc_clone( &thread_for_filter_restart, EP_StopFilter, NULL, VLC_THREAD_PRIORITY_LOW );
+	}
 
 }
