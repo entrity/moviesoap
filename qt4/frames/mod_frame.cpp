@@ -70,6 +70,11 @@ namespace Moviesoap
 		filterWin->toBlackoutFrame();
 	}
 
+	void ModFrame::previewClicked() {
+		dump( filterWin->p_mod );
+		filterWin->preview( filterWin->p_mod );
+	}
+
 	/* Constructor */
 	ModFrame::ModFrame(FilterWin *parent) : QFrame(parent), filterWin(parent)
 	{
@@ -135,6 +140,11 @@ namespace Moviesoap
 		layout->addLayout(hbox);
 		connect( okButton, SIGNAL(clicked()), this, SLOT(okClicked()) );
 		connect( cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()) );
+
+		hbox = new QHBoxLayout;
+		QPushButton * previewButton = addButton(hbox, "&Preview edit");
+		layout->addLayout(hbox);
+		connect( previewButton, SIGNAL(clicked()), this, SLOT(previewClicked()) );
 		// finish
 		hbox = new QHBoxLayout;
 		layout->addLayout(hbox, 9);

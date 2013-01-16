@@ -41,6 +41,10 @@ namespace Moviesoap
 
 	/* Functions */
 	extern void init( intf_thread_t * p_intf, MainInterface * mainInterface, QMenu * p_menu );
+	// Sets var Moviesoap::p_input & Moviesoap::p_playlist if not set or `force_overwrite`
+	extern void spawn_set_p_input(bool force_overwrite);
+	extern void spawn_restart_filter();
+	extern void spawn_stop_filter();
 }
 
 // BLACKOUT (filter-chain.h)

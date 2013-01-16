@@ -1,5 +1,4 @@
 SOURCES_moviesoap_video_filter = \
 	video-filter.c \
 	video-filter.h \
-	variables.c \
 	variables.h

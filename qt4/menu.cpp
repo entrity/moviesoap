@@ -66,21 +66,22 @@ namespace Moviesoap
 		if ( !filepath.isEmpty() ) {			
 			vlc_mutex_lock( &Moviesoap::lock );
 			// Ensure existence of loaded filter
-			if (p_loadedFilter == NULL)
-				p_loadedFilter = new Filter;
+			if (Moviesoap::p_loadedFilter == NULL)
+				Moviesoap::p_loadedFilter = new Filter;
 			// Stop loaded filter in case it is running
-			p_loadedFilter->Stop();
+			vlc_mutex_unlock( &Moviesoap::lock );
+			Moviesoap::spawn_stop_filter();
 			// Overwrite loaded filter with data from filter file
 			const char * c_filepath = qPrintable(filepath);
-			int err = p_loadedFilter->load( c_filepath );
-			free( (void *) c_filepath );
+			int err = Moviesoap::p_loadedFilter->load( c_filepath );
+			// free( (void *) c_filepath );
 			cout << "OLD FILTER OVERWRITTEN" << endl;
 			// Start loaded filter if menu has active selected
-			cout << "IS ACTIVE SELECTED" << isActiveSelected() << endl;
-			if ( isActiveSelected() )
-				p_loadedFilter->Restart();
-			cout << "NEW FILTER STARTED" << endl;
-			vlc_mutex_unlock( &Moviesoap::lock );
+			cout << "IS ACTIVE SELECTED: " << isActiveSelected() << endl;
+			if ( isActiveSelected() ) {
+				Moviesoap::spawn_set_p_input(false);
+				Moviesoap::spawn_restart_filter();
+			}
 			// Display error (if any) in QMessageBox
 			if (err) {
 				stringstream msgs;

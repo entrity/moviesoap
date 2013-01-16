@@ -31,14 +31,15 @@ namespace Moviesoap
 		blackoutFrame = new BlackoutFrame(this);
 		addWidget(blackoutFrame);
 		concludePreviewButton = new ConcludePreviewButton(QString("Conclude Preview Button"), this);
-		connect(concludePreviewButton, SIGNAL(clicked()), this, SLOT(concludePreview()));
+		// connect(concludePreviewButton, SIGNAL(clicked()), this, SLOT(concludePreview()));
+		connect(concludePreviewButton, SIGNAL(closeSignal()), this, SLOT(concludePreview()));
 	}
 
 	void FilterWin::openEditor(Filter * filterToEdit)
 	{
 		// pause play
-		if (Moviesoap::p_input)
-			input_Control( Moviesoap::p_input, INPUT_SET_STATE, PAUSE_S );
+		// if (Moviesoap::p_input)
+		// 	input_Control( Moviesoap::p_input, INPUT_SET_STATE, PAUSE_S );
 		// create filter if necessary
 		if (p_window == NULL)
 			p_window = new FilterWin;
@@ -160,7 +161,6 @@ namespace Moviesoap
 		// set filepath on filter obj
 		char * cstr = (char *) fileName.toAscii().data();
 		filter.filepath = cstr;
-		free(cstr);
 		// force file extension (*.cln)
 		if ( !fileName.endsWith(QString(MOVIESOAP_FILE_EXT)) )
 			filter.filepath += MOVIESOAP_FILE_EXT;
@@ -169,13 +169,25 @@ namespace Moviesoap
 	}
 
 	/* Set play time, play, hide this, show concludePreviewButton */
-	void FilterWin::preview(mtime_t start)
+	void FilterWin::preview(Mod * p_mod )
 	{
+		// require input thread and playlist
 		if (p_input == NULL || p_playlist == NULL)
 			return;
+		// ensure p_mod
+		if (p_mod == NULL)
+			p_mod = this->p_mod;
+		// dump filter frame to Filter
+		filterFrame->dump();
+		// dump filter being edited to liveness
 		holdingBayForLoadedFilter = Moviesoap::p_loadedFilter;
-		// Moviesoap::p_loadedFilter = &filter;
-		vlc_mutex_lock(&Moviesoap::lock); // todo del?
+		Moviesoap::p_loadedFilter = &filter;
+		// calculate start of preview
+		mtime_t t_offset = 1000000;
+		mtime_t start = p_mod->startTime();
+		start = (start > t_offset) ? start - t_offset : 0;
+		// change the time and control
+		// vlc_mutex_lock(&Moviesoap::lock); // todo del?
 		var_SetTime( p_input, "time", start );
 		// vlc_mutex_unlock(&Moviesoap::lock); // todo del?
 		playlist_Control( Moviesoap::p_playlist, PLAYLIST_PLAY, false );
@@ -186,7 +198,6 @@ namespace Moviesoap
 	/* Pause play, hide concludePreviewButton, show this */
 	void FilterWin::concludePreview()
 	{
-		concludePreviewButton->hide();
 		show();
 		playlist_Control( Moviesoap::p_playlist, PLAYLIST_PAUSE, false );
 		Moviesoap::p_loadedFilter = holdingBayForLoadedFilter;
