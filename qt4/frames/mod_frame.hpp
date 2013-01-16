@@ -34,6 +34,7 @@ namespace Moviesoap
 		void cancelClicked();
 		void okClicked();
 		void blackoutClicked();
+		void previewClicked();
 	};
 }
 
