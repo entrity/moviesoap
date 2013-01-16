@@ -50,6 +50,7 @@ namespace Moviesoap
 	
 	/* Playlist callbacks */
 	static MOVIESOAP_CALLBACK(PCB_ItemChange);
+	static MOVIESOAP_CALLBACK(PCB_TryToAttachFilter);
 	/* Input callbacks */
 	static MOVIESOAP_CALLBACK(InputCbState);
 	static MOVIESOAP_CALLBACK(InputCbGeneric);
@@ -100,53 +101,20 @@ namespace Moviesoap
 	/* Set by PlaylistChangeCallback. If a vout_thread exists on input, removes this callback and attaches the blackout filter to the vout. */
 	static MOVIESOAP_CALLBACK(PCB_ItemChange)
 	{
-		// #ifdef MSDEBUG1
-		// msg_Info( p_this, "!!! CALLBACK playlist item-change !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
-		// #endif
-
-
 		// if input item has changed: (newval.p_address is a input_item_t *)
 		if (newval.p_address != oldval.p_address) {
 			spawn_set_p_input(true);
 		}
-		
-		// todo (reimplement with control so that it doesn't get added repeatedly)
-		// spawn new thread to handle blackout and removal of this callback
-		// vlc_clone( &thread_for_item_change_cb, EP_EnableBlackout, NULL, VLC_THREAD_PRIORITY_LOW );
 		return MOVIESOAP_SUCCESS;
 	}
 
-	/* Add callback to Input change. Start Filter object. */
-	// static MOVIESOAP_CALLBACK(PlaylistCbItemCurrent)
-	// {
-	// 	#ifdef MSDEBUG1
-	// 	msg_Info( p_this, "!!! CALLBACK playlist item-current !!! : %s ... new: %d ... old: %d", psz_var, (int) newval.i_int, (int) oldval.i_int );
-	// 	#endif
-	// 	p_playlist = (playlist_t *) p_this;
-	// 	if (p_playlist)
-	// 	{
-	// 		// Add callback(s) to playlist (for purpose of adding video filter to chain)
-	// 		var_AddCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
-	// 		// Update p_input
-	// 		Moviesoap::setInputThread(true);
-	// 		if (p_input) {
-	// 			// Add callback(s) to input thread
-	// 			var_AddCallback( p_input, "position", InputCbPosition, NULL );
-	// 			var_AddCallback( p_input, "time", InputCbTime, NULL );
-	// 			var_AddCallback( p_input, "intf-event", InputCbGeneric, NULL );
-	// 			var_AddCallback( p_input, "state", InputCbState, NULL );
-	// 			// start filter object if one exists
-	// 			if (p_loadedFilter) p_loadedFilter->Restart();
-	// 			cout << "loaded filter: " << hex << p_loadedFilter << endl;
-	// 			return VLC_SUCCESS;
-	// 		} else {
-	// 			msg_Err( p_this, "No current input thread found." );
-	// 		}
-	// 	} else {
-	// 		msg_Err( p_this, "No playlist found." );
-	// 	}
-	// 	return VLC_ENOOBJ;
-	// }
+	static MOVIESOAP_CALLBACK(PCB_TryToAttachFilter)
+	{
+		// spawn new thread to handle blackout and removal of this callback
+		msg_Info( p_obj, "try to attach filter");
+		vlc_clone( &thread_for_item_change_cb, EP_EnableBlackout, NULL, VLC_THREAD_PRIORITY_LOW );
+		return MOVIESOAP_SUCCESS;
+	}
 
 	/* 
 	 * Input thread callbacks
@@ -306,8 +274,11 @@ namespace Moviesoap
 				b_no_vout_thread_found = false;
 				vlc_mutex_lock( &lock );
 				if (!p_blackout_filter) {
-					// var_DelCallback( p_playlist, "item-change", PlaylistCbItemChange, NULL );
+					var_DelCallback( p_playlist, "item-change", PCB_TryToAttachFilter, NULL );
 					add_blackout_filter_to_input( p_input );
+					#ifdef MSDEBUG1
+						msg_Info(p_obj, "Moviesoap Blackout added to filter chain.");
+					#endif
 				}
 				vlc_mutex_unlock( &lock );
 				return NULL;
@@ -335,6 +306,10 @@ namespace Moviesoap
 			// start filter object if one exists
 			if (Moviesoap::p_loadedFilter) Moviesoap::p_loadedFilter->Restart();
 		}
+		int n = vout_thread_exists( p_input );
+		msg_Info(p_obj, "number of vout threads: %d", n);
+		// Add callback to enable blackout
+		var_AddCallback( p_playlist, "item-change", PCB_TryToAttachFilter, NULL );
 	}
 
 	/* Set Moviesoap::p_input using a new thread */
