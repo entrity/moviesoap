@@ -292,12 +292,24 @@ namespace Moviesoap
 	/* Sets Moviesoap::p_input */
 	static void* EP_SetMoviesoapP_Input(void *data)
 	{
+		// require Moviesoap::p_playlist
+		if (Moviesoap::p_playlist == NULL) {
+			playlist_t * p_playlist = pl_Get( Moviesoap::p_obj );
+			if (p_playlist) {
+				vlc_mutex_lock( &Moviesoap::lock );
+				Moviesoap::p_playlist = p_playlist;
+				vlc_mutex_unlock( &Moviesoap::lock );
+			} else {
+				return NULL;
+			}
+		}
+		// get p_input
 		input_thread_t * p_input = playlist_CurrentInput( p_playlist );
-		vlc_mutex_lock( &Moviesoap::lock );
-		Moviesoap::p_input = playlist_CurrentInput( p_playlist );
-		vlc_mutex_unlock( &Moviesoap::lock );
-
-		if (Moviesoap::p_input) {
+		if (p_input) {
+			// set Moviesoap::p_input
+			vlc_mutex_lock( &Moviesoap::lock );
+			Moviesoap::p_input = p_input;
+			vlc_mutex_unlock( &Moviesoap::lock );
 			// Add callback(s) to input thread
 			var_AddCallback( p_input, "position", InputCbPosition, NULL );
 			var_AddCallback( p_input, "time", InputCbTime, NULL );
@@ -306,24 +318,20 @@ namespace Moviesoap
 			// start filter object if one exists
 			if (Moviesoap::p_loadedFilter) Moviesoap::p_loadedFilter->Restart();
 		}
-		int n = vout_thread_exists( p_input );
-		msg_Info(p_obj, "number of vout threads: %d", n);
 		// Add callback to enable blackout
 		var_AddCallback( p_playlist, "item-change", PCB_TryToAttachFilter, NULL );
+		return p_input;
 	}
 
 	/* Set Moviesoap::p_input using a new thread */
 	void spawn_set_p_input(bool force_overwrite)
 	{
+		vlc_join( thread_for_getting_input_thread, NULL );
 		if (p_obj) {
 			vlc_mutex_lock( &Moviesoap::lock );
-			if (p_playlist == NULL)
-				p_playlist = pl_Get( Moviesoap::p_obj );
-			if (p_playlist) {
-				if (force_overwrite || p_input == NULL) {
-					vlc_join( thread_for_getting_input_thread, NULL );
-					vlc_clone( &thread_for_getting_input_thread, EP_SetMoviesoapP_Input, NULL, VLC_THREAD_PRIORITY_LOW );
-				}
+			if (p_playlist == NULL || p_input == NULL || force_overwrite) {
+				vlc_join( thread_for_getting_input_thread, NULL );
+				vlc_clone( &thread_for_getting_input_thread, EP_SetMoviesoapP_Input, NULL, VLC_THREAD_PRIORITY_LOW );
 			}
 			vlc_mutex_unlock( &Moviesoap::lock );	
 		}
@@ -338,6 +346,7 @@ namespace Moviesoap
 
 	/* Call Filter::Stop in a new thread */
 	void spawn_stop_filter() {
+		vlc_join( thread_for_filter_restart, NULL );
 		vlc_clone( &thread_for_filter_restart, EP_StopFilter, NULL, VLC_THREAD_PRIORITY_LOW );
 	}
 

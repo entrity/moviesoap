@@ -91,8 +91,11 @@ namespace Moviesoap
 			#endif
 			// Start loaded filter if menu has active selected
 			if ( isActiveSelected() ) {
-				Moviesoap::spawn_set_p_input(false);
-				Moviesoap::spawn_restart_filter();
+				if (Moviesoap::p_input == NULL)
+					 spawn_set_p_input(false);
+				msg_Info(p_obj, "p input: %x", p_input);
+				if (Moviesoap::p_input)
+					Moviesoap::spawn_restart_filter();
 			}
 		}
 	}
