@@ -64,6 +64,7 @@ namespace Moviesoap
 	static void* EP_KillTimers(void *data);
 	static void* EP_EnableBlackout(void *data);
 	static void* EP_SetMoviesoapP_Input(void *data);
+	static void* EP_dummy(void *data);
 
 	/* Set vars, config. (Called by VLCMenuBar::createMenuBar in menus.cpp) */
 	void init( intf_thread_t * p_intf, MainInterface * mainInterface, QMenu * p_menu )
@@ -82,6 +83,11 @@ namespace Moviesoap
 		#define MOVIESOAP_BLACKOUT_CONFIG_POINTER
 		var_CreateGetAddress( p_obj->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME);
 		var_SetAddress( p_obj->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME, &blackout_config );
+		// create all vlc_thread_t instances used by this file
+		vlc_clone( &thread_for_http, EP_dummy, NULL, VLC_THREAD_PRIORITY_LOW );
+		vlc_clone( &thread_for_filter_restart, EP_dummy, NULL, VLC_THREAD_PRIORITY_LOW );
+		vlc_clone( &thread_for_item_change_cb, EP_dummy, NULL, VLC_THREAD_PRIORITY_LOW );
+		vlc_clone( &thread_for_getting_input_thread, EP_dummy, NULL, VLC_THREAD_PRIORITY_LOW );
 		// Add callback(s) to playlist
 		var_AddCallback( p_playlist, "item-change", PCB_ItemChange, NULL );
 		// Check for updates
@@ -323,17 +329,21 @@ namespace Moviesoap
 		return p_input;
 	}
 
+	/* A dummy function. Called in init() so that all vlc_thread_t instances can be created
+	and therefore vlc_join can be called on them even prior to any earnest call of vlc_clone 
+	on them. */
+	static void* EP_dummy(void *data) { return NULL; }
+
 	/* Set Moviesoap::p_input using a new thread */
 	void spawn_set_p_input(bool force_overwrite)
 	{
-		vlc_join( thread_for_getting_input_thread, NULL );
 		if (p_obj) {
-			vlc_mutex_lock( &Moviesoap::lock );
 			if (p_playlist == NULL || p_input == NULL || force_overwrite) {
 				vlc_join( thread_for_getting_input_thread, NULL );
+				vlc_mutex_lock( &Moviesoap::lock );
 				vlc_clone( &thread_for_getting_input_thread, EP_SetMoviesoapP_Input, NULL, VLC_THREAD_PRIORITY_LOW );
+				vlc_mutex_unlock( &Moviesoap::lock );	
 			}
-			vlc_mutex_unlock( &Moviesoap::lock );	
 		}
 	}
 

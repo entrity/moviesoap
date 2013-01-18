@@ -93,7 +93,9 @@ namespace Moviesoap
 			if ( isActiveSelected() ) {
 				if (Moviesoap::p_input == NULL)
 					 spawn_set_p_input(false);
-				msg_Info(p_obj, "p input: %x", p_input);
+				#ifdef MSDEBUG1
+					msg_Info(p_obj, "p input: %x", p_input);
+				#endif
 				if (Moviesoap::p_input)
 					Moviesoap::spawn_restart_filter();
 			}
