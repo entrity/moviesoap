@@ -130,7 +130,11 @@ namespace Moviesoap
 	{
 		dump();
 		int i = modListWidget->currentRow();
-		filterWin->editMod(i);
+		if (i == -1) {
+			modListWidget->setFocus(Qt::OtherFocusReason);
+			modListWidget->setCurrentRow(0);
+		} else
+			filterWin->editMod(i);
 	}
 
 	void FilterFrame::previewClicked()
