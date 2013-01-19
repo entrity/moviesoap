@@ -119,11 +119,11 @@ namespace Moviesoap
 	void FilterWin::toBlackoutFrame()
 	{
 		#ifdef MSDEBUG1
-		cout << "calling blackoutFrame->load" << endl;
+			msg_Info( p_obj, "calling blackoutFrame->load" );
 		#endif
 		blackoutFrame->load(p_mod);
 		#ifdef MSDEBUG1
-		cout << "done blackoutFrame->load" << endl;
+			msg_Info( p_obj, "done blackoutFrame->load" );
 		#endif
 		setCurrentWidget(blackoutFrame);
 	}
