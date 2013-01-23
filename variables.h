@@ -11,6 +11,12 @@
 #define MOVIESOAP_NO_RESTART -1
 #define MOVIESOAP_UNIVERSAL_TITLE -1 // if a mod has a title of -1, it can be queued for any title on the DVD
 
+#ifndef HAVE_POLL
+	struct pollfd;
+	int poll(struct pollfd*, unsigned, int);
+	#define HAVE_POLL
+#endif
+
 #include <vlc_common.h>
 
 #define MSDEBUG1

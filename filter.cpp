@@ -1,9 +1,10 @@
 #include "filter.hpp"
 
-#include <vlc_threads.h>
+#include <vlc_common.h>
+// #include <vlc_threads.h>
 #include <vlc_variables.h>
 #include <vlc_playlist.h> // needed for var_GetTime(input_thread_t *, char *)
-#include <vlc_aout_intf.h>	// aout_ToggleMute
+#include <vlc_aout_volume.h>	// aout_ToggleMute
 
 #include <list>
 #include <algorithm> // for list::advance
@@ -85,10 +86,11 @@ namespace Moviesoap
 	}
 
 	inline void setMute( bool on_off ) { // todo: needs intf lock; otherwise, danger of race condition (which, unfortunately, leads to interface freeze)
-		cout << "is muted? " << aout_IsMuted(VLC_OBJECT(pl_Get(p_obj))) << endl;
-		// if ( aout_IsMuted( VLC_OBJECT(pl_Get(p_obj)) ) != on_off )
-			{ aout_SetMute( VLC_OBJECT(pl_Get(p_obj)), &volume, on_off ); }
-		cout << "is muted? " << aout_IsMuted(VLC_OBJECT(pl_Get(p_obj))) << endl;
+		#ifdef MSDEBUG3
+			msg_Info( p_obj, "Is muted? %d", playlist_MuteGet( Moviesoap::p_playlist ) );
+		#endif
+		if ( playlist_MuteGet( Moviesoap::p_playlist ) != on_off )
+			playlist_MuteSet(  Moviesoap::p_playlist, on_off );
 	}
 }
 
@@ -131,7 +133,7 @@ namespace Moviesoap
 			return;
 		queuedMod = modList.begin();
 		#ifdef MSDEBUG2
-			cout << "FILTER RESTART (first mod: " << (*queuedMod).description << ")" << endl;
+			cout << "\tFILTER RESTART (first mod: " << (*queuedMod).description << ")" << endl;
 		#endif
 		loadNextMod( now );
 	}

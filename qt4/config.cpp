@@ -42,7 +42,7 @@ namespace Moviesoap
 	/* Returns path of config dir. */
 	string config_t::fpath()
 	{
-		char * dir = config_GetDataDir( Moviesoap::p_obj );
+		char * dir = config_GetDataDir();
 		// string confPath = (char *) malloc(strlen(dir) + strlen(MOVIESOAP_CONF_FNAME) + 1);
 		string confPath(dir);
 		free(dir);

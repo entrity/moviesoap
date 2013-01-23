@@ -68,7 +68,7 @@ namespace Moviesoap
 		/* Get filepath from user. Then call loadedFilter->save() */
 		void saveAs();
 		/* Swap this->filter for Moviesoap::filter, set play time, play main playing window, hide this, show concludePreviewButton */
-		void preview(mtime_t start);
+		void preview(Mod * p_mod);
 	public slots:
 		/* Swap back this->filter for Moviesoap::filter, pause play, hide concludePreviewButton, show this */
 		void concludePreview();

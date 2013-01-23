@@ -2,6 +2,7 @@
 #include <QMouseEvent>
 #include <QPaintEvent>
 #include <QPainter>
+#include <QSizePolicy>
 
 #ifndef MIN
 #define MIN( a, b ) ( a < b ? a : b )
@@ -79,20 +80,30 @@ namespace Moviesoap
 	/* Set x2, y2. Require paintEvent. Emit signal. */
 	void Thumbnail::update(QMouseEvent *evt)
 	{
-		QPoint pos = evt->pos();
-		x2 = MIN( pos.x(), pixmap()->width() );
-		y2 = MIN( pos.y(), pixmap()->height() );
-		QLabel::update();
-		emit blackoutChanged(x1*sizeFactor, y1*sizeFactor, x2*sizeFactor, y2*sizeFactor);
+		if (pixmap() != NULL) {
+			QPoint pos = evt->pos();
+			x2 = MIN( pos.x(), pixmap()->width() );
+			y2 = MIN( pos.y(), pixmap()->height() );
+			QLabel::update();
+			emit blackoutChanged(x1*sizeFactor, y1*sizeFactor, x2*sizeFactor, y2*sizeFactor);
+		}
 	}
 	
 	/* Paint widget */
 	void Thumbnail::paintEvent(QPaintEvent *evt)
 	{
 		QPainter painter(this);
-		// draw screenshot
-		painter.drawPixmap(0, 0, *pixmap());
-		// draw blackout rect
-		painter.fillRect(x1, y1, x2-x1, y2-y1, Qt::black);
+		if (pixmap() == NULL) {
+			const QRectF rectf(contentsRect());
+			painter.drawText(
+				rectf, 
+				Qt::AlignCenter | Qt::AlignTop, 
+				QString("If you have a video open,\na blackout preview will\nappear in this box."));
+		} else {
+			// draw screenshot
+			painter.drawPixmap(0, 0, *pixmap());
+			// draw blackout rect
+			painter.fillRect(x1, y1, x2-x1, y2-y1, Qt::black);
+		}
 	}
 }

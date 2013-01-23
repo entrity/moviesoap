@@ -120,7 +120,7 @@ namespace Moviesoap
 		// open file
 		ofstream outs(filepath.c_str(), ios::binary );
 		// return failure if couldn't write to file
-		if (!outs) return MOVIESOAP_ENOFILE;
+		if (!outs.is_open()) return MOVIESOAP_ENOFILE;
 		// write mods
 		dataOut(outs);
 		if (!outs) return MOVIESOAP_EFILEIO;
@@ -137,8 +137,8 @@ namespace Moviesoap
 	int Filter::load(const string & newfpath)
 	{
 		int status;
-		ifstream ins(newfpath.c_str(), ios::binary );
-		if (!ins) return MOVIESOAP_ENOFILE;
+		ifstream ins( newfpath.c_str(), ios::binary );
+		if (!ins.is_open()) return MOVIESOAP_ENOFILE;
 		// set filepath
 		filepath = newfpath;
 		// load mods

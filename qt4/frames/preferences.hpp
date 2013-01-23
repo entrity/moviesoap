@@ -3,8 +3,8 @@
 
 #include <QFrame>
 class QRadioButton;
-#include <vlc_common.h>
 #include "../../variables.h"
+#include <vlc_common.h>
 
 // test
 #include <cstdio>

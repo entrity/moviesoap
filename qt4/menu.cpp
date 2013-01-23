@@ -66,19 +66,14 @@ namespace Moviesoap
 		if ( !filepath.isEmpty() ) {			
 			vlc_mutex_lock( &Moviesoap::lock );
 			// Ensure existence of loaded filter
-			if (p_loadedFilter == NULL)
-				p_loadedFilter = new Filter;
+			if (Moviesoap::p_loadedFilter == NULL)
+				Moviesoap::p_loadedFilter = new Filter;
 			// Stop loaded filter in case it is running
-			p_loadedFilter->Stop();
-			// Overwrite loaded filter with data from filter file
-			int err = p_loadedFilter->load( filepath.toStdString() );
-			cout << "OLD FILTER OVERWRITTEN" << endl;
-			// Start loaded filter if menu has active selected
-			cout << "IS ACTIVE SELECTED" << isActiveSelected() << endl;
-			if ( isActiveSelected() )
-				p_loadedFilter->Restart();
-			cout << "NEW FILTER STARTED" << endl;
 			vlc_mutex_unlock( &Moviesoap::lock );
+			Moviesoap::spawn_stop_filter();
+			// Overwrite loaded filter with data from filter file
+			const char * c_filepath = qPrintable(filepath);
+			int err = Moviesoap::p_loadedFilter->load( c_filepath );
 			// Display error (if any) in QMessageBox
 			if (err) {
 				stringstream msgs;
@@ -87,6 +82,22 @@ namespace Moviesoap
 					tr("File IO failure"),
 					QString(msgs.str().c_str()),
 					QMessageBox::Ok);
+				return;
+			}
+			// if no error:
+			#ifdef MSDEBUG1
+				msg_Info( p_obj, "OLD FILTER OVERWRITTEN" );
+				msg_Info( p_obj, "IS ACTIVE SELECTED: %d", isActiveSelected() );
+			#endif
+			// Start loaded filter if menu has active selected
+			if ( isActiveSelected() ) {
+				if (Moviesoap::p_input == NULL)
+					 spawn_set_p_input(false);
+				#ifdef MSDEBUG1
+					msg_Info(p_obj, "p input: %x", p_input);
+				#endif
+				if (Moviesoap::p_input)
+					Moviesoap::spawn_restart_filter();
 			}
 		}
 	}

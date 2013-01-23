@@ -12,10 +12,11 @@ namespace Moviesoap {
 #include "qt4/main.hpp"
 #include "qt4/config.hpp"
 #include <vlc_common.h>
-#include <vlc_threads.h>
+// #include <vlc_threads.h>
 #include <vlc_input.h>
 #include <list>
 #include <string>
+#include <iostream>
 using namespace std;
 
 namespace Moviesoap {

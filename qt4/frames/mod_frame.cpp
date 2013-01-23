@@ -25,7 +25,7 @@ namespace Moviesoap
 		// category
 		mod->mod.category = categoryBox->currentIndex();
 		// description
-		mod->description = descText->text().toStdString();
+		mod->description = descText->text().toAscii().data();
 	}
 
 	/* Set fields, p_editingMod */
@@ -68,6 +68,11 @@ namespace Moviesoap
 	{
 		dump( filterWin->p_mod );
 		filterWin->toBlackoutFrame();
+	}
+
+	void ModFrame::previewClicked() {
+		dump( filterWin->p_mod );
+		filterWin->preview( filterWin->p_mod );
 	}
 
 	/* Constructor */
@@ -135,6 +140,11 @@ namespace Moviesoap
 		layout->addLayout(hbox);
 		connect( okButton, SIGNAL(clicked()), this, SLOT(okClicked()) );
 		connect( cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()) );
+
+		hbox = new QHBoxLayout;
+		QPushButton * previewButton = addButton(hbox, "&Preview edit");
+		layout->addLayout(hbox);
+		connect( previewButton, SIGNAL(clicked()), this, SLOT(previewClicked()) );
 		// finish
 		hbox = new QHBoxLayout;
 		layout->addLayout(hbox, 9);

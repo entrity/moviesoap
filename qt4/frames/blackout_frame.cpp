@@ -15,6 +15,7 @@
 #include <QLabel>
 #include <QPixmap>
 #include <cstdio>
+#include <vlc_block.h> // block_Release()
 #include <vlc_fs.h>
 
 // test
@@ -63,7 +64,7 @@ namespace Moviesoap
 		var_SetTime( Moviesoap::p_input, "time", usec );
 		// get vout thread
 		vout_thread_t * p_vout = input_GetVout( Moviesoap::p_input );
-		if ( !p_vout ) { return NULL; }
+		if ( p_vout == NULL ) { return NULL; }
 		// take snapshot
 		picture_t *p_picture = NULL;
     	block_t *p_image = NULL;
@@ -87,15 +88,15 @@ namespace Moviesoap
 	/* Takes .bmp file and loads it into thumbnail QLabel */
 	void BlackoutFrame::loadImageFromFile() {
 		QPixmap pixmap = QPixmap(QString(MOVIESOAP_SNAPSHOT_FNAME), "bmp");
-		thumbnail->setPixmap(pixmap);
+		if (!pixmap.isNull())
+			thumbnail->setPixmap(pixmap);
 	}
-
 
 	/* If vout thread is available. Move to start_time of mod, take snapshot, load snapshot. */
 	void BlackoutFrame::captureAndLoadImage(Mod * mod)
 	{
 		// check for input
-		if ( !Moviesoap::p_input ) { return; }
+		if ( Moviesoap::p_input == NULL ) { return; }
 		// take snapshot
 		block_t * p_image = takeSnapshot(mod->mod.start * MOVIESOAP_MOD_TIME_FACTOR);
 		if ( p_image ) {
@@ -159,25 +160,6 @@ namespace Moviesoap
 			mod->mod.y1 = y2;
 			mod->mod.y2 = y1;
 		}
-	}
-
-	/* Not working */
-	void BlackoutFrame::loadImageFromBlock(block_t *p_block) {
-		char * data = (char *) p_block->p_buffer;
-		bmp_file_header_t * file_header = (bmp_file_header_t *) data;
-		
-		uint32_t offset = bytes_to_int(file_header->bf_off_bits, 4);
-		cout << "offset :" << dec << offset << endl;
-		bmp_img_header_t * img_header = (bmp_img_header_t *) data + offset;
-
-		cout << "header size: " << endl
-		<< dec << bytes_to_int(img_header->size, 4) << endl
-		<< dec << (int) img_header->size << endl
-		<< dec << (uint32_t) img_header->size << endl;
-		
-		// char * bits = data + offset;
-		// QBitmap bitmap = QBitmap::fromData(QSize(), bits);
-		// thumbnail->setPixmap(bitmap);
 	}
 	
 	/* Constructor */

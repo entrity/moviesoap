@@ -2,7 +2,7 @@
  * menus.cpp : Qt menus
  *****************************************************************************
  * Copyright © 2006-2011 the VideoLAN team
- * $Id: 177dd4f159bd3fc86af3d8c93656893d6f80f4c0 $
+ * $Id: 45a1d904864c876910e1d033cb5bfd6386bbe250 $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
@@ -49,6 +49,7 @@
 #include "extensions_manager.hpp"                 /* Extensions menu */
 #include "util/qmenuview.hpp"                     /* Simple Playlist menu */
 #include "components/playlist/playlist_model.hpp" /* PLModel getter */
+#include "components/playlist/standardpanel.hpp"  /* PLView getter */
 
 #include <QMenu>
 #include <QMenuBar>
@@ -93,7 +94,7 @@ QAction *addDPStaticEntry( QMenu *menu,
                        const char *icon,
                        const char *member,
                        const char *shortcut = NULL,
-                       QAction::MenuRole = QAction::NoRole
+                       QAction::MenuRole role = QAction::NoRole
                        )
 {
     QAction *action = NULL;
@@ -114,6 +115,11 @@ QAction *addDPStaticEntry( QMenu *menu,
         else
             action = menu->addAction( text, THEDP, member );
     }
+#ifdef __APPLE__
+    action->setMenuRole( role );
+#else
+    Q_UNUSED( role );
+#endif
     action->setData( VLCMenuBar::ACTION_STATIC );
     return action;
 }
@@ -252,8 +258,8 @@ static int AudioAutoMenuBuilder( audio_output_t *p_object,
         QVector<const char *> &varnames )
 {
     PUSH_INPUTVAR( "audio-es" );
-    PUSH_VAR( "audio-channels" );
-    PUSH_VAR( "audio-device" );
+    PUSH_VAR( "stereo-mode" );
+    PUSH_VAR( "device" );
     PUSH_VAR( "visual" );
     return VLC_SUCCESS;
 }
@@ -416,7 +422,7 @@ QMenu *VLCMenuBar::ToolsMenu( QMenu *menu )
 
 #ifdef ENABLE_VLM
     addDPStaticEntry( menu, qtr( I_MENU_VLM ), "", SLOT( vlmDialog() ),
-        "Ctrl+W" );
+        "Ctrl+Shift+W" );
 #endif
 
     addDPStaticEntry( menu, qtr( "Program Guide" ), "", SLOT( epgDialog() ),
@@ -477,13 +483,16 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
             qtr( "Play&list" ), mi,
             SLOT( togglePlaylist() ), qtr( "Ctrl+L" ) );
 
+    if( mi->getPlaylistView() )
+        menu->addMenu( StandardPLPanel::viewSelectionMenu( mi->getPlaylistView() ) );
     menu->addSeparator();
 
     /* Minimal View */
     action = menu->addAction( qtr( "Mi&nimal Interface" ) );
     action->setShortcut( qtr( "Ctrl+H" ) );
     action->setCheckable( true );
-    action->setChecked( (mi->getControlsVisibilityStatus() & CONTROLS_HIDDEN ) );
+    action->setChecked( (mi->getControlsVisibilityStatus()
+                         & MainInterface::CONTROLS_HIDDEN ) );
 
     CONNECT( action, triggered( bool ), mi, toggleMinimalView( bool ) );
     CONNECT( mi, minimalViewToggled( bool ), action, setChecked( bool ) );
@@ -500,7 +509,7 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
     action = menu->addAction( qtr( "&Advanced Controls" ), mi,
             SLOT( toggleAdvancedButtons() ) );
     action->setCheckable( true );
-    if( mi->getControlsVisibilityStatus() & CONTROLS_ADVANCED )
+    if( mi->getControlsVisibilityStatus() & MainInterface::CONTROLS_ADVANCED )
         action->setChecked( true );
 
     /* Docked Playlist */
@@ -572,13 +581,13 @@ static inline void VolumeEntries( intf_thread_t *p_intf, QMenu *current )
 {
     current->addSeparator();
 
-    QAction *action = current->addAction( qtr( "Increase Volume" ),
+    QAction *action = current->addAction( qtr( "&Increase Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioUp() ) );
     action->setData( VLCMenuBar::ACTION_STATIC );
-    action = current->addAction( qtr( "Decrease Volume" ),
+    action = current->addAction( qtr( "&Decrease Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioDown() ) );
     action->setData( VLCMenuBar::ACTION_STATIC );
-    action = current->addAction( qtr( "Mute" ),
+    action = current->addAction( qtr( "&Mute" ),
                 ActionsManager::getInstance( p_intf ), SLOT( toggleMuteAudio() ) );
     action->setData( VLCMenuBar::ACTION_STATIC );
 }
@@ -596,8 +605,8 @@ QMenu *VLCMenuBar::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     if( current->isEmpty() )
     {
         addActionWithSubmenu( current, "audio-es", qtr( "Audio &Track" ) );
-        addActionWithSubmenu( current, "audio-channels", qtr( "Audio &Channels" ) );
-        addActionWithSubmenu( current, "audio-device", qtr( "Audio &Device" ) );
+        addActionWithSubmenu( current, "stereo-mode", qtr( "&Stereo Mode" ) );
+        addActionWithSubmenu( current, "device", qtr( "Audio &Device" ) );
         current->addSeparator();
 
         addActionWithSubmenu( current, "visual", qtr( "&Visualizations" ) );
@@ -793,7 +802,7 @@ void VLCMenuBar::PopupMenuPlaylistEntries( QMenu *menu,
     /* Play or Pause action and icon */
     if( !p_input || var_GetInteger( p_input, "state" ) != PLAYING_S )
     {
-        action = menu->addAction( qtr( "Play" ),
+        action = menu->addAction( qtr( "&Play" ),
                 ActionsManager::getInstance( p_intf ), SLOT( play() ) );
 #ifndef __APPLE__ /* No icons in menus in Mac */
         action->setIcon( QIcon( ":/menu/play" ) );
@@ -958,6 +967,7 @@ void VLCMenuBar::MiscPopupMenu( intf_thread_t *p_intf, bool show )
 {
     POPUP_BOILERPLATE
 
+    menu = new QMenu();
     if( p_input )
     {
         varnames.append( "audio-es" );
@@ -965,7 +975,6 @@ void VLCMenuBar::MiscPopupMenu( intf_thread_t *p_intf, bool show )
         menu->addSeparator();
     }
 
-    menu = new QMenu();
     Populate( p_intf, menu, varnames, objects );
 
     menu->addSeparator();
@@ -1123,13 +1132,13 @@ void VLCMenuBar::updateSystrayMenu( MainInterface *mi,
     if( mi->isVisible() || b_force_visible )
     {
         sysMenu->addAction( QIcon( ":/logo/vlc16.png" ),
-                            qtr( "Hide VLC media player in taskbar" ), mi,
+                            qtr( "&Hide VLC media player in taskbar" ), mi,
                             SLOT( hideUpdateSystrayMenu() ) );
     }
     else
     {
         sysMenu->addAction( QIcon( ":/logo/vlc16.png" ),
-                            qtr( "Show VLC media player" ), mi,
+                            qtr( "Sho&w VLC media player" ), mi,
                             SLOT( showUpdateSystrayMenu() ) );
     }
     sysMenu->addSeparator();
@@ -1140,7 +1149,7 @@ void VLCMenuBar::updateSystrayMenu( MainInterface *mi,
 
     VolumeEntries( p_intf, sysMenu );
     sysMenu->addSeparator();
-    addDPStaticEntry( sysMenu, qtr( "Open Media" ),
+    addDPStaticEntry( sysMenu, qtr( "&Open Media" ),
             ":/type/file-wide", SLOT( openFileDialog() ) );
     addDPStaticEntry( sysMenu, qtr( "&Quit" ) ,
             ":/menu/quit", SLOT( quit() ) );

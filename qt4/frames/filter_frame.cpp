@@ -17,6 +17,11 @@
 #include <cstdio> // unused
 #include <iostream>
 
+// todo : needs freeing?
+#define QSTRING_TO_C(dst, qstr) do { \
+	dst = qstr.toAscii().data(); \
+	} while (0)
+
 
 /* Create padded, bordered QFrame, using given layout */
 static inline QFrame *newDiv(QLayout * layout)
@@ -65,11 +70,10 @@ namespace Moviesoap
 		// default to use filterWin->p_editingFilter;
 		if (!filter) filter = &filterWin->filter;
 		// Get string values
-		filter->title = titleText->text().toStdString();
-		filter->year = yearText->text().toStdString();
-		filter->isbn = isbnText->text().toStdString();
-		filter->creator = creatorText->text().toStdString();
-		// Mods should be updated as they are changed in the QListWidget
+		QSTRING_TO_C( filter->title, titleText->text() );
+		QSTRING_TO_C( filter->year, yearText->text() );
+		QSTRING_TO_C( filter->isbn, isbnText->text() );
+		QSTRING_TO_C( filter->creator, creatorText->text() );
 	}
 
 	/* Slot. Save filter. */
@@ -102,7 +106,10 @@ namespace Moviesoap
 	void FilterFrame::cancelClicked() { filterWin->hide(); }
 
 	/* Slot. Add new mod to list */
-	void FilterFrame::newModClicked() { filterWin->editMod(); }
+	void FilterFrame::newModClicked() {
+		dump();
+		filterWin->editMod();
+	}
 
 	/* Slot. Delete selected mod from filter. */
 	void FilterFrame::delModClicked()
@@ -121,8 +128,13 @@ namespace Moviesoap
 	/* Slot. Edit currently selected mod in list */
 	void FilterFrame::editModClicked()
 	{
+		dump();
 		int i = modListWidget->currentRow();
-		filterWin->editMod(i);
+		if (i == -1) {
+			modListWidget->setFocus(Qt::OtherFocusReason);
+			modListWidget->setCurrentRow(0);
+		} else
+			filterWin->editMod(i);
 	}
 
 	void FilterFrame::previewClicked()
@@ -130,14 +142,7 @@ namespace Moviesoap
 		Mod * mod = getSelectedMod();
 		if (mod == NULL)
 			return;
-		// get Mod's startT
-		mtime_t start = mod->startTime();
-		// Get value to backtrack from the mod's startTime from the GUI
-		mtime_t offset = MOVIESOAP_MOD_TIME_TO_US(strptime(previewOffsetText->text().toAscii().data()));
-		// Adjust start time by offset
-		start = (start > offset) ? start - offset : 0;
-		// call preview on the FilterWin
-		filterWin->preview( start );
+		filterWin->preview( mod );
 	}
 
 	void FilterFrame::refreshModListWidget(Filter * filter)
@@ -193,12 +198,9 @@ namespace Moviesoap
 		// preview div
 		hbox = new QHBoxLayout;
 		frame = newDiv(hbox);
-		QPushButton * previewButton = new QPushButton(QString("Preview edit"));
+		QPushButton * previewButton = new QPushButton(QString("Preview selected edit"));
 		hbox->addWidget(previewButton);
 		connect(previewButton, SIGNAL(clicked()), this, SLOT(previewClicked()));
-		QLabel * previewOffsetLabel = new QLabel(tr("preview offset (backward):"));
-		hbox->addWidget(previewOffsetLabel);
-		previewOffsetText = addText(hbox, "seconds");
 		layout->addWidget(frame);
 		// creation div
 		frameVLayout = new QVBoxLayout;
