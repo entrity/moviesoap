@@ -185,23 +185,24 @@ namespace Moviesoap
 		hbox->addLayout(frameVLayout);
 		// mods div (right)
 		frameVLayout = new QVBoxLayout;
-		QPushButton * newModButton = new QPushButton(tr("&New edit")); 
-		QPushButton * editModButton = new QPushButton(tr("&Edit edit"));
-		QPushButton * delModButton = new QPushButton(tr("&Delete edit"));
+		QPushButton * newModButton = new QPushButton(tr("&New mod")); 
+		QPushButton * editModButton = new QPushButton(tr("&Edit mod"));
+		QPushButton * delModButton = new QPushButton(tr("Delete mod"));
+		QPushButton * previewButton = new QPushButton(QString("Preview\nselected mod"));
 		connect(newModButton, SIGNAL(clicked()), this, SLOT(newModClicked()));
 		connect(editModButton, SIGNAL(clicked()), this, SLOT(editModClicked()));
 		connect(delModButton, SIGNAL(clicked()), this, SLOT(delModClicked()));
+		connect(previewButton, SIGNAL(clicked()), this, SLOT(previewClicked()));
 		frameVLayout->addWidget(newModButton);
 		frameVLayout->addWidget(editModButton);
 		frameVLayout->addWidget(delModButton);
+		frameVLayout->addWidget(previewButton);
 		hbox->addLayout(frameVLayout);
 		layout->addWidget(frame);
-		// preview div
+		// quick mod creation div
 		hbox = new QHBoxLayout;
 		frame = newDiv(hbox);
-		QPushButton * previewButton = new QPushButton(QString("Preview selected edit"));
-		hbox->addWidget(previewButton);
-		connect(previewButton, SIGNAL(clicked()), this, SLOT(previewClicked()));
+		
 		layout->addWidget(frame);
 		// creation div
 		frameVLayout = new QVBoxLayout;
