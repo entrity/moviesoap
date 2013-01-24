@@ -15,9 +15,13 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QTranslator>
-// temp
-#include <cstdio> // unused
-#include <iostream>
+#include <QMessageBox>
+
+#ifdef MSDEBUG1
+	// #include <cstdio> // unused
+	#include <iostream>
+	using namespace std;
+#endif
 
 // todo : needs freeing?
 #define QSTRING_TO_C(dst, qstr) do { \
@@ -160,8 +164,26 @@ namespace Moviesoap
 			new ModListWidgetItem(modListWidget, &*iter);
 	}
 
+	void FilterFrame::quickCreateMod(uint8_t mode)
+	{
+		if (Moviesoap::p_input) {
+			uint32_t offset = parseTime(quickCreateOffsetText, 100);
+			uint32_t now_cs = MoviesoapGetNow(Moviesoap::p_input) / MOVIESOAP_MOD_TIME_FACTOR;
+			uint32_t start_cs = (offset > now_cs) ? 0 : now_cs - offset;
+			uint32_t stop_cs = start_cs + 100;
+			p_quickCreatedMod = new Mod(mode, start_cs, stop_cs);
+			Moviesoap::p_loadedFilter->modList.push_back(*p_quickCreatedMod);
+			refreshModListWidget(Moviesoap::p_loadedFilter);
+		} else {
+			QMessageBox::information( this,
+					QString("No action taken"),
+					QString("To make use of the quick-create functions, media must be playing."),
+					QMessageBox::Ok);
+		}
+	}
+
 	/* Constructor */
-	FilterFrame::FilterFrame(FilterWin *parent) : QFrame(parent), filterWin(parent)
+	FilterFrame::FilterFrame(FilterWin *parent) : QFrame(parent), filterWin(parent), p_quickCreatedMod(NULL)
 	{
 		QVBoxLayout *frameVLayout, *layout = new QVBoxLayout;
 		QHBoxLayout *hbox;
@@ -202,9 +224,17 @@ namespace Moviesoap
 		hbox->addLayout(frameVLayout);
 		layout->addWidget(frame);
 		// quick mod creation div
+		addLabel(layout, "Quick-create mod:");
 		hbox = new QHBoxLayout;
 		frame = newDiv(hbox);
-		
+		QPushButton * quickSkipModButton = addButton(hbox, "Ski&p");
+		QPushButton * quickMuteModButton = addButton(hbox, "&Mute");
+		QPushButton * quickBlackModButton = addButton(hbox, "&Black");
+		connect(quickSkipModButton, SIGNAL(clicked()), this, SLOT(quickCreateSkipMod()));
+		connect(quickMuteModButton, SIGNAL(clicked()), this, SLOT(quickCreateMuteMod()));
+		connect(quickBlackModButton, SIGNAL(clicked()), this, SLOT(quickCreateBlackoutMod()));
+		addLabel(hbox, " offset backward from now:");
+		quickCreateOffsetText = addText(hbox, "00:00:01.0");
 		layout->addWidget(frame);
 		// creation div
 		frameVLayout = new QVBoxLayout;

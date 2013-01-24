@@ -17,9 +17,9 @@ namespace Moviesoap
 		// mode
 		mod->mod.mode = getChecked(modeRadios, MOVIESOAP_MOD_MODE_COUNT);
 		// times
-		mod->mod.start = strptime(startText->text().toAscii().data());
-		mod->mod.stop = strptime(stopText->text().toAscii().data());
-		mod->mod.title = titleText->text().toInt();
+		mod->mod.start = parseTime(startText);
+		mod->mod.stop = parseTime(stopText);
+		mod->mod.title = parseInt(titleText);
 		// severity
 		mod->mod.severity = getChecked(severityRadios, MOVIESOAP_TOLERANCE_COUNT-1);
 		// category

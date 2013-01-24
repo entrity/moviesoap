@@ -6,6 +6,8 @@
 class QLineEdit;
 class QListWidget;
 
+#include "../../variables.h"
+
 namespace Moviesoap
 {
 	class Filter;
@@ -17,9 +19,10 @@ namespace Moviesoap
 		Q_OBJECT
 	protected:
 		QLineEdit
-			*titleText, *yearText, *isbnText, *creatorText, *previewOffsetText;
+			*titleText, *yearText, *isbnText, *creatorText, *previewOffsetText, *quickCreateOffsetText;
 		QListWidget *modListWidget;
 		FilterWin * filterWin;
+		Mod * p_quickCreatedMod;
 	public:
 		FilterFrame(FilterWin * parent);
 		void load(Filter * filter=NULL);
@@ -36,6 +39,10 @@ namespace Moviesoap
 		void editModClicked();
 		void delModClicked();
 		void previewClicked();
+		void quickCreateMod(uint8_t mode);
+		void quickCreateSkipMod() { quickCreateMod(MOVIESOAP_SKIP); }
+		void quickCreateMuteMod() { quickCreateMod(MOVIESOAP_MUTE); }
+		void quickCreateBlackoutMod() { quickCreateMod(MOVIESOAP_BLACKOUT); }
 	};
 }
 
