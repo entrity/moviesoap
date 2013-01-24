@@ -12,6 +12,7 @@
 #include <string>
 using namespace std;
 #include <cstdio>
+#include <cstring>
 
 namespace Moviesoap
 {
@@ -92,6 +93,18 @@ namespace Moviesoap
 			centiseconds += 1; // consider thousandths place
 		// return
 		return centiseconds;
+	}
+	/* Parses the contents of given QLineEdit, returns time_t. Returns t_default if QLineEdit's text is emtpy. */
+	inline time_t parseTime(QLineEdit * lineEdit, time_t t_default=0)
+	{
+		char * data = lineEdit->text().toAscii().data();
+		time_t output = (strlen(data) == 0) ? t_default : strptime(data);
+		return output; // I tried freeing 'data' but got a segfault!
+	}
+	/* Parses the contents of given QLineEdit, returns int. Returns i_default if QLineEdit's text is emtpy. */
+	inline int parseInt(QLineEdit * lineEdit, int i_default=0)
+	{
+		return lineEdit->text().isEmpty() ? i_default : lineEdit->text().toInt();
 	}
 	/* Returns first index of pointer whose button isChecked(). Defaults to -1. Takes an array of pointers. */
 	inline int getChecked(QRadioButton *firstPointer[], int nPointers) {
