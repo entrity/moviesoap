@@ -1,12 +1,11 @@
+#ifndef MOVIESOAP_FILTER_WIN_H
+#define MOVIESOAP_FILTER_WIN_H
+
 #include "../../filter.hpp"
 #include <QStackedWidget>
 #include <QFrame>
 #include <QFileDialog>
 #include <QMessageBox>
-
-#include <iostream>
-#include <sstream>
-using namespace std;
 
 namespace Moviesoap
 {
@@ -80,3 +79,5 @@ namespace Moviesoap
 
 	void loadFilterDialogue(QWidget * parent);
 }
+
+#endif

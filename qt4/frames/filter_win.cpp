@@ -8,11 +8,9 @@
 
 #include <vlc_playlist.h>
 
-// test
-#ifdef MSDEBUG1
 #include <iostream>
+#include <sstream>
 using namespace std;
-#endif
 
 namespace Moviesoap
 {

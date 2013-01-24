@@ -1,8 +1,10 @@
 #include "filter_frame.hpp"
 #include "filter_win.hpp"
+#include "mod_list_widget_item.hpp"
 #include "gui_helpers.hpp"
 #include "../main.hpp"
 #include "../../filter.hpp"
+
 #include <vlc_configuration.h>
 #include <QFrame>
 #include <QVBoxLayout>
@@ -155,7 +157,7 @@ namespace Moviesoap
 		// add mods
 		list<Mod>::iterator iter;
 		for (iter = filter->modList.begin(); iter != filter->modList.end(); iter++)
-			new QListWidgetItem(QString(iter->description.c_str()), modListWidget);
+			new ModListWidgetItem(modListWidget, &*iter);
 	}
 
 	/* Constructor */
