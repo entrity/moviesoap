@@ -55,7 +55,10 @@ namespace Moviesoap
 
 	void Menu::editFilter() { Moviesoap::FilterWin::openEditor(Moviesoap::p_loadedFilter); }
 
-	void Menu::newFilter() { Moviesoap::FilterWin::openEditor(NULL); }
+	void Menu::newFilter() {
+		Moviesoap::p_loadedFilter = new Moviesoap::Filter;
+		Moviesoap::FilterWin::openEditor(NULL);
+	}
 
 	void Menu::loadFilter() {
 		// Get filepath from user

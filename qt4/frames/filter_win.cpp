@@ -37,7 +37,7 @@ namespace Moviesoap
 
 	void FilterWin::openEditor(Filter * filterToEdit)
 	{
-		// create filter if necessary
+		// create window if necessary
 		if (p_window == NULL)
 			p_window = new FilterWin;
 		p_window->editFilter(filterToEdit);
