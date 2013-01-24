@@ -7,7 +7,6 @@
 #include "conclude_preview_button.hpp"
 
 #include <vlc_playlist.h>
-#include <QFileDialog>
 
 // test
 #ifdef MSDEBUG1
@@ -40,10 +39,15 @@ namespace Moviesoap
 		// create window if necessary
 		if (p_window == NULL)
 			p_window = new FilterWin;
-		p_window->editFilter(filterToEdit);
-		// show window
-		p_window->show();
-		p_window->raise();
+		// open file dialogue if no filter is loaded
+		if (Moviesoap::p_loadedFilter == NULL)
+			Moviesoap::loadFilterDialogue(p_window);
+		if (Moviesoap::p_loadedFilter) {
+			p_window->editFilter(NULL);
+			// show window
+			p_window->show();
+			p_window->raise();
+		}
 	}
 
 	/* Set p_editingFilter. Load filter in filter frame. */
@@ -202,5 +206,50 @@ namespace Moviesoap
 		p_mod->mod.category = MOVIESOAP_CAT_NONE;
 		p_mod->mod.severity = MOVIESOAP_TOLERANCE_COUNT;
 		p_mod->description = "";
+	}
+
+	void loadFilterDialogue(QWidget * parent)
+	{		// Get filepath from user
+		QString filepath = QFileDialog::getOpenFileName( parent,
+			QString("Open Moviesoap filter file"),
+			QString(saveDir().c_str()),
+			QString(MOVIESOAP_FILECHOOSER_FILTER));
+		if ( !filepath.isEmpty() ) {			
+			vlc_mutex_lock( &Moviesoap::lock );
+			// Ensure existence of loaded filter
+			if (Moviesoap::p_loadedFilter == NULL)
+				Moviesoap::p_loadedFilter = new Filter;
+			// Stop loaded filter in case it is running
+			vlc_mutex_unlock( &Moviesoap::lock );
+			Moviesoap::spawn_stop_filter();
+			// Overwrite loaded filter with data from filter file
+			const char * c_filepath = qPrintable(filepath);
+			int err = Moviesoap::p_loadedFilter->load( c_filepath );
+			// Display error (if any) in QMessageBox
+			if (err) {
+				stringstream msgs;
+				msgs << "Failure to load filter from file.\nError code " << err;
+				QMessageBox::warning( parent, 
+					QString("File IO failure"),
+					QString(msgs.str().c_str()),
+					QMessageBox::Ok);
+				return;
+			}
+			// if no error:
+			#ifdef MSDEBUG1
+				msg_Info( p_obj, "OLD FILTER OVERWRITTEN" );
+				msg_Info( p_obj, "IS ACTIVE SELECTED: %d", isActiveSelected() );
+			#endif
+			// Start loaded filter if menu has active selected
+			if ( isActiveSelected() ) {
+				if (Moviesoap::p_input == NULL)
+					 spawn_set_p_input(false);
+				#ifdef MSDEBUG1
+					msg_Info(p_obj, "p input: %x", p_input);
+				#endif
+				if (Moviesoap::p_input)
+					Moviesoap::spawn_restart_filter();
+			}
+		}
 	}
 }

@@ -23,6 +23,7 @@ namespace Moviesoap
 
 	extern string saveDir();
 	extern string extractDir(const string& str);
+	extern bool isActiveSelected();
 	extern const char * toleranceLabels[];
 	extern Moviesoap::Menu * p_GuiMenu; // this is the 'Moviesoap' menu in the main menu bar
 }

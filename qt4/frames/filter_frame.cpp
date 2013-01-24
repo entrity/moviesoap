@@ -81,7 +81,6 @@ namespace Moviesoap
 	{
 		dump();
 		filterWin->save();
-		filterWin->hide();
 	}
 
 	/* Slot. Save filter as. */
@@ -89,7 +88,6 @@ namespace Moviesoap
 	{
 		dump();
 		filterWin->saveAs();
-		filterWin->hide();
 	}
 
 	/* Slot. Update loadedFilter and close filter editor window. */
@@ -99,8 +97,13 @@ namespace Moviesoap
 		filterWin->hide();
 	}
 
-	/* Slot. Hide editor without update. */
-	void FilterFrame::cancelClicked() { filterWin->hide(); }
+	/* Slot. Save; update loadedFilter; and close filter editor window */
+	void FilterFrame::okAndSaveClicked()
+	{
+		dump();
+		filterWin->save();
+		filterWin->hide();
+	}
 
 	/* Slot. Add new mod to list */
 	void FilterFrame::newModClicked() {
@@ -113,6 +116,7 @@ namespace Moviesoap
 	{
 		int i = modListWidget->currentRow();
 		filterWin->deleteMod(i);
+		dump();
 	}
 
 	Mod * FilterFrame::getSelectedMod()
@@ -205,21 +209,21 @@ namespace Moviesoap
 		hbox = newRow(frameVLayout);
 		addLabelAndLine(hbox, &creatorText, "Filter maker");
 		hbox = newRow(frameVLayout);
+		QPushButton * okButton = new QPushButton(tr("&Ok"));
+		QPushButton * okAndSaveButton = new QPushButton(tr("Save and O&k"));
 		QPushButton * saveButton = new QPushButton(tr("&Save"));
 		QPushButton * saveAsButton = new QPushButton(tr("S&ave as..."));
-		QPushButton * okButton = new QPushButton(tr("&Update w/out save"));
-		QPushButton * cancelButton = new QPushButton(tr("&Cancel"));
+		connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
+		connect(okAndSaveButton, SIGNAL(clicked()), this, SLOT(okAndSaveClicked()));
 		connect(saveButton, SIGNAL(clicked()), this, SLOT(saveClicked()));
 		connect(saveAsButton, SIGNAL(clicked()), this, SLOT(saveAsClicked()));
-		connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
-		connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+		hbox->addWidget(okButton);
+		hbox->addWidget(okAndSaveButton);
 		hbox->addWidget(saveButton);
 		hbox->addWidget(saveAsButton);
-		hbox->addWidget(okButton);
-		hbox->addWidget(cancelButton);
 		layout->addWidget(frame);
 		// end
 		setLayout(layout);
 	}
 
-}
+}	

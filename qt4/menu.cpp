@@ -8,12 +8,6 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QAction>
-#include <QFileDialog>
-#include <QMessageBox>
-
-#include <iostream>
-#include <sstream>
-using namespace std;
 
 namespace Moviesoap
 {
@@ -60,50 +54,7 @@ namespace Moviesoap
 		Moviesoap::FilterWin::openEditor(NULL);
 	}
 
-	void Menu::loadFilter() {
-		// Get filepath from user
-		QString filepath = QFileDialog::getOpenFileName( this,
-			QString("Open Moviesoap filter file"),
-			QString(saveDir().c_str()),
-			QString(MOVIESOAP_FILECHOOSER_FILTER));
-		if ( !filepath.isEmpty() ) {			
-			vlc_mutex_lock( &Moviesoap::lock );
-			// Ensure existence of loaded filter
-			if (Moviesoap::p_loadedFilter == NULL)
-				Moviesoap::p_loadedFilter = new Filter;
-			// Stop loaded filter in case it is running
-			vlc_mutex_unlock( &Moviesoap::lock );
-			Moviesoap::spawn_stop_filter();
-			// Overwrite loaded filter with data from filter file
-			const char * c_filepath = qPrintable(filepath);
-			int err = Moviesoap::p_loadedFilter->load( c_filepath );
-			// Display error (if any) in QMessageBox
-			if (err) {
-				stringstream msgs;
-				msgs << "Failure to load filter from file.\nError code " << err;
-				QMessageBox::warning( this, 
-					tr("File IO failure"),
-					QString(msgs.str().c_str()),
-					QMessageBox::Ok);
-				return;
-			}
-			// if no error:
-			#ifdef MSDEBUG1
-				msg_Info( p_obj, "OLD FILTER OVERWRITTEN" );
-				msg_Info( p_obj, "IS ACTIVE SELECTED: %d", isActiveSelected() );
-			#endif
-			// Start loaded filter if menu has active selected
-			if ( isActiveSelected() ) {
-				if (Moviesoap::p_input == NULL)
-					 spawn_set_p_input(false);
-				#ifdef MSDEBUG1
-					msg_Info(p_obj, "p input: %x", p_input);
-				#endif
-				if (Moviesoap::p_input)
-					Moviesoap::spawn_restart_filter();
-			}
-		}
-	}
+	void Menu::loadFilter() { Moviesoap::loadFilterDialogue(this); }
 
 	void Menu::notifyUpdatesAvailable() { emit updatesAvailable(); }
 	
