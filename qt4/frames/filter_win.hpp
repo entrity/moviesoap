@@ -1,6 +1,12 @@
 #include "../../filter.hpp"
 #include <QStackedWidget>
 #include <QFrame>
+#include <QFileDialog>
+#include <QMessageBox>
+
+#include <iostream>
+#include <sstream>
+using namespace std;
 
 namespace Moviesoap
 {
@@ -71,4 +77,6 @@ namespace Moviesoap
 		/* Swap back this->filter for Moviesoap::filter, pause play, hide concludePreviewButton, show this */
 		void concludePreview();
 	};
+
+	void loadFilterDialogue(QWidget * parent);
 }

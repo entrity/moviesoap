@@ -28,10 +28,10 @@ namespace Moviesoap
 		void refreshModListWidget(Filter *);
 		Mod * getSelectedMod();
 	public slots:
+		void okClicked();
+		void okAndSaveClicked();
 		void saveClicked();
 		void saveAsClicked();
-		void okClicked();
-		void cancelClicked();
 		void newModClicked();
 		void editModClicked();
 		void delModClicked();

@@ -1,4 +1,5 @@
 #include "main.hpp"
+#include "menu.hpp"
 
 #include <vlc_configuration.h>
 
@@ -45,5 +46,10 @@ namespace Moviesoap
 			free(userDir);
 			return dir;
 		}
+	}
+
+	bool isActiveSelected()
+	{
+		return p_GuiMenu ? p_GuiMenu->isActiveSelected() : false;
 	}
 }
