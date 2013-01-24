@@ -54,7 +54,7 @@ namespace Moviesoap
 	void FilterFrame::load(Filter * filter)
 	{
 		// default to use filterWin->p_editingFilter;
-		if (!filter) filter = &filterWin->filter;
+		if (!filter) filter = Moviesoap::p_loadedFilter;
 		// text inputs
 		setText(titleText, filter->title);
 		setText(yearText, filter->year);
@@ -68,7 +68,7 @@ namespace Moviesoap
 	void FilterFrame::dump(Filter * filter)
 	{
 		// default to use filterWin->p_editingFilter;
-		if (!filter) filter = &filterWin->filter;
+		if (!filter) filter = Moviesoap::p_loadedFilter;
 		// Get string values
 		QSTRING_TO_C( filter->title, titleText->text() );
 		QSTRING_TO_C( filter->year, yearText->text() );
@@ -81,7 +81,6 @@ namespace Moviesoap
 	{
 		dump();
 		filterWin->save();
-		filterWin->updateLoadedFilter();
 		filterWin->hide();
 	}
 
@@ -90,7 +89,6 @@ namespace Moviesoap
 	{
 		dump();
 		filterWin->saveAs();
-		filterWin->updateLoadedFilter();
 		filterWin->hide();
 	}
 
@@ -98,7 +96,6 @@ namespace Moviesoap
 	void FilterFrame::okClicked()
 	{
 		dump();
-		filterWin->updateLoadedFilter();
 		filterWin->hide();
 	}
 
@@ -121,7 +118,7 @@ namespace Moviesoap
 	Mod * FilterFrame::getSelectedMod()
 	{
 		int i = modListWidget->currentRow();
-		list<Mod>::iterator iter = filterWin->filter.getMod(i);
+		list<Mod>::iterator iter = Moviesoap::p_loadedFilter->getMod(i);
 		return &*iter;
 	}
 

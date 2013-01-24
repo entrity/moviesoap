@@ -37,9 +37,6 @@ namespace Moviesoap
 
 	void FilterWin::openEditor(Filter * filterToEdit)
 	{
-		// pause play
-		// if (Moviesoap::p_input)
-		// 	input_Control( Moviesoap::p_input, INPUT_SET_STATE, PAUSE_S );
 		// create filter if necessary
 		if (p_window == NULL)
 			p_window = new FilterWin;
@@ -52,12 +49,8 @@ namespace Moviesoap
 	/* Set p_editingFilter. Load filter in filter frame. */
 	void FilterWin::editFilter(Filter * filterToEdit)
 	{
-		if (filterToEdit)
-			filter = *filterToEdit;
-		else
-			filter.nullify();
 		// pass filter to pane(s)
-		filterFrame->load(&filter);
+		filterFrame->load();
 		// set visible pane
 		setCurrentWidget(filterFrame);
 	}
@@ -82,8 +75,8 @@ namespace Moviesoap
 	void FilterWin::editMod(int i)
 	{
 		// ensure i corresponds to a mod in modList
-		if (i >= 0 && i < filter.modList.size()) {
-			list<Mod>::iterator iter = filter.modList.begin();
+		if (i >= 0 && i < Moviesoap::p_loadedFilter->modList.size()) {
+			list<Mod>::iterator iter = Moviesoap::p_loadedFilter->modList.begin();
 			advance(iter, i);
 			editMod(&*iter);
 		}
@@ -91,22 +84,22 @@ namespace Moviesoap
 
 	void FilterWin::deleteMod(int i) {
 		// ensure i corresponds to a mod in modList
-		if (i >= 0 && i < filter.modList.size()) {
+		if (i >= 0 && i < Moviesoap::p_loadedFilter->modList.size()) {
 			// get iterator pointing to mod to be deleted
-			list<Mod>::iterator iter = filter.modList.begin();
+			list<Mod>::iterator iter = Moviesoap::p_loadedFilter->modList.begin();
 			advance(iter, i);
 			// delete mod
-			filter.modList.erase(iter);
+			Moviesoap::p_loadedFilter->modList.erase(iter);
 			// update mod list widget
-			filterFrame->refreshModListWidget(&filter);
+			filterFrame->refreshModListWidget(Moviesoap::p_loadedFilter);
 		}
 	}
 
-	void FilterWin::refreshModListWidget() { filterFrame->refreshModListWidget(&filter); }
+	void FilterWin::refreshModListWidget() { filterFrame->refreshModListWidget(Moviesoap::p_loadedFilter); }
 
 	void FilterWin::toFilterFrame()
 	{
-		filterFrame->load(&filter);
+		filterFrame->load();
 		setCurrentWidget(filterFrame);
 	}
 
@@ -131,22 +124,16 @@ namespace Moviesoap
 	void FilterWin::addModToModListIfNew()
 	{
 		if (p_mod == &mod) {
-			filter.modList.push_back(mod);
-			p_mod = &filter.modList.back();
-			filter.modList.sort();
+			Moviesoap::p_loadedFilter->modList.push_back(mod);
+			p_mod = &Moviesoap::p_loadedFilter->modList.back();
+			Moviesoap::p_loadedFilter->modList.sort();
 		}
-	}
-
-	void FilterWin::updateLoadedFilter() {
-		if (Moviesoap::p_loadedFilter == NULL)
-			Moviesoap::p_loadedFilter = new Moviesoap::Filter;
-		*Moviesoap::p_loadedFilter = filter;
 	}
 
 	void FilterWin::save()
 	{
 		// Attempt save. If fail, perform 'save as'
-		if ( filter.filepath.empty() || filter.save() )
+		if ( Moviesoap::p_loadedFilter->filepath.empty() || Moviesoap::p_loadedFilter->save() )
 			saveAs();
 	}
 
@@ -160,12 +147,12 @@ namespace Moviesoap
 			return;
 		// set filepath on filter obj
 		char * cstr = (char *) fileName.toAscii().data();
-		filter.filepath = cstr;
+		Moviesoap::p_loadedFilter->filepath = cstr;
 		// force file extension (*.cln)
 		if ( !fileName.endsWith(QString(MOVIESOAP_FILE_EXT)) )
-			filter.filepath += MOVIESOAP_FILE_EXT;
+			Moviesoap::p_loadedFilter->filepath += MOVIESOAP_FILE_EXT;
 		// save
-		filter.save();
+		Moviesoap::p_loadedFilter->save();
 	}
 
 	/* Set play time, play, hide this, show concludePreviewButton */
@@ -179,17 +166,14 @@ namespace Moviesoap
 			p_mod = this->p_mod;
 		// dump filter frame to Filter
 		filterFrame->dump();
-		// dump filter being edited to liveness
-		holdingBayForLoadedFilter = Moviesoap::p_loadedFilter;
-		Moviesoap::p_loadedFilter = &filter;
 		// calculate start of preview
 		mtime_t t_offset = 1000000;
 		mtime_t start = p_mod->startTime();
 		start = (start > t_offset) ? start - t_offset : 0;
 		// change the time and control
-		// vlc_mutex_lock(&Moviesoap::lock); // todo del?
+		vlc_mutex_lock(&Moviesoap::lock); // todo del?
 		var_SetTime( p_input, "time", start );
-		// vlc_mutex_unlock(&Moviesoap::lock); // todo del?
+		vlc_mutex_unlock(&Moviesoap::lock); // todo del?
 		playlist_Control( Moviesoap::p_playlist, PLAYLIST_PLAY, false );
 		hide();
 		concludePreviewButton->show();
@@ -200,7 +184,6 @@ namespace Moviesoap
 	{
 		show();
 		playlist_Control( Moviesoap::p_playlist, PLAYLIST_PAUSE, false );
-		Moviesoap::p_loadedFilter = holdingBayForLoadedFilter;
 	}
 
 	/* Set intial values for new mod. */

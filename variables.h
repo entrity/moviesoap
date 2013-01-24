@@ -1,6 +1,6 @@
 #ifndef MOVIESOAP_VARIABLES_H
 #define MOVIESOAP_VARIABLES_H
-#define MOVIESOAP_VERSION "0.3.0"
+#define MOVIESOAP_VERSION "0.3.1"
 #define MOVIESOAP_FILTER_VARNAME "moviesoap-filter"
 #define MOVIESOAP_BLACKOUT_VARNAME "moviesoap-blackout-config"
 #define MOVIESOAP_TOLERANCE_COUNT 6
