@@ -13,6 +13,7 @@ namespace Moviesoap
 	class Filter;
 	class Mod;
 	class FilterWin;
+	class ModListWidget;
 
 	class FilterFrame : public QFrame
 	{
@@ -20,7 +21,7 @@ namespace Moviesoap
 	protected:
 		QLineEdit
 			*titleText, *yearText, *isbnText, *creatorText, *previewOffsetText, *quickCreateOffsetText;
-		QListWidget *modListWidget;
+		ModListWidget *modListWidget;
 		FilterWin * filterWin;
 		Mod * p_quickCreatedMod;
 	public:

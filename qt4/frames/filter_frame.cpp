@@ -191,7 +191,7 @@ namespace Moviesoap
 		frame = newDiv(hbox);
 		frameVLayout = new QVBoxLayout;
 		frameVLayout->addWidget(new QLabel("Edits"));
-		modListWidget = new QListWidget;
+		modListWidget = new ModListWidget(this);
 		connect(modListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(editModClicked()));
 		frameVLayout->addWidget(modListWidget);
 		hbox->addLayout(frameVLayout);

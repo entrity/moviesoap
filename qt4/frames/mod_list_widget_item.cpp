@@ -1,6 +1,9 @@
 #include "mod_list_widget_item.hpp"
 #include "../../filter.hpp"
 #include "gui_helpers.hpp"
+#include "filter_frame.hpp"
+
+#include <QKeyEvent>
 
 #include <string>
 #include <iostream>
@@ -38,6 +41,13 @@ namespace Moviesoap
 			ss << p_mod->description.substr(0,30);
 		// set text
 		setText( QString(ss.str().c_str()) );
+	}
+
+	void ModListWidget::keyReleaseEvent(QKeyEvent * p_evt)
+	{
+		if (p_evt->key() == Qt::Key_Delete) {
+			parent->delModClicked();
+		}
 	}
 
 }
