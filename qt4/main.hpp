@@ -17,25 +17,27 @@ class MainInterface;
 class QMenu;
 class QAction;
 class QCheckBox;
+class QLineEdit;
 
 // MISC (main.cpp)
 namespace Moviesoap 
 {
 	class Menu;
+	class FilterWin;
 	// functions
 	extern string saveDir();
 	extern string extractDir(const string& str);
 	extern bool isActiveSelected();
-	extern bool isUltraQuickModCreationEnabled();
 	extern Mod * addEditingModToModListIfNew();
-	extern void defaultizeMod(Mod * p_mod); // loads times and title from p_input
+	extern void defaultizeMod(Mod * p_mod, uint32_t start_offset_backward=0, uint32_t stop_offset_forward_from_start=MOVIESOAP_QUICK_MOD_CREATION_STOP_OFFSET_DEFAULT); // loads times and title from p_input
+	extern void quickCreateMod(uint8_t mode);
 	// variables
 	extern const char * toleranceLabels[];
 	extern Mod newMod;
 	extern Mod * p_editingMod;
+	extern Mod * p_quickCreatedMod;
 	extern Moviesoap::Menu * p_GuiMenu; // this is the 'Moviesoap' menu in the main menu bar
-	extern QAction * p_actionActive; // pointer to the checkbox in the QMenu
-	extern QCheckBox * p_ultraQuickModCheckbox; // pointer to the checkbox which enables ultra-quick mod creation
+	extern FilterWin *p_window; // pointer to FilterWin gui
 }
 
 // CALLBACKS (callbacks.cpp)

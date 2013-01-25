@@ -170,13 +170,7 @@ namespace Moviesoap
 	void FilterFrame::quickCreateMod(uint8_t mode)
 	{
 		if (Moviesoap::p_input) {
-			uint32_t offset = parseTime(quickCreateOffsetText, 100);
-			uint32_t now_cs = MoviesoapGetNow(Moviesoap::p_input) / MOVIESOAP_MOD_TIME_FACTOR;
-			uint32_t start_cs = (offset > now_cs) ? 0 : now_cs - offset;
-			uint32_t stop_cs = start_cs + 100;
-			p_quickCreatedMod = new Mod(mode, start_cs, stop_cs);
-			Moviesoap::p_loadedFilter->modList.push_back(*p_quickCreatedMod);
-			refreshModListWidget(Moviesoap::p_loadedFilter);
+			Moviesoap::quickCreateMod(mode);
 		} else {
 			QMessageBox::information( this,
 					QString("No action taken"),
@@ -230,10 +224,10 @@ namespace Moviesoap
 		connect(quickMuteModButton, SIGNAL(clicked()), this, SLOT(quickCreateMuteMod()));
 		connect(quickBlackModButton, SIGNAL(clicked()), this, SLOT(quickCreateBlackoutMod()));
 		addLabel(hbox, " offset backward from now:");
-		quickCreateOffsetText = addText(hbox, "00:00:01.0");
+		parent->p_quickCreateOffsetText = addText(hbox, "00:00:01.0");
 		hbox = newRow(frameVLayout);
-		Moviesoap::p_ultraQuickModCheckbox = new QCheckBox(tr("enable ultra-quick mod creation (hotkeys create mods)"));
-		hbox->addWidget(Moviesoap::p_ultraQuickModCheckbox);
+		parent->p_ultraQuickModCheckbox = new QCheckBox(tr("enable ultra-quick mod creation (hotkeys create mods)"));
+		hbox->addWidget(parent->p_ultraQuickModCheckbox);
 		layout->addWidget(frame);
 		// film div
 		frameVLayout = new QVBoxLayout;

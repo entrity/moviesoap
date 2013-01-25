@@ -7,6 +7,7 @@
 #include "../variables.h"
 #include "../filter-chain.h"
 #include "../updates.hpp"
+#include "frames/filter_win.hpp"
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
@@ -213,10 +214,11 @@ namespace Moviesoap
 	/* Captures keypress event and creates/edits a corresponding mod. These key captures only take place if the main VLC window is the selected window (at least, the Moviesoap windows must not be the selected window.) */
     static MOVIESOAP_CALLBACK(CB_KeyEvent)
     {
-    	if (Moviesoap::p_input && Moviesoap::isUltraQuickModCreationEnabled()) {
+    	if (Moviesoap::p_input && Moviesoap::p_window && Moviesoap::p_window->isUltraQuickModCreationEnabled()) {
     		// handle mod mode values
     		switch( newval.i_int ) {
     			case 's':
+
     				break;
     			case 'm':
     				break;

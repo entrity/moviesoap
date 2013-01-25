@@ -5,8 +5,11 @@
 #include "../main.hpp"
 #include "../../filter.hpp"
 #include "conclude_preview_button.hpp"
+#include "gui_helpers.hpp"
 
 #include <vlc_playlist.h>
+
+#include <QCheckBox>
 
 #include <iostream>
 #include <sstream>
@@ -15,7 +18,6 @@ using namespace std;
 namespace Moviesoap
 {
 	/* Init vars */
-	FilterWin * FilterWin::p_window = NULL;
 
 	/* Constructor */
 	FilterWin::FilterWin() : QStackedWidget(NULL)
@@ -116,7 +118,7 @@ namespace Moviesoap
 		#ifdef MSDEBUG1
 			msg_Info( p_obj, "calling blackoutFrame->load" );
 		#endif
-		blackoutFrame->load(Moviesoap::p_editingMod);
+		blackoutFrame->load();
 		#ifdef MSDEBUG1
 			msg_Info( p_obj, "done blackoutFrame->load" );
 		#endif
@@ -224,5 +226,19 @@ namespace Moviesoap
 					Moviesoap::spawn_restart_filter();
 			}
 		}
+	}
+
+	/*** Public accessor functions ***/
+
+	/* Return true if hotkeys are enabled for creating mods */
+	bool FilterWin::isUltraQuickModCreationEnabled()
+	{
+		return p_ultraQuickModCheckbox->isChecked();
+	}
+
+	/* Return the centiseconds backward which a quick-created mod should use when calculating its start time */
+	time_t FilterWin::quickModCreationOffset()
+	{
+		return parseTime(p_quickCreateOffsetText, MOVIESOAP_QUICK_MOD_CREATION_OFFSET_DEFAULT);
 	}
 }

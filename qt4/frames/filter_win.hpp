@@ -24,11 +24,14 @@ namespace Moviesoap
 	{
 		Q_OBJECT
 	protected:
-		static FilterWin *p_window;
 		FilterFrame * filterFrame;
 		ModFrame * modFrame;
 		BlackoutFrame * blackoutFrame;
 		ConcludePreviewButton * concludePreviewButton;
+		/* widgets owned by children */
+		QAction * 	p_actionActive; // pointer to the checkbox in the QMenu
+		QCheckBox * p_ultraQuickModCheckbox; // pointer to the checkbox which enables ultra-quick mod creation
+		QLineEdit * p_quickCreateOffsetText; // pointer to QLineEdit with the offset for quick mod creation
 	public:
 		Filter blankFilter; // used to copy null fields to this->filter when new filter is wanted
 		/* Constructor */
@@ -40,6 +43,10 @@ namespace Moviesoap
 		static void openEditor(Filter *);
 		/* 'Close' this window */
 		static void hideEditor();
+		/* Return true if hotkeys are enabled for creating mods */
+		bool isUltraQuickModCreationEnabled();
+		/* Return the centiseconds backward which a quick-created mod should use when calculating its start time */
+		time_t quickModCreationOffset();
 		/* Return p_editingFilter. Appends a new mod to filter.modList() if NULL. */
 		Mod * getOrCreateEditingMod();
 		/* Show filterFrame */
@@ -66,6 +73,10 @@ namespace Moviesoap
 		void saveAs();
 		/* Swap this->filter for Moviesoap::filter, set play time, play main playing window, hide this, show concludePreviewButton */
 		void preview(Mod * p_mod);
+		//
+		friend class FilterFrame;
+		friend class ModFrame;
+		friend class BlackoutFrame;
 	public slots:
 		/* Swap back this->filter for Moviesoap::filter, pause play, hide concludePreviewButton, show this */
 		void concludePreview();

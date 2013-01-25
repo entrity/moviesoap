@@ -26,8 +26,8 @@ using namespace std;
 
 /* Return int value of number in given coordinate text field*/
 #define MOVIESOAP_GET_COORD_I(name) (name##Text->text().toInt())
-#define MOVIESOAP_DUMP_COORD_TEXT(name) (mod->mod.name = name##Text->text().toInt())
-#define MOVIESOAP_LOAD_COORD_TEXT(name) (name##Text->setText(QString::number(mod->mod.name)))
+#define MOVIESOAP_DUMP_COORD_TEXT(name) (Moviesoap::p_editingMod->mod.name = name##Text->text().toInt())
+#define MOVIESOAP_LOAD_COORD_TEXT(name) (name##Text->setText(QString::number(Moviesoap::p_editingMod->mod.name)))
 #define MOVIESOAP_LOAD_COORD_TEXT_FINT(name) (name##Text->setText(QString::number(name)))
 #define MOVIESOAP_SNAPSHOT_FNAME "moviesoap-snapshot.bmp"
 
@@ -129,13 +129,13 @@ namespace Moviesoap
 	}
 
 	/* Set GUI inputs according to Mod fields */
-	void BlackoutFrame::load(Mod * mod)
+	void BlackoutFrame::load()
 	{
 		MOVIESOAP_LOAD_COORD_TEXT(x1);
 		MOVIESOAP_LOAD_COORD_TEXT(x2);
 		MOVIESOAP_LOAD_COORD_TEXT(y1);
 		MOVIESOAP_LOAD_COORD_TEXT(y2);
-		captureAndLoadImage(mod);
+		captureAndLoadImage(Moviesoap::p_editingMod);
 	}
 
 	/* Set Mod fields according to GUI inputs */
