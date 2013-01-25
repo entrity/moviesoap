@@ -51,7 +51,7 @@ namespace Moviesoap
 
 	void Menu::newFilter() {
 		if (Moviesoap::p_loadedFilter)
-			free(Moviesoap::p_loadedFilter)
+			free(Moviesoap::p_loadedFilter);
 		Moviesoap::p_loadedFilter = new Moviesoap::Filter;
 		Moviesoap::FilterWin::openEditor(NULL);
 	}

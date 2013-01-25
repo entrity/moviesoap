@@ -148,8 +148,11 @@ namespace Moviesoap
 		list<Mod*>::iterator iter;
 		for ( iter = scheduledMods.begin(); iter != scheduledMods.end(); iter++ ) {
 			Mod * p_mod = *iter;
-			// Continue if iterator points to nothing
-			if (!p_mod) continue;
+			// remove pointer if NULL
+			if (p_mod == NULL) {
+				scheduledMods.erase( iter );
+				continue;
+			}
 			#ifdef MSDEBUG2
 			cout << "-- stop mod: " << p_mod->description << endl;
 			#endif
@@ -180,8 +183,28 @@ namespace Moviesoap
 	/* Destroy timers, and but leave active effects (mute & blackout) as they are. */
 	void Filter::KillTimers() { StopAndCleanup(false); }
 
-	// /* Load queuedMod. Stop Filter if end reached. */
-	// void Filter::loadNextMod() { loadNextMod(MoviesoapGetNow(p_input)); }
+	/* Kills timers on BLACKOUT mods in scheduledMods. (This is useful if a BLACKOUT mod is to be activated but another BLACKOUT is already running. When the first BLACKOUT expires, it would kill the effect even if the seond BLACKOUT weren't expired.) */
+	void Filter::KillBlackouts()
+	{
+		// iterate through scheduled/active mods
+		list<Mod*>::iterator iter;
+		for ( iter = scheduledMods.begin(); iter != scheduledMods.end(); iter++ ) {
+			Mod * p_mod = *iter;
+			// remove pointer if NULL
+			if (p_mod == NULL) {
+				scheduledMods.erase( iter );
+				continue;
+			}
+			if (p_mod->mod.mode == MOVIESOAP_BLACKOUT) {
+				// remove from scheduledMods
+				scheduledMods.erase( iter );
+				// destroy timer
+				vlc_timer_destroy( p_mod->timer );
+				// deactivate. just to be on the safe side
+				p_mod->deactivate();
+			}
+		}
+	}
 
 	/* Load queuedMod. Stop Filter if end reached. (Arg 'now' should be in microseconds) */
 	void Filter::loadNextMod(int64_t now)
@@ -300,6 +323,10 @@ namespace Moviesoap {
 				setMute( true );
 				break;
 			case MOVIESOAP_BLACKOUT:
+				// destroy 'stop' timer on any active blackout mod
+				if (blackout_config.b_active)
+					p_filter->KillBlackouts();
+				// set config
 				blackout_config.b_active = true;
 				blackout_config.i_x1 = mod.x1;
 				blackout_config.i_y1 = mod.y1;
