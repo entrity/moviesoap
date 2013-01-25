@@ -16,6 +16,7 @@
 #include <QPushButton>
 #include <QTranslator>
 #include <QMessageBox>
+#include <QCheckBox>
 
 #ifdef MSDEBUG1
 	// #include <cstdio> // unused
@@ -47,10 +48,12 @@ static inline QHBoxLayout *newRow(QVBoxLayout * vbox)
 	return hbox;
 }
 
-static inline void addLabelAndLine( QLayout *layout, QLineEdit **p_lineEdit, char *text )
+static inline void addLabelAndLine( QLayout *layout, QLineEdit **p_lineEdit, char *text, char *placeholder=NULL )
 {
 	layout->addWidget(new QLabel(QObject::tr(text)));
 	*p_lineEdit = new QLineEdit;
+	if (placeholder)
+		(*p_lineEdit)->setPlaceholderText(QString(placeholder));
 	layout->addWidget( *p_lineEdit );
 }
 
@@ -189,15 +192,6 @@ namespace Moviesoap
 		QHBoxLayout *hbox;
 		QGridLayout *frameGridLayout;
 		QFrame *frame;
-		// film div
-		frameVLayout = new QVBoxLayout;
-		frame = newDiv(frameVLayout);
-		hbox = newRow(frameVLayout);
-		addLabelAndLine(hbox, &titleText, "Title");
-		hbox = newRow(frameVLayout);
-		addLabelAndLine(hbox, &yearText, "Year");
-		addLabelAndLine(hbox, &isbnText, "Isbn");
-		layout->addWidget(frame);
 		// mods div (left)
 		hbox = new QHBoxLayout;
 		frame = newDiv(hbox);
@@ -224,9 +218,11 @@ namespace Moviesoap
 		hbox->addLayout(frameVLayout);
 		layout->addWidget(frame);
 		// quick mod creation div
-		addLabel(layout, "Quick-create mod:");
-		hbox = new QHBoxLayout;
-		frame = newDiv(hbox);
+		frameVLayout = new QVBoxLayout;
+		frame = newDiv(frameVLayout);
+		hbox = newRow(frameVLayout);
+		addLabel(hbox, "Quick-create mod");
+		hbox = newRow(frameVLayout);
 		QPushButton * quickSkipModButton = addButton(hbox, "Ski&p");
 		QPushButton * quickMuteModButton = addButton(hbox, "&Mute");
 		QPushButton * quickBlackModButton = addButton(hbox, "&Black");
@@ -235,12 +231,22 @@ namespace Moviesoap
 		connect(quickBlackModButton, SIGNAL(clicked()), this, SLOT(quickCreateBlackoutMod()));
 		addLabel(hbox, " offset backward from now:");
 		quickCreateOffsetText = addText(hbox, "00:00:01.0");
+		hbox = newRow(frameVLayout);
+		Moviesoap::p_ultraQuickModCheckbox = new QCheckBox(tr("enable ultra-quick mod creation (hotkeys create mods)"));
+		hbox->addWidget(Moviesoap::p_ultraQuickModCheckbox);
 		layout->addWidget(frame);
-		// creation div
+		// film div
 		frameVLayout = new QVBoxLayout;
 		frame = newDiv(frameVLayout);
 		hbox = newRow(frameVLayout);
-		addLabelAndLine(hbox, &creatorText, "Filter maker");
+		addLabelAndLine(hbox, &titleText, "Title");
+		hbox = newRow(frameVLayout);
+		addLabelAndLine(hbox, &yearText, "Year");
+		addLabelAndLine(hbox, &isbnText, "Isbn");
+		hbox = newRow(frameVLayout);
+		addLabelAndLine(hbox, &creatorText, "Filter maker", "your name");
+		layout->addWidget(frame);
+		// creation buttons row		
 		hbox = newRow(frameVLayout);
 		QPushButton * okButton = new QPushButton(tr("&Ok"));
 		QPushButton * okAndSaveButton = new QPushButton(tr("Save and O&k"));

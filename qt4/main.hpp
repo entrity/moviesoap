@@ -15,6 +15,8 @@ using namespace std;
 
 class MainInterface;
 class QMenu;
+class QAction;
+class QCheckBox;
 
 // MISC (main.cpp)
 namespace Moviesoap 
@@ -25,7 +27,10 @@ namespace Moviesoap
 	extern string extractDir(const string& str);
 	extern bool isActiveSelected();
 	extern const char * toleranceLabels[];
+	extern Mod * p_editingMod;
 	extern Moviesoap::Menu * p_GuiMenu; // this is the 'Moviesoap' menu in the main menu bar
+	extern QAction * p_actionActive; // pointer to the checkbox in the QMenu
+	extern QCheckBox * p_ultraQuickModCheckbox; // pointer to the checkbox which enables ultra-quick mod creation
 }
 
 // CALLBACKS (callbacks.cpp)

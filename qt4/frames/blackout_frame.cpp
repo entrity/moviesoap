@@ -176,8 +176,11 @@ namespace Moviesoap
 		layout->addLayout(grid);
 		// button div
 		QPushButton *okButton = new QPushButton(QString("&Ok"));
+		QPushButton *backButton = new QPushButton(QString("Back"));
 		connect( okButton, SIGNAL(clicked()), this, SLOT(okClicked()) );
+		connect( backButton, SIGNAL(clicked()), this, SLOT(okClicked()) );
 		layout->addWidget(okButton);
+		layout->addWidget(backButton);
 		// thumbnail div
 		thumbnail = new Thumbnail(tr("If you have a video open,\na blackout preview will\nappear in this box."));
 		thumbnail->setFixedSize(MOVIESOAP_THUMBNAIL_MAX_WIDTH, MOVIESOAP_THUMBNAIL_MAX_HEIGHT);

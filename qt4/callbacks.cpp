@@ -14,6 +14,8 @@
 #include <vlc_aout_volume.h>	// aout_ToggleMute
 // #include <vlc_threads.h> // temp used for vlc_timer...
 
+#include <QCheckBox>
+
 #ifndef INT64_C	// ibid.
 # define INT64_C(c)  c ## LL
 #endif
@@ -56,6 +58,8 @@ namespace Moviesoap
 	static MOVIESOAP_CALLBACK(InputCbGeneric);
 	static MOVIESOAP_CALLBACK(InputCbPosition);
 	static MOVIESOAP_CALLBACK(InputCbTime);
+	/* Other callbacks */
+	static MOVIESOAP_CALLBACK(CB_KeyEvent);
 	/* Other local prototypes */
 	static inline void StopAndStartFilter(mtime_t new_time);
 	static void* EP_StopAndStartFilter(void *data);
@@ -84,6 +88,8 @@ namespace Moviesoap
 		var_SetAddress( p_obj->p_libvlc, MOVIESOAP_BLACKOUT_VARNAME, &blackout_config );
 		// Add callback(s) to playlist
 		var_AddCallback( p_playlist, "item-change", PCB_ItemChange, NULL );
+		// Add callback(s) to root
+    	var_AddCallback( p_intf->p_libvlc, "key-pressed", CB_KeyEvent, p_intf );
 		// Check for updates
 		vlc_clone( &thread_for_http, handleUpdateCheck, p_intf, VLC_THREAD_PRIORITY_LOW );
 	}
@@ -199,6 +205,32 @@ namespace Moviesoap
 		}
 		return 0;
 	}
+
+	/*
+	 * Other callbacks
+	 */
+
+	/* Captures keypress event and creates/edits a corresponding mod. These key captures only take place if the main VLC window is the selected window (at least, the Moviesoap windows must not be the selected window.) */
+    static MOVIESOAP_CALLBACK(CB_KeyEvent)
+    {
+    	if (Moviesoap::p_ultraQuickModCheckbox && Moviesoap::p_input && Moviesoap::p_ultraQuickModCheckbox->isChecked()) {
+    		// handle mod mode values
+    		switch( newval.i_int ) {
+    			case 's':
+    				break;
+    			case 'm':
+    				break;
+    			case 'b':
+    				break;
+    		}
+    		// handle numeric values (severity)
+    		if ( newval.i_int <= 57 && newval.i_int >= 49 ) {
+
+    		}
+	    	msg_Info(p_obj, "key code: %d", newval.i_int);
+	    }
+    }
+
 
 	/*
 	 * Support functions

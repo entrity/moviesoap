@@ -7,7 +7,10 @@ namespace Moviesoap
 {
 
 	/* initialize misc fields extern'ed from main.hpp */
+	Mod * p_editingMod = NULL;
 	Moviesoap::Menu * p_GuiMenu = NULL;
+	QAction * p_actionActive = NULL;
+	QCheckBox * p_ultraQuickModCheckbox = NULL;
 
 
 	const char * toleranceLabels[] = {

@@ -20,6 +20,7 @@ namespace Moviesoap
 		QAction * actionEdit = new QAction("&Edit filter...", this);
 		QAction * actionPreferences = new QAction("&Set Tolerances...", this);
 		actionActive = new QAction("&Active...", this);
+		Moviesoap::p_actionActive = actionActive;
 		// add actions
 		addAction(actionLoad);
 		addSeparator();
