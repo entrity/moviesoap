@@ -213,7 +213,7 @@ namespace Moviesoap
 	/* Captures keypress event and creates/edits a corresponding mod. These key captures only take place if the main VLC window is the selected window (at least, the Moviesoap windows must not be the selected window.) */
     static MOVIESOAP_CALLBACK(CB_KeyEvent)
     {
-    	if (Moviesoap::p_ultraQuickModCheckbox && Moviesoap::p_input && Moviesoap::p_ultraQuickModCheckbox->isChecked()) {
+    	if (Moviesoap::p_input && Moviesoap::isUltraQuickModCreationEnabled()) {
     		// handle mod mode values
     		switch( newval.i_int ) {
     			case 's':
@@ -227,8 +227,9 @@ namespace Moviesoap
     		if ( newval.i_int <= 57 && newval.i_int >= 49 ) {
 
     		}
-	    	msg_Info(p_obj, "key code: %d", newval.i_int);
 	    }
+	    	msg_Info(p_obj, "key code: %d", newval.i_int);
+	    
     }
 
 

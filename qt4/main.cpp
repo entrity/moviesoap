@@ -3,10 +3,13 @@
 
 #include <vlc_configuration.h>
 
+#include <QCheckBox>
+
 namespace Moviesoap
 {
 
 	/* initialize misc fields extern'ed from main.hpp */
+	Mod newMod;
 	Mod * p_editingMod = NULL;
 	Moviesoap::Menu * p_GuiMenu = NULL;
 	QAction * p_actionActive = NULL;
@@ -54,5 +57,10 @@ namespace Moviesoap
 	bool isActiveSelected()
 	{
 		return p_GuiMenu ? p_GuiMenu->isActiveSelected() : false;
+	}
+
+	bool isUltraQuickModCreationEnabled()
+	{
+		return (Moviesoap::p_ultraQuickModCheckbox && Moviesoap::p_ultraQuickModCheckbox->isChecked());
 	}
 }

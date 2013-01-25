@@ -26,7 +26,9 @@ namespace Moviesoap
 	extern string saveDir();
 	extern string extractDir(const string& str);
 	extern bool isActiveSelected();
+	extern bool isUltraQuickModCreationEnabled();
 	extern const char * toleranceLabels[];
+	extern Mod newMod;
 	extern Mod * p_editingMod;
 	extern Moviesoap::Menu * p_GuiMenu; // this is the 'Moviesoap' menu in the main menu bar
 	extern QAction * p_actionActive; // pointer to the checkbox in the QMenu
