@@ -29,12 +29,8 @@ namespace Moviesoap
 		ModFrame * modFrame;
 		BlackoutFrame * blackoutFrame;
 		ConcludePreviewButton * concludePreviewButton;
-		void defaultizeMod(Mod * p_mod); // loads times and title from p_input
 	public:
 		Filter blankFilter; // used to copy null fields to this->filter when new filter is wanted
-		Mod mod; // extra mod for editing in gui if user is adding new mod
-		Mod blankMod; // used to copy null fields to this->mod when new mod is wanted
-		Mod * p_mod; // pointer to mod currently being edited. Must point to either this->mod or a mod in filter.modList
 		/* Constructor */
 		FilterWin();
 		/* Destructor */
@@ -62,8 +58,6 @@ namespace Moviesoap
 		void deleteMod(int i);
 		/* Refreshes contents of list of mods */
 		void refreshModListWidget();
-		/* If p_mod points to a new mod, add it to filter.modList and sort list */
-		void addModToModListIfNew();
 		/* updates Moviesoap::loadedFilter */
 		void updateLoadedFilter();
 		/* call loadedFilter->save() */

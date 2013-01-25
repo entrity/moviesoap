@@ -22,11 +22,14 @@ class QCheckBox;
 namespace Moviesoap 
 {
 	class Menu;
-
+	// functions
 	extern string saveDir();
 	extern string extractDir(const string& str);
 	extern bool isActiveSelected();
 	extern bool isUltraQuickModCreationEnabled();
+	extern Mod * addEditingModToModListIfNew();
+	extern void defaultizeMod(Mod * p_mod); // loads times and title from p_input
+	// variables
 	extern const char * toleranceLabels[];
 	extern Mod newMod;
 	extern Mod * p_editingMod;

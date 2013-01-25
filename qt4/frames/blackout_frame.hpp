@@ -23,7 +23,7 @@ namespace Moviesoap
 	public:
 		BlackoutFrame(FilterWin *);
 		void load(Mod *);
-		void dump(Mod *);
+		void dump();
 		void loadImageFromFile();
 		void loadImageFromBlock(block_t *);
 		void captureAndLoadImage(Mod *);

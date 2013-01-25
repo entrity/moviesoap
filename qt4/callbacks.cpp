@@ -227,9 +227,8 @@ namespace Moviesoap
     		if ( newval.i_int <= 57 && newval.i_int >= 49 ) {
 
     		}
-	    }
 	    	msg_Info(p_obj, "key code: %d", newval.i_int);
-	    
+	    }
     }
 
 

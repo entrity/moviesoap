@@ -114,7 +114,7 @@ namespace Moviesoap
 	void BlackoutFrame::okClicked()
 	{
 		// update p_editingMod
-		dump(filterWin->p_mod);
+		dump();
 		// show mod pane
 		filterWin->toModFrame();
 	}
@@ -139,8 +139,9 @@ namespace Moviesoap
 	}
 
 	/* Set Mod fields according to GUI inputs */
-	void BlackoutFrame::dump(Mod * mod)
+	void BlackoutFrame::dump()
 	{
+		Mod * mod = Moviesoap::p_editingMod;
 		int
 			x1 = MOVIESOAP_GET_COORD_I(x1),
 			x2 = MOVIESOAP_GET_COORD_I(x2),

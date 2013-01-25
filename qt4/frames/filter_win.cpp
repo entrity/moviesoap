@@ -18,7 +18,7 @@ namespace Moviesoap
 	FilterWin * FilterWin::p_window = NULL;
 
 	/* Constructor */
-	FilterWin::FilterWin() : QStackedWidget(NULL), p_mod(NULL)
+	FilterWin::FilterWin() : QStackedWidget(NULL)
 	{
 		setWindowTitle(QString("Moviesoap Filter Editor"));
 		filterFrame = new FilterFrame(this);
@@ -62,13 +62,13 @@ namespace Moviesoap
 	{
 		// initialize null mod if arg == NULL
 		if (!modToLoad) {
-			defaultizeMod(&mod);
-			p_mod = &mod;
+			Moviesoap::defaultizeMod(&Moviesoap::newMod);
+			Moviesoap::p_editingMod = &Moviesoap::newMod;
 		} else {
-			p_mod = modToLoad;
+			Moviesoap::p_editingMod = modToLoad;
 		}
 		// pass mod to pane
-		modFrame->load(p_mod);
+		modFrame->load( Moviesoap::p_editingMod );
 		// set visible pane
 		setCurrentWidget(modFrame);
 	}
@@ -107,7 +107,7 @@ namespace Moviesoap
 
 	void FilterWin::toModFrame()
 	{
-		modFrame->load(p_mod);
+		modFrame->load(Moviesoap::p_editingMod);
 		setCurrentWidget(modFrame);
 	}
 	
@@ -116,20 +116,11 @@ namespace Moviesoap
 		#ifdef MSDEBUG1
 			msg_Info( p_obj, "calling blackoutFrame->load" );
 		#endif
-		blackoutFrame->load(p_mod);
+		blackoutFrame->load(Moviesoap::p_editingMod);
 		#ifdef MSDEBUG1
 			msg_Info( p_obj, "done blackoutFrame->load" );
 		#endif
 		setCurrentWidget(blackoutFrame);
-	}
-
-	void FilterWin::addModToModListIfNew()
-	{
-		if (p_mod == &mod) {
-			Moviesoap::p_loadedFilter->modList.push_back(mod);
-			p_mod = &Moviesoap::p_loadedFilter->modList.back();
-			Moviesoap::p_loadedFilter->modList.sort();
-		}
 	}
 
 	void FilterWin::save()
@@ -158,14 +149,16 @@ namespace Moviesoap
 	}
 
 	/* Set play time, play, hide this, show concludePreviewButton */
-	void FilterWin::preview(Mod * p_mod )
+	void FilterWin::preview( Mod * p_mod )
 	{
 		// require input thread and playlist
 		if (p_input == NULL || p_playlist == NULL)
 			return;
-		// ensure p_mod
+		// require p_mod
 		if (p_mod == NULL)
-			p_mod = this->p_mod;
+			p_mod = Moviesoap::p_editingMod;
+		if (p_mod == NULL)
+			return;
 		// dump filter frame to Filter
 		filterFrame->dump();
 		// calculate start of preview
@@ -186,24 +179,6 @@ namespace Moviesoap
 	{
 		show();
 		playlist_Control( Moviesoap::p_playlist, PLAYLIST_PAUSE, false );
-	}
-
-	/* Set intial values for new mod. */
-	void FilterWin::defaultizeMod(Mod * p_mod)
-	{
-		if (Moviesoap::p_input) {
-			p_mod->mod.start = MoviesoapGetNow(Moviesoap::p_input) / MOVIESOAP_MOD_TIME_FACTOR;
-			p_mod->mod.stop = p_mod->mod.start + (100);
-			p_mod->mod.title = var_GetInteger(Moviesoap::p_input, "title");
-		} else {
-			p_mod->mod.start = 0;
-			p_mod->mod.stop = 100;
-			p_mod->mod.title = MOVIESOAP_UNIVERSAL_TITLE;
-		}
-		p_mod->mod.mode = MOVIESOAP_SKIP;
-		p_mod->mod.category = MOVIESOAP_CAT_NONE;
-		p_mod->mod.severity = MOVIESOAP_TOLERANCE_COUNT;
-		p_mod->description = "";
 	}
 
 	void loadFilterDialogue(QWidget * parent)

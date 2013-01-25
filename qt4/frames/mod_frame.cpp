@@ -57,22 +57,22 @@ namespace Moviesoap
 	void ModFrame::okClicked()
 	{
 		// dump data to editingMod (appending new one to modList if necessary)
-		dump( filterWin->p_mod );
-		// add new mod to filter.modList (if this is new)
-		filterWin->addModToModListIfNew();
+		dump( Moviesoap::p_editingMod );
+		// add new mod to modList (if this is new)
+		Moviesoap::addEditingModToModListIfNew();
 		// return to filterFrame view
 		filterWin->toFilterFrame();
 	}
 
 	void ModFrame::blackoutClicked()
 	{
-		dump( filterWin->p_mod );
+		dump( Moviesoap::p_editingMod );
 		filterWin->toBlackoutFrame();
 	}
 
 	void ModFrame::previewClicked() {
-		dump( filterWin->p_mod );
-		filterWin->preview( filterWin->p_mod );
+		dump( Moviesoap::p_editingMod );
+		filterWin->preview( Moviesoap::p_editingMod );
 	}
 
 	/* Constructor */
