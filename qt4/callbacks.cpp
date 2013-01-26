@@ -5,7 +5,6 @@
 #include "config.hpp"
 #include "../filter.hpp"
 #include "../variables.h"
-#include "../filter-chain.h"
 #include "../updates.hpp"
 #include "frames/filter_win.hpp"
 
@@ -13,7 +12,6 @@
 #include <vlc_interface.h>
 #include <vlc_modules.h>
 #include <vlc_aout_volume.h>	// aout_ToggleMute
-// #include <vlc_threads.h> // temp used for vlc_timer...
 
 #include <QCheckBox>
 
@@ -39,7 +37,6 @@ namespace Moviesoap
 	playlist_t * p_playlist = NULL;
 	input_thread_t * p_input = NULL;
 	Filter * p_loadedFilter = NULL;
-	filter_chain_t * p_filter_chain = NULL; // chain holds blackout video filter
 	audio_volume_t volume;
 	vlc_mutex_t lock;
 	moviesoap_blackout_config_t blackout_config;
@@ -53,7 +50,6 @@ namespace Moviesoap
 	
 	/* Playlist callbacks */
 	static MOVIESOAP_CALLBACK(PCB_ItemChange);
-	static MOVIESOAP_CALLBACK(PCB_TryToAttachFilter);
 	/* Input callbacks */
 	static MOVIESOAP_CALLBACK(InputCbState);
 	static MOVIESOAP_CALLBACK(InputCbGeneric);
@@ -106,14 +102,6 @@ namespace Moviesoap
 		if (newval.p_address != oldval.p_address) {
 			spawn_set_p_input(true);
 		}
-		return MOVIESOAP_SUCCESS;
-	}
-
-	static MOVIESOAP_CALLBACK(PCB_TryToAttachFilter)
-	{
-		// spawn new thread to handle blackout and removal of this callback
-		msg_Info( p_obj, "try to attach filter");
-		vlc_clone( &thread_for_item_change_cb, EP_EnableBlackout, NULL, VLC_THREAD_PRIORITY_LOW );
 		return MOVIESOAP_SUCCESS;
 	}
 
@@ -292,30 +280,6 @@ namespace Moviesoap
 		}
 	}
 
-	/* If vout thread exists on input thread, add blackout filter to vout and remove item-change callback */
-	static void* EP_EnableBlackout(void *data)
-	{
-		bool b_no_vout_thread_found = true;
-		if (p_input) {
-			if ( vout_thread_exists( p_input ) ) {
-				b_no_vout_thread_found = false;
-				vlc_mutex_lock( &lock );
-				if (!p_blackout_filter) {
-					var_DelCallback( p_playlist, "item-change", PCB_TryToAttachFilter, NULL );
-					add_blackout_filter_to_input( p_input );
-					#ifdef MSDEBUG1
-						msg_Info(p_obj, "Moviesoap Blackout added to filter chain.");
-					#endif
-				}
-				vlc_mutex_unlock( &lock );
-				return NULL;
-			}
-		}
-		if (b_no_vout_thread_found && p_blackout_filter)
-			p_blackout_filter = NULL;
-		return NULL;
-	}
-
 	/* Sets Moviesoap::p_input */
 	static void* EP_SetMoviesoapP_Input(void *data)
 	{
@@ -345,8 +309,6 @@ namespace Moviesoap
 			// start filter object if one exists
 			if (Moviesoap::p_loadedFilter) Moviesoap::p_loadedFilter->Restart();
 		}
-		// Add callback to enable blackout
-		var_AddCallback( p_playlist, "item-change", PCB_TryToAttachFilter, NULL );
 		return p_input;
 	}
 

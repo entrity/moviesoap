@@ -41,7 +41,6 @@ MOVIESOAP_GUI_HPPS = \
 	../../moviesoap/variables.h \
 	../../moviesoap/filter.hpp \
 	../../moviesoap/updates.hpp \
-	../../moviesoap/filter-chain.h \
 	../../moviesoap/qt4/frames/preferences.hpp \
 	../../moviesoap/qt4/frames/filter_win.hpp \
 	../../moviesoap/qt4/frames/filter_frame.hpp	\
