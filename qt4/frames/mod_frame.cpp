@@ -21,7 +21,7 @@ namespace Moviesoap
 		mod->mod.stop = parseTime(stopText);
 		mod->mod.title = parseInt(titleText);
 		// severity
-		mod->mod.severity = getChecked(severityRadios, MOVIESOAP_TOLERANCE_COUNT-1);
+		mod->mod.severity = getChecked(severityRadios, MOVIESOAP_TOLERANCE_COUNT-1) + 1;
 		// category
 		mod->mod.category = categoryBox->currentIndex();
 		// description
@@ -41,8 +41,11 @@ namespace Moviesoap
 		stopText->setText(buffer);
 		titleText->setText(QString::number(mod->mod.title));
 		// severity
-		if (mod->mod.severity >= 0 && mod->mod.severity < MOVIESOAP_TOLERANCE_COUNT)
-			severityRadios[mod->mod.severity]->setChecked(true);
+		if (mod->mod.severity > 0) {
+			if (mod->mod.severity >= MOVIESOAP_TOLERANCE_COUNT - 1)
+				mod->mod.severity = MOVIESOAP_TOLERANCE_COUNT - 1;
+			severityRadios[mod->mod.severity - 1]->setChecked(true);
+		}
 		// category
 		if (mod->mod.category >= 0 && mod->mod.category < MOVIESOAP_CAT_COUNT)
 			categoryBox->setCurrentIndex(mod->mod.category);

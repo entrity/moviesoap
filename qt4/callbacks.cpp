@@ -217,22 +217,22 @@ namespace Moviesoap
     	if (Moviesoap::p_input && Moviesoap::p_window && Moviesoap::p_window->isUltraQuickModCreationEnabled()) {
     		// handle mod mode values
     		switch( newval.i_int ) {
-    			case 's':
-
+    			case 'i':
+    				quickCreateMod(MOVIESOAP_SKIP);
     				break;
-    			case 'm':
+    			case 'u':
+    				quickCreateMod(MOVIESOAP_MUTE);
     				break;
-    			case 'b':
+    			case 'y':
+    				quickCreateMod(MOVIESOAP_BLACKOUT);
     				break;
     		}
     		// handle numeric values (severity)
-    		if ( newval.i_int <= 57 && newval.i_int >= 49 ) {
-
+    		if ( p_quickCreatedMod && newval.i_int <= 57 && newval.i_int >= 49 ) {
+    			p_quickCreatedMod->mod.severity = newval.i_int - 48;
     		}
-	    	msg_Info(p_obj, "key code: %d", newval.i_int);
 	    }
     }
-
 
 	/*
 	 * Support functions
