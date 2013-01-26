@@ -1,0 +1,5 @@
+If there is a file called vlc.patch in this directory, then you should apply it from the directory ABOVE your vlc root directory. To do so automatically, you can just run ./apply_patch.sh.
+
+If there is NOT a file called vlc.patch in this directory (or if you find that the patch file just doesn't work), then you should build your own patch. You can use the other .sh files as helpers:
+ - 1. run ./copy_patchable_files.sh. This will create a directory tree beneath this directory, containing the files which you must manually edit to resemble their matchint *.cpy files.
+ - 2. run ./build_patch after.sh you have manually edited the files in the directory tree beneath this one.

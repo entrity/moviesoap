@@ -1,6 +1,6 @@
 #ifndef MOVIESOAP_VARIABLES_H
 #define MOVIESOAP_VARIABLES_H
-#define MOVIESOAP_VERSION "0.3.0"
+#define MOVIESOAP_VERSION "0.2.0"
 #define MOVIESOAP_FILTER_VARNAME "moviesoap-filter"
 #define MOVIESOAP_BLACKOUT_VARNAME "moviesoap-blackout-config"
 #define MOVIESOAP_TOLERANCE_COUNT 6
@@ -10,6 +10,8 @@
 #define MOVIESOAP_MOD_TIME_TO_US(mod_time) (mod_time * MOVIESOAP_MOD_TIME_FACTOR) // calculate microseconds equivalent of moviesoap_mod_t times
 #define MOVIESOAP_NO_RESTART -1
 #define MOVIESOAP_UNIVERSAL_TITLE -1 // if a mod has a title of -1, it can be queued for any title on the DVD
+#define MOVIESOAP_QUICK_MOD_CREATION_OFFSET_DEFAULT 100
+#define MOVIESOAP_QUICK_MOD_CREATION_STOP_OFFSET_DEFAULT 100
 
 #ifndef HAVE_POLL
 	struct pollfd;

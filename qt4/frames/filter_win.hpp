@@ -1,6 +1,11 @@
+#ifndef MOVIESOAP_FILTER_WIN_H
+#define MOVIESOAP_FILTER_WIN_H
+
 #include "../../filter.hpp"
 #include <QStackedWidget>
 #include <QFrame>
+#include <QFileDialog>
+#include <QMessageBox>
 
 namespace Moviesoap
 {
@@ -19,19 +24,16 @@ namespace Moviesoap
 	{
 		Q_OBJECT
 	protected:
-		static FilterWin *p_window;
 		FilterFrame * filterFrame;
 		ModFrame * modFrame;
 		BlackoutFrame * blackoutFrame;
 		ConcludePreviewButton * concludePreviewButton;
-		Filter * holdingBayForLoadedFilter; // holds Moviesoap::p_loadedFilter during Mod previews
-		void defaultizeMod(Mod * p_mod); // loads times and title from p_input
+		/* widgets owned by children */
+		QAction * 	p_actionActive; // pointer to the checkbox in the QMenu
+		QCheckBox * p_ultraQuickModCheckbox; // pointer to the checkbox which enables ultra-quick mod creation
+		QLineEdit * p_quickCreateOffsetText; // pointer to QLineEdit with the offset for quick mod creation
 	public:
-		Filter filter;
 		Filter blankFilter; // used to copy null fields to this->filter when new filter is wanted
-		Mod mod; // extra mod for editing in gui if user is adding new mod
-		Mod blankMod; // used to copy null fields to this->mod when new mod is wanted
-		Mod * p_mod; // pointer to mod currently being edited. Must point to either this->mod or a mod in filter.modList
 		/* Constructor */
 		FilterWin();
 		/* Destructor */
@@ -41,6 +43,10 @@ namespace Moviesoap
 		static void openEditor(Filter *);
 		/* 'Close' this window */
 		static void hideEditor();
+		/* Return true if hotkeys are enabled for creating mods */
+		bool isUltraQuickModCreationEnabled();
+		/* Return the centiseconds backward which a quick-created mod should use when calculating its start time */
+		time_t quickModCreationOffset();
 		/* Return p_editingFilter. Appends a new mod to filter.modList() if NULL. */
 		Mod * getOrCreateEditingMod();
 		/* Show filterFrame */
@@ -59,8 +65,6 @@ namespace Moviesoap
 		void deleteMod(int i);
 		/* Refreshes contents of list of mods */
 		void refreshModListWidget();
-		/* If p_mod points to a new mod, add it to filter.modList and sort list */
-		void addModToModListIfNew();
 		/* updates Moviesoap::loadedFilter */
 		void updateLoadedFilter();
 		/* call loadedFilter->save() */
@@ -69,8 +73,16 @@ namespace Moviesoap
 		void saveAs();
 		/* Swap this->filter for Moviesoap::filter, set play time, play main playing window, hide this, show concludePreviewButton */
 		void preview(Mod * p_mod);
+		//
+		friend class FilterFrame;
+		friend class ModFrame;
+		friend class BlackoutFrame;
 	public slots:
 		/* Swap back this->filter for Moviesoap::filter, pause play, hide concludePreviewButton, show this */
 		void concludePreview();
 	};
+
+	void loadFilterDialogue(QWidget * parent);
 }
+
+#endif

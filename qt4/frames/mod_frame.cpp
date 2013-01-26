@@ -17,11 +17,11 @@ namespace Moviesoap
 		// mode
 		mod->mod.mode = getChecked(modeRadios, MOVIESOAP_MOD_MODE_COUNT);
 		// times
-		mod->mod.start = strptime(startText->text().toAscii().data());
-		mod->mod.stop = strptime(stopText->text().toAscii().data());
-		mod->mod.title = titleText->text().toInt();
+		mod->mod.start = parseTime(startText);
+		mod->mod.stop = parseTime(stopText);
+		mod->mod.title = parseInt(titleText);
 		// severity
-		mod->mod.severity = getChecked(severityRadios, MOVIESOAP_TOLERANCE_COUNT-1);
+		mod->mod.severity = getChecked(severityRadios, MOVIESOAP_TOLERANCE_COUNT-1) + 1;
 		// category
 		mod->mod.category = categoryBox->currentIndex();
 		// description
@@ -41,8 +41,11 @@ namespace Moviesoap
 		stopText->setText(buffer);
 		titleText->setText(QString::number(mod->mod.title));
 		// severity
-		if (mod->mod.severity >= 0 && mod->mod.severity < MOVIESOAP_TOLERANCE_COUNT)
-			severityRadios[mod->mod.severity]->setChecked(true);
+		if (mod->mod.severity > 0) {
+			if (mod->mod.severity >= MOVIESOAP_TOLERANCE_COUNT - 1)
+				mod->mod.severity = MOVIESOAP_TOLERANCE_COUNT - 1;
+			severityRadios[mod->mod.severity - 1]->setChecked(true);
+		}
 		// category
 		if (mod->mod.category >= 0 && mod->mod.category < MOVIESOAP_CAT_COUNT)
 			categoryBox->setCurrentIndex(mod->mod.category);
@@ -57,22 +60,22 @@ namespace Moviesoap
 	void ModFrame::okClicked()
 	{
 		// dump data to editingMod (appending new one to modList if necessary)
-		dump( filterWin->p_mod );
-		// add new mod to filter.modList (if this is new)
-		filterWin->addModToModListIfNew();
+		dump( Moviesoap::p_editingMod );
+		// add new mod to modList (if this is new)
+		Moviesoap::addEditingModToModListIfNew();
 		// return to filterFrame view
 		filterWin->toFilterFrame();
 	}
 
 	void ModFrame::blackoutClicked()
 	{
-		dump( filterWin->p_mod );
+		dump( Moviesoap::p_editingMod );
 		filterWin->toBlackoutFrame();
 	}
 
 	void ModFrame::previewClicked() {
-		dump( filterWin->p_mod );
-		filterWin->preview( filterWin->p_mod );
+		dump( Moviesoap::p_editingMod );
+		filterWin->preview( Moviesoap::p_editingMod );
 	}
 
 	/* Constructor */

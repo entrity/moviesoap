@@ -26,8 +26,8 @@ using namespace std;
 
 /* Return int value of number in given coordinate text field*/
 #define MOVIESOAP_GET_COORD_I(name) (name##Text->text().toInt())
-#define MOVIESOAP_DUMP_COORD_TEXT(name) (mod->mod.name = name##Text->text().toInt())
-#define MOVIESOAP_LOAD_COORD_TEXT(name) (name##Text->setText(QString::number(mod->mod.name)))
+#define MOVIESOAP_DUMP_COORD_TEXT(name) (Moviesoap::p_editingMod->mod.name = name##Text->text().toInt())
+#define MOVIESOAP_LOAD_COORD_TEXT(name) (name##Text->setText(QString::number(Moviesoap::p_editingMod->mod.name)))
 #define MOVIESOAP_LOAD_COORD_TEXT_FINT(name) (name##Text->setText(QString::number(name)))
 #define MOVIESOAP_SNAPSHOT_FNAME "moviesoap-snapshot.bmp"
 
@@ -114,7 +114,7 @@ namespace Moviesoap
 	void BlackoutFrame::okClicked()
 	{
 		// update p_editingMod
-		dump(filterWin->p_mod);
+		dump();
 		// show mod pane
 		filterWin->toModFrame();
 	}
@@ -129,18 +129,19 @@ namespace Moviesoap
 	}
 
 	/* Set GUI inputs according to Mod fields */
-	void BlackoutFrame::load(Mod * mod)
+	void BlackoutFrame::load()
 	{
 		MOVIESOAP_LOAD_COORD_TEXT(x1);
 		MOVIESOAP_LOAD_COORD_TEXT(x2);
 		MOVIESOAP_LOAD_COORD_TEXT(y1);
 		MOVIESOAP_LOAD_COORD_TEXT(y2);
-		captureAndLoadImage(mod);
+		captureAndLoadImage(Moviesoap::p_editingMod);
 	}
 
 	/* Set Mod fields according to GUI inputs */
-	void BlackoutFrame::dump(Mod * mod)
+	void BlackoutFrame::dump()
 	{
+		Mod * mod = Moviesoap::p_editingMod;
 		int
 			x1 = MOVIESOAP_GET_COORD_I(x1),
 			x2 = MOVIESOAP_GET_COORD_I(x2),
@@ -176,8 +177,11 @@ namespace Moviesoap
 		layout->addLayout(grid);
 		// button div
 		QPushButton *okButton = new QPushButton(QString("&Ok"));
+		QPushButton *backButton = new QPushButton(QString("Back"));
 		connect( okButton, SIGNAL(clicked()), this, SLOT(okClicked()) );
+		connect( backButton, SIGNAL(clicked()), this, SLOT(okClicked()) );
 		layout->addWidget(okButton);
+		layout->addWidget(backButton);
 		// thumbnail div
 		thumbnail = new Thumbnail(tr("If you have a video open,\na blackout preview will\nappear in this box."));
 		thumbnail->setFixedSize(MOVIESOAP_THUMBNAIL_MAX_WIDTH, MOVIESOAP_THUMBNAIL_MAX_HEIGHT);

@@ -1,43 +1,7 @@
 BUGS
+- crashes after preview for unsaved feature (not reproduceable?)
 
-TODO
-- test p_input is NULL when play is done (playlist item-current callback. should it change to item-changed?)
-- test active button in menu
-
-DONE
-- test create and destroy timers
-- attach listener to position change
-- attach listener to play/pause
-- implement timers for activate/deactivate mods
-- skip EFFECT
-- mute EFFECT
-- blackout EFFECT
-- destroy timers on 'stop'
-- attach listeners to forward/backward actions (alt+Rarr, alt+Larr)
-- user tolerances ui
-- preferences file io
-- load filter (from file)
-- filter save choose filename
-- new/edit filter
-- in menu's open frame actions: move opened window to front
-- label radios in prefs
-- make blackout: drag over screenshot
-- new/edit mod
-- bugfix: segfault when opening filter file. Why? It worked before!
-- + delete mod ability
-- modDblClick opens mod for editing
-- preview mod function
-- clean up filter.cpp so as to handle scheduledMods list and activation/deactivation in proper order
-- when filter file loaded, stop old filter and start new one
-- handle queueing correct mod downstream of position change callback
-- Fixed: interface becomes unresponsive when pos changed into a SKIP zone?
-- remove input-change callback when blackout video filter is enabled
-- add auto check for updates
-- add behaviour for interface events in callbacks.cpp
-- add title to mod, mod check, mod edit gui
-- activate mod only if severity exceeds tolerance
-- jumping into mute zone does not start mute
-- jumping into zone of two effects only implements first
--------------
-- bugfix: editing mod locks up when playing and attempt to pause
-- bugfix: editing mod locks up when playing and attempt to run blackout drawer
+FEATURES
+- add 'save without closing' button.
+- don't pause after preview concludes
+- make edit filter open load filter dialog if no filter loaded

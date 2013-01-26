@@ -1,0 +1,317 @@
+Only in vlc: ABOUT-NLS
+Only in vlc: aclocal.m4
+Only in vlc: AUTHORS
+Only in vlc: autom4te.cache
+Only in vlc: autotools
+Only in vlc: bin
+Only in vlc: bindings
+Only in vlc: bootstrap
+Only in vlc: compat
+Only in vlc: compile
+Only in vlc: config.h
+Only in vlc: config.h.in
+Only in vlc: config.h.in~
+Only in vlc: config.log
+Only in vlc: config.status
+Only in vlc: configure
+diff -rbc vlc/configure.ac vlc/modules/moviesoap/patches/vlc/configure.ac
+*** vlc/configure.ac	2013-01-25 19:31:33.328376327 -0800
+--- vlc/modules/moviesoap/patches/vlc/configure.ac	2013-01-25 19:24:34.626300100 -0800
+***************
+*** 407,412 ****
+--- 407,416 ----
+  AM_GNU_GETTEXT_VERSION([0.18.1])
+  AM_GNU_GETTEXT([external], [need-ngettext])
+  
++ dnl <Moviesoap>
++ VLC_ADD_PLUGIN([moviesoap_video_filter])
++ dnl </Moviesoap>
++ 
+  dnl
+  dnl Iconv stuff
+  dnl
+***************
+*** 4077,4082 ****
+--- 4081,4087 ----
+    modules/meta_engine/Makefile
+    modules/misc/Makefile
+    modules/media_library/Makefile
++   modules/moviesoap/Makefile
+    modules/mux/Makefile
+    modules/notify/Makefile
+    modules/packetizer/Makefile
+Only in vlc: contrib
+Only in vlc: COPYING
+Only in vlc: COPYING.LIB
+Only in vlc: cvlc
+Only in vlc: doc
+Only in vlc: doltcompile
+Only in vlc: doltlibtool
+Only in vlc: extras
+Only in vlc: .git
+Only in vlc: .gitattributes
+Only in vlc: .gitignore
+Only in vlc: include
+Only in vlc: INSTALL
+Only in vlc: lib
+Only in vlc: libtool
+Only in vlc: m4
+Only in vlc: .mailmap
+Only in vlc: make-alias
+Only in vlc: Makefile
+Only in vlc: Makefile.am
+Only in vlc: Makefile.in
+Only in vlc/modules: access
+Only in vlc/modules: access_output
+Only in vlc/modules: altivec
+Only in vlc/modules: arm_neon
+Only in vlc/modules: audio_filter
+Only in vlc/modules: audio_mixer
+Only in vlc/modules: audio_output
+Only in vlc/modules: codec
+Only in vlc/modules: common.am
+Only in vlc/modules: control
+Only in vlc/modules: demux
+Only in vlc/modules: genmf
+Only in vlc/modules: .gitignore
+Only in vlc/modules/gui: .deps
+Only in vlc/modules/gui: eject.c
+Only in vlc/modules/gui: .gitignore
+Only in vlc/modules/gui: macosx
+Only in vlc/modules/gui: macosx_dialog_provider
+Only in vlc/modules/gui: Makefile
+Only in vlc/modules/gui: Makefile.am
+Only in vlc/modules/gui: Makefile.in
+Only in vlc/modules/gui: minimal_macosx
+Only in vlc/modules/gui: Modules.am
+Only in vlc/modules/gui: ncurses.c
+Only in vlc/modules/gui/qt4: actions_manager.cpp
+Only in vlc/modules/gui/qt4: actions_manager.hpp
+Only in vlc/modules/gui/qt4: actions_manager.moc.cpp
+Only in vlc/modules/gui/qt4: adapters
+Only in vlc/modules/gui/qt4: components
+Only in vlc/modules/gui/qt4: .deps
+Only in vlc/modules/gui/qt4: dialogs
+Only in vlc/modules/gui/qt4: dialogs_provider.cpp
+Only in vlc/modules/gui/qt4: dialogs_provider.hpp
+Only in vlc/modules/gui/qt4: dialogs_provider.moc.cpp
+Only in vlc/modules/gui/qt4: extensions_manager.cpp
+Only in vlc/modules/gui/qt4: extensions_manager.hpp
+Only in vlc/modules/gui/qt4: extensions_manager.moc.cpp
+Only in vlc/modules/gui/qt4: .gitignore
+Only in vlc/modules/gui/qt4: HACKING
+Only in vlc/modules/gui/qt4: input_manager.cpp
+Only in vlc/modules/gui/qt4: input_manager.hpp
+Only in vlc/modules/gui/qt4: input_manager.moc.cpp
+Only in vlc/modules/gui/qt4: libqt4_plugin.la
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-actions_manager.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-actions_manager.moc.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-dialogs_provider.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-dialogs_provider.moc.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-extensions_manager.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-extensions_manager.moc.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-input_manager.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-input_manager.moc.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-main_interface.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-main_interface.moc.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-menus.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-menus.moc.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-qt4.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-recents.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-recents.moc.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-resources.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-variables.lo
+Only in vlc/modules/gui/qt4: libqt4_plugin_la-variables.moc.lo
+Only in vlc/modules/gui/qt4: .libs
+Only in vlc/modules/gui/qt4: main_interface.cpp
+Only in vlc/modules/gui/qt4: main_interface.hpp
+Only in vlc/modules/gui/qt4: main_interface.moc.cpp
+Only in vlc/modules/gui/qt4: main_interface_win32.cpp
+Only in vlc/modules/gui/qt4: Makefile
+Only in vlc/modules/gui/qt4: Makefile.am
+Only in vlc/modules/gui/qt4: Makefile.in
+diff -rbc vlc/modules/gui/qt4/menus.cpp vlc/modules/moviesoap/patches/vlc/modules/gui/qt4/menus.cpp
+*** vlc/modules/gui/qt4/menus.cpp	2013-01-25 19:31:33.364376499 -0800
+--- vlc/modules/moviesoap/patches/vlc/modules/gui/qt4/menus.cpp	2013-01-25 19:24:34.630300123 -0800
+***************
+*** 58,63 ****
+--- 58,66 ----
+  #include <QSignalMapper>
+  #include <QStatusBar>
+  
++ #include "../../moviesoap/qt4/menu.hpp" // Moviesoap
++ #include "../../moviesoap/qt4/main.hpp" // Moviesoap
++ 
+  /*
+    This file defines the main menus and the pop-up menu (right-click menu)
+    and the systray menu (in that order in the file)
+***************
+*** 329,334 ****
+--- 332,342 ----
+  
+      addMenuToMainbar( HelpMenu( bar ), qtr( "&Help" ), bar );
+  
++     // start Moviesoap code
++     QMenu * p_moviesoapMenu = (Moviesoap::Menu::create( bar ));
++     addMenuToMainbar( p_moviesoapMenu, qtr( "M&ovieSoap" ), bar );
++     Moviesoap::init(p_intf, mi, p_moviesoapMenu);
++     // end Moviesoap code
+  }
+  
+  /**
+Only in vlc/modules/gui/qt4: menus.hpp
+Only in vlc/modules/gui/qt4: menus.moc.cpp
+diff -rbc vlc/modules/gui/qt4/Modules.am vlc/modules/moviesoap/patches/vlc/modules/gui/qt4/Modules.am
+*** vlc/modules/gui/qt4/Modules.am	2013-01-25 19:31:33.356376465 -0800
+--- vlc/modules/moviesoap/patches/vlc/modules/gui/qt4/Modules.am	2013-01-25 19:24:34.630300123 -0800
+***************
+*** 423,425 ****
+--- 423,426 ----
+  	ui/vlm.ui \
+  	$(DEPS_res)
+  
++ include $(srcdir)/../../moviesoap/qt4/Modules-patch.am
+\ No newline at end of file
+Only in vlc/modules/gui/qt4: pixmaps
+Only in vlc/modules/gui/qt4: qt4.cpp
+Only in vlc/modules/gui/qt4: qt4.hpp
+Only in vlc/modules/gui/qt4: recents.cpp
+Only in vlc/modules/gui/qt4: recents.hpp
+Only in vlc/modules/gui/qt4: recents.moc.cpp
+Only in vlc/modules/gui/qt4: resources.cpp
+Only in vlc/modules/gui/qt4: styles
+Only in vlc/modules/gui/qt4: ui
+Only in vlc/modules/gui/qt4: util
+Only in vlc/modules/gui/qt4: variables.cpp
+Only in vlc/modules/gui/qt4: variables.hpp
+Only in vlc/modules/gui/qt4: variables.moc.cpp
+Only in vlc/modules/gui/qt4: vlc.qrc
+Only in vlc/modules/gui: skins2
+Only in vlc/modules: LIST
+Only in vlc/modules: list.sh
+Only in vlc/modules: lua
+Only in vlc/modules: Makefile
+diff -rbc vlc/modules/Makefile.am vlc/modules/moviesoap/patches/vlc/modules/Makefile.am
+*** vlc/modules/Makefile.am	2013-01-25 19:31:33.328376327 -0800
+--- vlc/modules/moviesoap/patches/vlc/modules/Makefile.am	2013-01-25 19:24:34.630300123 -0800
+***************
+*** 11,16 ****
+--- 11,17 ----
+  	meta_engine \
+  	misc \
+  	media_library \
++ 	moviesoap \
+  	notify \
+  	packetizer \
+  	services_discovery \
+Only in vlc/modules: Makefile.in
+Only in vlc/modules: media_library
+Only in vlc/modules: meta_engine
+Only in vlc/modules: misc
+Only in vlc/modules: mmx
+Only in vlc/modules: moviesoap
+Only in vlc/modules: mux
+Only in vlc/modules: notify
+Only in vlc/modules: packetizer
+Only in vlc/modules: plugins.dat
+Only in vlc/modules: services_discovery
+Only in vlc/modules: sse2
+Only in vlc/modules: stream_filter
+Only in vlc/modules: stream_out
+Only in vlc/modules: text_renderer
+Only in vlc/modules: video_chroma
+Only in vlc/modules: video_filter
+Only in vlc/modules: video_output
+Only in vlc/modules: visualization
+Only in vlc: moviesoap-snapshot.bmp
+Only in vlc: NEWS
+Only in vlc: po
+Only in vlc: qvlc
+Only in vlc: README
+Only in vlc: rvlc
+Only in vlc: share
+Only in vlc/src: android
+Only in vlc/src: audio_output
+Only in vlc/src: check_headers
+Only in vlc/src/config: chain.c
+Only in vlc/src/config: chain.lo
+diff -rbc vlc/src/config/cmdline.c vlc/modules/moviesoap/patches/vlc/src/config/cmdline.c
+*** vlc/src/config/cmdline.c	2013-01-25 18:26:40.545073058 -0800
+--- vlc/modules/moviesoap/patches/vlc/src/config/cmdline.c	2013-01-25 19:27:15.871099674 -0800
+***************
+*** 231,236 ****
+--- 231,241 ----
+                      continue;
+                  }
+  
++                 // Moviesoap
++                 var_Create( p_this, "video-filter", VLC_VAR_STRING );
++                 var_SetString( p_this, "video-filter", "moviesoap_video_filter" );
++                 // end Moviesoap
++ 
+                  switch( CONFIG_CLASS(p_conf->i_type) )
+                  {
+                      case CONFIG_ITEM_STRING:
+Only in vlc/src/config: cmdline.lo
+Only in vlc/src/config: configuration.h
+Only in vlc/src/config: core.c
+Only in vlc/src/config: core.lo
+Only in vlc/src/config: .deps
+Only in vlc/src/config: .dirstamp
+Only in vlc/src/config: file.c
+Only in vlc/src/config: file.lo
+Only in vlc/src/config: getopt.c
+Only in vlc/src/config: getopt.lo
+Only in vlc/src/config: help.c
+Only in vlc/src/config: help.lo
+Only in vlc/src/config: intf.c
+Only in vlc/src/config: intf.lo
+Only in vlc/src/config: keys.c
+Only in vlc/src/config: keys.lo
+Only in vlc/src/config: .libs
+Only in vlc/src/config: vlc_getopt.h
+Only in vlc/src: .deps
+Only in vlc/src: extras
+Only in vlc/src: .gitignore
+Only in vlc/src: input
+Only in vlc/src: interface
+Only in vlc/src: .libs
+Only in vlc/src: libvlc.c
+Only in vlc/src: libvlccore.la
+Only in vlc/src: libvlccore.sym
+Only in vlc/src: libvlc.h
+Only in vlc/src: libvlc.lo
+Only in vlc/src: libvlc-module.c
+Only in vlc/src: libvlc-module.lo
+Only in vlc/src: libvlc_win32_rc.rc.in
+Only in vlc/src: Makefile
+Only in vlc/src: Makefile.am
+Only in vlc/src: Makefile.in
+Only in vlc/src: misc
+Only in vlc/src: missing.c
+Only in vlc/src: missing.lo
+Only in vlc/src: modules
+Only in vlc/src: network
+Only in vlc/src: os2
+Only in vlc/src: osd
+Only in vlc/src: playlist
+Only in vlc/src: posix
+Only in vlc/src: revision.c
+Only in vlc/src: revision.lo
+Only in vlc/src: revision.txt
+Only in vlc/src: stream_output
+Only in vlc/src: symbian
+Only in vlc/src: test
+Only in vlc/src: text
+Only in vlc/src: version.c
+Only in vlc/src: version.lo
+Only in vlc/src: video_output
+Only in vlc/src: vlc-plugin.pc
+Only in vlc/src: vlc-plugin.pc.in
+Only in vlc/src: win32
+Only in vlc: stamp-h1
+Only in vlc: test
+Only in vlc: THANKS
+Only in vlc: vlc
+Only in vlc: vlc-whole.sublime-project
+Only in vlc: vlc-whole.sublime-workspace

@@ -89,6 +89,8 @@ namespace Moviesoap {
 		void Stop();
 		/* Convenience method for StopAndCleanup. Destroy timers, but leave active effects (mute & blackout) as they are. */
 		void KillTimers();
+		/* Kills timers on BLACKOUT mods in scheduledMods. (This is useful if a BLACKOUT mod is to be activated but another BLACKOUT is already running. When the first BLACKOUT expires, it would kill the effect even if the seond BLACKOUT weren't expired.) */
+		void KillBlackouts();
 		
 
 		/* Load queuedMod. */
