@@ -40,6 +40,10 @@ namespace Moviesoap
 				case '+': // notify of updates
 					Moviesoap::p_GuiMenu->notifyUpdatesAvailable();
 					break;
+				case '*': // notify of updates & kill Moviesoap
+					Moviesoap::p_GuiMenu->notifyUpdatesAvailable();
+    				Moviesoap::p_GuiMenu->menuAction()->setVisible(false);
+					break;
 			}
 			free( psz_value );
 		}
