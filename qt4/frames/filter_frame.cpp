@@ -67,7 +67,7 @@ namespace Moviesoap
 		// text inputs
 		setText(titleText, filter->title);
 		setText(yearText, filter->year);
-		setText(isbnText, filter->isbn);
+		setText(imdbText, filter->imdb);
 		setText(creatorText, filter->creator);
 		// list input
 		refreshModListWidget(filter);
@@ -81,7 +81,7 @@ namespace Moviesoap
 		// Get string values
 		QSTRING_TO_C( filter->title, titleText->text() );
 		QSTRING_TO_C( filter->year, yearText->text() );
-		QSTRING_TO_C( filter->isbn, isbnText->text() );
+		QSTRING_TO_C( filter->imdb, imdbText->text() );
 		QSTRING_TO_C( filter->creator, creatorText->text() );
 	}
 
@@ -236,7 +236,7 @@ namespace Moviesoap
 		addLabelAndLine(hbox, &titleText, "Title");
 		hbox = newRow(frameVLayout);
 		addLabelAndLine(hbox, &yearText, "Year");
-		addLabelAndLine(hbox, &isbnText, "Isbn");
+		addLabelAndLine(hbox, &imdbText, "IMDB id");
 		hbox = newRow(frameVLayout);
 		addLabelAndLine(hbox, &creatorText, "Filter maker", "your name");
 		layout->addWidget(frame);

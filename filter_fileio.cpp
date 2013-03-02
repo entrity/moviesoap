@@ -17,7 +17,7 @@ namespace Moviesoap
 		// calc length of filter meta + "\n"
 		size += 1 + creator.length();
 		size += 1 + title.length();
-		size += 1 + isbn.length();
+		size += 1 + imdb.length();
 		size += 1 + year.length();
 		// calc length of mod descriptions + "\n"
 		for (list<Mod>::iterator iter = modList.begin(); iter != modList.end(); iter++) {
@@ -38,7 +38,7 @@ namespace Moviesoap
 		// write file meta
 		outs << creator << endl;
 		outs << title << endl;
-		outs << isbn << endl;
+		outs << imdb << endl;
 		outs << year << endl;
 		// write mod descriptions
 		for (list<Mod>::iterator iter = modList.begin(); iter != modList.end(); iter++) {
@@ -59,7 +59,7 @@ namespace Moviesoap
 		// read file meta
 		getline(ins, creator);
 		getline(ins, title);
-		getline(ins, isbn);
+		getline(ins, imdb);
 		getline(ins, year);
 		if (!ins) return MOVIESOAP_EFILEIO;
 		// read mod descriptions

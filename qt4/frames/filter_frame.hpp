@@ -20,7 +20,7 @@ namespace Moviesoap
 		Q_OBJECT
 	protected:
 		QLineEdit
-			*titleText, *yearText, *isbnText, *creatorText, *previewOffsetText, *quickCreateOffsetText;
+			*titleText, *yearText, *imdbText, *creatorText, *previewOffsetText, *quickCreateOffsetText;
 		ModListWidget *modListWidget;
 		FilterWin * filterWin;
 		Mod * p_quickCreatedMod;

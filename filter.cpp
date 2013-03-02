@@ -105,7 +105,7 @@ namespace Moviesoap
 		filepath.clear();
 		creator.clear();
 		title.clear();
-		isbn.clear();
+		imdb.clear();
 		year.clear();
 		modList.clear();
 		scheduledMods.clear();
@@ -250,7 +250,7 @@ namespace Moviesoap
 		p_filter->filepath = "/home/markham/tmp/dummy-filter.cln";
 		p_filter->creator = "MJ";
 		p_filter->title = "Labour of Love";
-		p_filter->isbn = "1234567890";
+		p_filter->imdb = "1234567890";
 		p_filter->year = "1987";
 		// add mod
 		p_mod = new Mod( MOVIESOAP_SKIP, 500, 800, 0, 0 );

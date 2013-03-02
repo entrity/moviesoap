@@ -35,7 +35,7 @@ namespace Moviesoap {
 			filepath,
 			creator,
 			title,
-			isbn,
+			imdb,
 			year,
 			version;
 		list<Mod> modList; // all mods for this filter
