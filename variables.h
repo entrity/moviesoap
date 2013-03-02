@@ -3,7 +3,7 @@
 #define MOVIESOAP_VERSION "0.3.0"
 #define MOVIESOAP_FILTER_VARNAME "moviesoap-filter"
 #define MOVIESOAP_BLACKOUT_VARNAME "moviesoap-blackout-config"
-#define MOVIESOAP_TOLERANCE_COUNT 6
+#define MOVIESOAP_TOLERANCE_COUNT 5
 #define MOVIESOAP_FILE_EXT ".cln"
 #define MOVIESOAP_FILECHOOSER_FILTER "Filter files (*.cln)"
 #define MOVIESOAP_MOD_TIME_FACTOR 10000 // start and stop times on mod are stored in centiseconds, but the application uses microseconds for its time measurements
@@ -103,9 +103,7 @@ enum {
 	MOVIESOAP_CAT_NONE,
 	MOVIESOAP_CAT_BIGOTRY, // racism, etc.
 	MOVIESOAP_CAT_BLASPHEMY, // sacrilege
-	MOVIESOAP_CAT_CONTENTION,
-	MOVIESOAP_CAT_DISRESPECT_FAMILY, // dishonour parent
-	MOVIESOAP_CAT_OTHER,
+	MOVIESOAP_CAT_DISRESPECT, // dishonour parent
 	MOVIESOAP_CAT_NUDITY, // immodesty
 	MOVIESOAP_CAT_PROFANITY,
 	MOVIESOAP_CAT_SEXUALITY, // non-nudity
