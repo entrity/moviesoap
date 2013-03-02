@@ -133,7 +133,46 @@ namespace Entrity
 			setCommonValues();
 		}
 
-		Header::Header(istream & in) { char * p = (char *) this; in.read(p, sizeof(Header)); }
+		Header::Header(istream & in) {
+			read(in);
+		}
+
+		Header * Header::find(istream & ins, string & filename)
+		{
+			// put a Header on the heap
+			Header * p_header = new Header;
+			// check header at current position in file
+			if (ins.good()) {
+				p_header->read(ins);
+				if (p_header->name().compare(filename) == 0)
+					return p_header;
+			}
+			// if that failed, check all headers from the beginning of the file
+			// move to start of tar
+			ins.seekg(0, ios::beg);
+			// get each header, return if matching
+			while(ins.good()) {
+				// load header
+				p_header->read(ins);
+				// break if EOF
+				if (ins.eof()) break;
+				// if match, load header onto heap, return pointer
+				if (p_header->name().compare(filename))
+					return p_header;
+				// else, skip ahead in file to next header
+				p_header->skip(ins);
+			};
+			// no match found. deallocate Header, and return NULL
+			delete p_header;
+			return NULL;
+		}
+
+		/* Replaces current contents of header with the data from the stream. This is much like the constructor */
+		void Header::read(istream & in)
+		{
+			char * p = (char *) this;
+			in.read(p, sizeof(Header));
+		}
 
 		void Header::zero() { memset(this, 0, sizeof(Header)); }
 

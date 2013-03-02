@@ -31,9 +31,9 @@ namespace Entrity
 		{
 		public:
 			/* fields */
-			unsigned long offset; // end of last header read
 			ifstream * p_istream;
 			unsigned long size; // size of data for latest-parsed Header
+			unsigned long offset; // end of last header read
 			int padding; // size of padding for latest-parsed Header (padding + size gets us to next)
 			/* constructors */
 			File(string filepath) : size(0), offset(0) { p_istream = new ifstream(filepath.c_str(), ios::in | ios::binary); }
@@ -41,7 +41,7 @@ namespace Entrity
 			~File()	{ if (p_istream) p_istream->close(); }
 			/* functions */
 			Header * readHeader();
-			void next(); // move ahead in stream to end of data block for latest-read header
+			void next(); // move ahead in stream to end of data block for latest-read header; returns NULL if not found
 			char * readBin(unsigned int size = 0, void * dest = NULL);
 			char * readText(unsigned int size = 0, void * dest = NULL);
 			void close(); // close instream
@@ -80,6 +80,9 @@ namespace Entrity
 			Header(string name, long size=0, char typeflag=USTAR_REGULAR);
 			/* Constructor. Reads block from stream */
 			Header(istream & in);
+			/* Other */
+			static Header * find(istream &, string &); // look through entire archive for given file
+			void read(istream & in); /* Replaces current contents of header with the data from the stream. This is much like the constructor */
 			/* Mutator functions */
 			void setCommonValues(); /* Set all fields except name, size, typeflag, chksum, devmajor, devminor, prefix */
 			void name(string);

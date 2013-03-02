@@ -8,7 +8,6 @@
 #include <sstream>
 using namespace std;
 
-
 namespace Moviesoap
 {	
 	/* Calculate size of meta file (meta + mod descriptions) */
@@ -48,14 +47,15 @@ namespace Moviesoap
 		}
 		// write padding
 		header.pad(outs);
-		return outs ? MOVIESOAP_EFILEIO : MOVIESOAP_SUCCESS;
+		return outs ? MOVIESOAP_SUCCESS : MOVIESOAP_EFILEIO;
 	}
 
 	int Filter::metaIn(istream & ins)
 	{
-		// read tar file header
-		Entrity::Ustar::Header header(ins);
-		if (header.name().compare("meta.txt")) return MOVIESOAP_ENOFPATH; // if wrong archive file
+		// find archive header
+		string filename = "version.txt";
+		Entrity::Ustar::Header * p_header = Entrity::Ustar::Header::find(ins, filename);
+		if (p_header == NULL) return MOVIESOAP_EFIO_WRNG_HDR;
 		// read file meta
 		getline(ins, creator);
 		getline(ins, title);
@@ -69,8 +69,9 @@ namespace Moviesoap
 			if (!ins) return MOVIESOAP_EFILEIO;
 		}
 		// seek past padding
-		ins.seekg(header.padding(), ios::cur);
-		// return
+		ins.seekg(p_header->padding(), ios::cur);
+		// cleanup & return
+		delete p_header;
 		return MOVIESOAP_SUCCESS;
 	}
 
@@ -92,41 +93,82 @@ namespace Moviesoap
 		// write padding
 		header.pad(outs);
 		// return
-		return outs ? MOVIESOAP_EFILEIO : MOVIESOAP_SUCCESS;
+		return outs ? MOVIESOAP_SUCCESS : MOVIESOAP_EFILEIO;
 	}
 
 	/* Read mods from tar file. Return err/success */
 	int Filter::dataIn(istream & ins)
 	{
-		// read tar file header
-		Entrity::Ustar::Header header(ins);
-		if (header.name().compare("data")) return MOVIESOAP_ENOFPATH; // if wrong archive file
+		// find archive header
+		string filename = "data";
+		Entrity::Ustar::Header * p_header = Entrity::Ustar::Header::find(ins, filename);
+		if (p_header == NULL) return MOVIESOAP_EFIO_WRNG_HDR;
 		// calc number of mods
-		size_t mods_n = header.size() / sizeof(moviesoap_mod_t);
+		size_t mods_n = p_header->size() / sizeof(moviesoap_mod_t);
 		// push new mods onto list
 		for (size_t i = 0; i < mods_n; i++ ) {
 			if (!ins) return MOVIESOAP_EFILEIO;
 			modList.push_back( Mod(ins) );
 		}
 		// seek past padding
-		ins.seekg(header.padding(), ios::cur);
-		// return
+		ins.seekg(p_header->padding(), ios::cur);
+		// cleanup & return
+		delete p_header;
+		return MOVIESOAP_SUCCESS;
+	}
+
+	/* Write version number to archive file */
+	int Filter::versionOut(ofstream & outs)
+	{
+		// prepare string representation of version
+		version = MOVIESOAP_VERSION;
+		// calculate size
+		size_t size = 1 + version.length();
+		// make header
+		Entrity::Ustar::Header header("version.txt", size);
+		// write header
+		header.out(outs);
+		// write archive content
+		outs << version << endl;
+		// write padding
+		header.pad(outs);
+		return outs ? MOVIESOAP_SUCCESS : MOVIESOAP_EFILEIO;
+	}
+
+	/* Read status from tar file. Return err/success */
+	int Filter::versionIn(istream & ins)
+	{
+		// find archive header
+		string filename = "version.txt";
+		Entrity::Ustar::Header * p_header = Entrity::Ustar::Header::find(ins, filename);
+		if (p_header == NULL) return MOVIESOAP_EFIO_WRNG_HDR;
+		// read archive content
+		getline(ins, version);
+		if (!ins) return MOVIESOAP_EFILEIO;
+		// seek past padding
+		ins.seekg(p_header->padding(), ios::cur);
+		// cleanup & return
+		delete p_header;
 		return MOVIESOAP_SUCCESS;
 	}
 
 	/* Write filter to tar file. Return 0 if success. */
 	int Filter::save()
 	{
+		int status;
 		// open file
 		ofstream outs(filepath.c_str(), ios::binary );
 		// return failure if couldn't write to file
 		if (!outs.is_open()) return MOVIESOAP_ENOFILE;
+		// write version
+		status = versionOut(outs);
+		if (status) return status;
 		// write mods
-		dataOut(outs);
-		if (!outs) return MOVIESOAP_EFILEIO;
+		status = dataOut(outs);
+		if (status) return status;
 		// write meta
-		metaOut(outs);
-		if (!outs) return MOVIESOAP_EFILEIO;
+		status = metaOut(outs);
+		if (status) return status;
 		// write two empty blocks & close stream & return
 		for (int i=0; i < 512*2; i++) { outs.put(0); }
 		if (!outs) return MOVIESOAP_EFILEIO;
@@ -141,6 +183,9 @@ namespace Moviesoap
 		if (!ins.is_open()) return MOVIESOAP_ENOFILE;
 		// set filepath
 		filepath = newfpath;
+		// load version number
+		status = versionIn(ins);
+		if (status) return status;
 		// load mods
 		modList.clear();
 		status = dataIn(ins);

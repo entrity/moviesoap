@@ -36,7 +36,8 @@ namespace Moviesoap {
 			creator,
 			title,
 			isbn,
-			year;
+			year,
+			version;
 		list<Mod> modList; // all mods for this filter
 		list<Mod*> scheduledMods; // this list lets programme know which timers to destroy when filter is stopped
 		list<Mod>::iterator queuedMod; // iterator on modList
@@ -66,10 +67,13 @@ namespace Moviesoap {
 		// FILE IO
 		
 		size_t metaSize();
-		/* Write tar header, data and padding to stream */
+		/* Write archive header, version, and padding to stream */
+		int versionOut(ofstream &);
+		int versionIn(istream &);
+		/* Write archive header, data, and padding to stream */
 		int metaOut(ofstream &);
 		int metaIn(istream &);
-		/* Write tar header, data and padding to stream */
+		/* Write archive header, data, and padding to stream */
 		int dataOut(ofstream &);
 		int dataIn(istream &);
 		/* Writes filter to file */

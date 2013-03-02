@@ -1,6 +1,6 @@
 #ifndef MOVIESOAP_VARIABLES_H
 #define MOVIESOAP_VARIABLES_H
-#define MOVIESOAP_VERSION "0.2.0"
+#define MOVIESOAP_VERSION "0.3.0"
 #define MOVIESOAP_FILTER_VARNAME "moviesoap-filter"
 #define MOVIESOAP_BLACKOUT_VARNAME "moviesoap-blackout-config"
 #define MOVIESOAP_TOLERANCE_COUNT 6
@@ -33,7 +33,8 @@ enum {
 	MOVIESOAP_ENOFPATH,
 	MOVIESOAP_CANCEL,
 	MOVIESOAP_ENOFILE,
-	MOVIESOAP_EFILEIO
+	MOVIESOAP_EFILEIO,
+	MOVIESOAP_EFIO_WRNG_HDR
 };
 
 /************************************************
