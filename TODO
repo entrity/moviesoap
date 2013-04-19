@@ -1,7 +1,5 @@
 BUGS
 - crashes after preview for unsaved feature (not reproduceable?)
+- segfault when new mod editor open, then media loaded
 
 FEATURES
-- add 'save without closing' button.
-- don't pause after preview concludes
-- make edit filter open load filter dialog if no filter loaded

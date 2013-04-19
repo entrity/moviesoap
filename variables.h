@@ -21,9 +21,9 @@
 
 #include <vlc_common.h>
 
-#define MSDEBUG1
-#define MSDEBUG2
-#define MSDEBUG3
+// #define MSDEBUG1
+// #define MSDEBUG2
+// #define MSDEBUG3
 
 enum {
 	MOVIESOAP_SUCCESS,
